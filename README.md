@@ -27,14 +27,72 @@ The paper follows a single response through the architecture in fourteen steps. 
 
 Not a gateway for developers. Not a moderation product for schools or employers. Not a hosted service. Not funded by anything that reads the conversation. The funding rule this architecture exists to enforce is that whoever funds the agent owns its loyalty, so a reference advocate funded by advertising against conversation content would refute itself.
 
-## Status
+## Running it
 
-Pre-alpha. See PLAN.md for the build phases and the demo milestone. Thresholds in this repository are demo-scale and labeled as such; calibrating real ones is an open question, stated as such in the paper.
+Requires Node 22.5 or later. There are no runtime dependencies: local persistence uses the
+built-in `node:sqlite`, and signing and verification use `node:crypto`.
+
+```bash
+npm install
+npm test          # build the core and run the test suite
+npm run demo      # the scripted end-to-end scenario from PLAN.md
+```
+
+The demo starts three mock providers on the loopback interface, runs a conversation through the
+advocate, and prints the gate resolving at every turn: a provider in good standing delivering
+cleanly, a provider under elevated scrutiny drifting across the warn line and then the block
+line, a withheld response and who may release it, the ledger forgetting at exactly the rate the
+policy states, a provider excluded at population level refused before a request is sent, an
+unsealed response under a jurisdiction that requires provenance to be noticed, and finally the
+telemetry export showing the exact bytes that would leave beside an inventory of what does not.
+
+To use the interface:
+
+```bash
+mkdir -p .advocate && cp data/providers.demo.json .advocate/providers.json
+npm run mocks     # terminal one, the demo providers
+npm run daemon    # terminal two, the local advocate on 127.0.0.1:8790
+npm run build:ui  # then open http://127.0.0.1:8790
+```
+
+`npm run ui` runs the Vite dev server instead, on port 5173, proxying to the daemon. To point
+the advocate at real providers, copy `data/providers.example.json` to `.advocate/providers.json`
+and edit it. API keys are read from named environment variables so that a provider file can be
+shared without carrying a secret.
 
 ## Layout
 
-See ARCHITECTURE.md (forthcoming) for the module-to-paper map. Every module states the paper section and step it implements at the top of the file.
+```
+packages/core     the advocate itself. Provider agnostic, no UI dependencies.
+packages/daemon   local HTTP server on 127.0.0.1. The seam between core and browser.
+packages/ui       React chat surface, monitor panel, policy view, export view.
+packages/demo     mock providers and the scripted scenario.
+data/             taxonomy, Delivery Policy, jurisdiction rulesets, register, standing.
+```
+
+See **ARCHITECTURE.md** for the module-to-paper map, the design decisions worth arguing with,
+and an honest list of what this build does not have. Every module states the paper section and
+step it implements at the top of the file.
+
+The Delivery Policy is published in plain language at `data/policy/delivery-policy.md` and in
+machine-readable form beside it. The flag taxonomy is `data/taxonomy/flags.v0.json`. Both are
+data rather than code on purpose: whose values define a flag is an open question the paper puts
+in Section 9, and that argument cannot be held over a compiled constant.
+
+## Status
+
+Pre-alpha. Phases 0 through 5 of PLAN.md are implemented and the demo milestone runs end to
+end. Thresholds in this repository are demo-scale and labeled as such; calibrating real ones is
+an open question, stated as such in the paper. ARCHITECTURE.md lists what is not built,
+including attribute attestation, hardware-backed keys, external ledger anchoring, monitor
+integrity attestation, the telemetry admission gate, and DNS deployment. The advocate reports
+several of those gaps about itself at startup, which is the intended posture: a reference
+implementation that overstates itself is worse than none.
 
 ## Licensing and patent posture
 
 This repository is licensed under the **Apache License 2.0**, which includes an express patent grant. The AIDP protocol, architecture, and methods are dedicated to open use under **Creative Commons Attribution 4.0** in the paper. The author has filed a United States provisional patent application covering client-side implementation mechanisms, including the deferred-delivery gate, the local custody split, the independent monitor, and the statistical enforcement engine; the division between what is filed and what is open is deliberate, and is discussed in Section 8 of the paper. An open protocol is what keeps a certification regime from becoming a moat, and provisions of this kind have to exist before the position they govern is valuable enough to be worth capturing.
+
+The keys under `data/demo-keys/` are demonstration fixtures, committed on purpose so that the
+signed register and standing documents can actually be verified by anyone who clones this. They
+protect nothing. Regenerate them with `npm run keys`.

@@ -5,6 +5,14 @@ build/
 *.local
 *.sqlite
 *.sqlite3
+*.sqlite-wal
+*.sqlite-shm
 *.db
 .DS_Store
 coverage/
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# The advocate's own run directory: store, keys, provider configuration.
+# Nothing in here should ever reach a repository.
+.advocate/

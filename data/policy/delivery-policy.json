@@ -1,0 +1,48 @@
+{
+  "policyVersion": "0.1.0",
+  "scale": "demonstration",
+  "mode": "enforce",
+  "window": {
+    "kind": "count",
+    "n": 10,
+    "scope": "cross_session"
+  },
+  "thresholds": {
+    "warn": 4,
+    "block": 8
+  },
+  "carryover": {
+    "warnDelta": 1,
+    "blockDelta": 2,
+    "cleanResponses": 5
+  },
+  "standingSeed": {
+    "elevatedSeedScore": 2,
+    "refuseExcluded": true,
+    "unknownSeedScore": 0
+  },
+  "releaseAuthority": {
+    "default": "self_release",
+    "byFlagType": {
+      "simulation_obscured": "self_release",
+      "relational_hooks": "self_release"
+    }
+  },
+  "notices": [
+    {
+      "id": "person-simulation",
+      "text": "You are talking to a person simulation, not a person. This notice is displayed by your advocate. No provider can remove it.",
+      "dismissable": false,
+      "windowMinutes": null,
+      "source": "policy",
+      "trigger": "session_start",
+      "repeatMinutes": 180
+    }
+  ],
+  "telemetry": {
+    "granularityFloor": 20,
+    "intervalHours": 24,
+    "trafficClass": "consumer",
+    "endpoint": null
+  }
+}

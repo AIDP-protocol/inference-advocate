@@ -14,7 +14,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
-import { openAdvocate, type ExchangeResult, type OpenedAdvocate } from '@aidp/core';
+import { ProviderRegistry, openAdvocate, type ExchangeResult, type OpenedAdvocate } from '@aidp/core';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const dataDir = process.env['AIDP_DATA_DIR'] ?? join(repoRoot, 'data');
@@ -22,10 +22,12 @@ const runDir = process.env['AIDP_RUN_DIR'] ?? join(repoRoot, '.advocate');
 const uiDist = join(repoRoot, 'packages', 'ui', 'dist');
 const PORT = Number(process.env['AIDP_PORT'] ?? 8790);
 
+const providersPath = join(runDir, 'providers.json');
+
 const opened: OpenedAdvocate = openAdvocate({
   dataDir,
   storePath: join(runDir, 'advocate.sqlite'),
-  providersPath: join(runDir, 'providers.json'),
+  providersPath,
   jurisdictionId: process.env['AIDP_JURISDICTION'] ?? 'us-ny',
   devKeyfile: join(runDir, 'dev.key'),
 });
@@ -56,6 +58,25 @@ async function readBody<T>(req: IncomingMessage): Promise<T> {
   const chunks: Buffer[] = [];
   for await (const chunk of req) chunks.push(chunk as Buffer);
   return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}') as T;
+}
+
+/**
+ * Re-read the provider file on every state poll. The daemon used to load it once at boot,
+ * which meant adding a provider and wondering why the Send button did nothing. Configuration
+ * that only takes effect on restart is a trap in a reference implementation people are
+ * supposed to be able to poke at.
+ */
+function reloadProviders(): void {
+  if (!existsSync(providersPath)) return;
+  try {
+    const fresh = ProviderRegistry.load(providersPath);
+    for (const p of fresh.list()) opened.providers.add(p);
+    for (const existing of opened.providers.list()) {
+      if (!fresh.get(existing.id)) opened.providers.remove(existing.id);
+    }
+  } catch {
+    // A half-written file during an edit is not worth taking the daemon down for.
+  }
 }
 
 function monitorState() {
@@ -95,6 +116,7 @@ const server = createServer(async (req, res) => {
 
   try {
     if (url.pathname === '/api/state') {
+      reloadProviders();
       json(res, 200, {
         sessionId: opened.advocate.sessionId,
         jurisdiction: opened.jurisdiction.ruleset,

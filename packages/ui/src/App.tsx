@@ -46,8 +46,22 @@ export function App() {
 
   const pinnedNotices: Notice[] = useMemo(() => (state?.pinned ?? []).map((p) => p.notice), [state]);
 
+  // Why sending is not possible right now, in words. A button that does nothing and says
+  // nothing is the wrong behavior anywhere, and especially here.
+  const blocked: string | null = !state
+    ? 'Connecting to the local advocate.'
+    : state.providers.length === 0
+      ? 'No providers configured. Copy data/providers.demo.json to .advocate/providers.json and restart the daemon.'
+      : !provider
+        ? 'Choose a provider.'
+        : null;
+
   async function send() {
-    if (!input.trim() || !provider || busy) return;
+    if (blocked) {
+      setError(blocked);
+      return;
+    }
+    if (!input.trim() || busy) return;
     const text = input.trim();
     setInput('');
     setTurns((t) => [...t, { role: 'user', text }]);
@@ -162,6 +176,7 @@ export function App() {
               </div>
 
               {error && <div className="error">{error}</div>}
+              {blocked && !error && <p className="empty">{blocked}</p>}
 
               <div className="composer">
                 <select value={provider} onChange={(e) => setProvider(e.target.value)}>
@@ -182,7 +197,7 @@ export function App() {
                     }
                   }}
                 />
-                <button onClick={() => void send()} disabled={busy}>
+                <button onClick={() => void send()} disabled={busy || blocked !== null} title={blocked ?? 'Send'}>
                   Send
                 </button>
               </div>

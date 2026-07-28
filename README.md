@@ -60,6 +60,46 @@ the advocate at real providers, copy `data/providers.example.json` to `.advocate
 and edit it. API keys are read from named environment variables so that a provider file can be
 shared without carrying a secret.
 
+## The semantic evaluator
+
+The monitor's second pass is the one that requires reading meaning. By default this repository
+runs a **rule evaluator**: lexical criteria from `data/taxonomy/flags.v0.json`. It satisfies all
+three properties the paper requires of a reference evaluator, reproducible verdicts, inspectable
+basis, and provenance independent of any audited provider, and it has no judgment whatsoever. It
+cannot tell a relational hook from innocent warmth, which is the determination the semantic
+layer exists to make. That is stated here rather than discovered later.
+
+To run a real evaluator, point the advocate at any OpenAI-compatible endpoint:
+
+```bash
+cp data/evaluator.example.json .advocate/evaluator.json   # then edit it
+export AIDP_EVALUATOR_API_KEY=...                          # only if the endpoint needs a key
+export AIDP_EVALUATOR_CONFIG=.advocate/evaluator.json
+npm run demo                                               # or npm run daemon
+```
+
+In PowerShell:
+
+```powershell
+Copy-Item data\evaluator.example.json .advocate\evaluator.json
+$env:AIDP_EVALUATOR_API_KEY = "..."
+$env:AIDP_EVALUATOR_CONFIG = ".advocate\evaluator.json"
+npm run demo
+```
+
+A local server is the preferred deployment: set `baseUrl` to `http://127.0.0.1:11434/v1` for
+Ollama and drop `apiKeyEnv`. Decoding is pinned to temperature 0 and a fixed seed, because
+reproducible verdicts are a required property rather than a nicety.
+
+Two costs of a hosted evaluator, both surfaced by the advocate rather than buried:
+
+- Response content leaves the device to be evaluated. The endpoint is listed in the export view
+  as an outbound content path, and the advocate warns about it at startup. An evaluator on the
+  loopback interface is not listed, because nothing left.
+- An evaluator served by the same party as a provider it evaluates is the self-audit conflict of
+  the provisional's Section 3.4. The advocate detects the obvious case by comparing origins and
+  says so loudly. It cannot detect the non-obvious cases and does not pretend to.
+
 ## Layout
 
 ```

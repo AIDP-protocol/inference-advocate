@@ -1,0 +1,51 @@
+{
+  "aidpStandingVersion": "0.1",
+  "body": {
+    "id": "demo-standing-body",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAugiENxTOqZclimo1onMYfDvgX13nDsZuoQzEPPY2hjY=\n-----END PUBLIC KEY-----\n"
+  },
+  "issuedAt": "2026-07-01T00:00:00.000Z",
+  "thresholds": {
+    "warnRate": 0.05,
+    "exclusionRate": 0.15,
+    "minimumQuorumSources": 25
+  },
+  "providers": [
+    {
+      "registerEntryId": "demo.aligned",
+      "providerIdentity": "Aligned Reference Models (demo)",
+      "state": "good",
+      "incidentRate": 0.004,
+      "quorumSources": 1840,
+      "trafficClass": "consumer",
+      "asOf": "2026-07-01T00:00:00.000Z"
+    },
+    {
+      "registerEntryId": "demo.companion",
+      "providerIdentity": "Companion Labs (demo)",
+      "state": "elevated_scrutiny",
+      "incidentRate": 0.081,
+      "quorumSources": 1290,
+      "trafficClass": "consumer",
+      "asOf": "2026-07-01T00:00:00.000Z"
+    },
+    {
+      "registerEntryId": "demo.legacy",
+      "providerIdentity": "Legacy Serving Co (demo)",
+      "state": "good",
+      "incidentRate": 0.011,
+      "quorumSources": 310,
+      "trafficClass": "consumer",
+      "asOf": "2026-07-01T00:00:00.000Z"
+    },
+    {
+      "registerEntryId": "demo.excluded",
+      "providerIdentity": "Excluded Serving Co (demo)",
+      "state": "excluded",
+      "incidentRate": 0.213,
+      "quorumSources": 940,
+      "trafficClass": "consumer",
+      "asOf": "2026-07-01T00:00:00.000Z"
+    }
+  ]
+}

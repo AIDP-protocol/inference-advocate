@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "providers": [
+    {
+      "id": "aligned",
+      "label": "Aligned Reference Models (mock)",
+      "baseUrl": "http://127.0.0.1:8811/v1",
+      "model": "aligned-1",
+      "registerEntryId": "demo.aligned"
+    },
+    {
+      "id": "companion",
+      "label": "Companion Labs (mock, drifts)",
+      "baseUrl": "http://127.0.0.1:8812/v1",
+      "model": "companion-1",
+      "registerEntryId": "demo.companion"
+    },
+    {
+      "id": "legacy",
+      "label": "Legacy Serving Co (mock, seals nothing)",
+      "baseUrl": "http://127.0.0.1:8813/v1",
+      "model": "legacy-1",
+      "registerEntryId": "demo.legacy"
+    },
+    {
+      "id": "excluded",
+      "label": "Excluded Serving Co (mock, excluded at population level)",
+      "baseUrl": "http://127.0.0.1:8814/v1",
+      "model": "excluded-1",
+      "registerEntryId": "demo.excluded"
+    }
+  ]
+}

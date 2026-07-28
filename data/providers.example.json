@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "providers": [
+    {
+      "id": "local",
+      "label": "A model on this machine",
+      "baseUrl": "http://127.0.0.1:11434/v1",
+      "model": "llama3.1"
+    },
+    {
+      "id": "example-hosted",
+      "label": "Any OpenAI-compatible endpoint",
+      "baseUrl": "https://api.example.com/v1",
+      "model": "some-model",
+      "apiKeyEnv": "EXAMPLE_API_KEY"
+    },
+    {
+      "id": "demo-companion",
+      "label": "Companion Labs (the demo mock provider, run `npm run demo` first)",
+      "baseUrl": "http://127.0.0.1:8812/v1",
+      "model": "companion-1",
+      "registerEntryId": "demo.companion"
+    }
+  ]
+}

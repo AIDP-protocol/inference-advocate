@@ -1,0 +1,74 @@
+{
+  "aidpRegisterVersion": "0.1",
+  "issuedAt": "2026-07-01T00:00:00.000Z",
+  "registrar": {
+    "id": "demo-registrar",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo5LqGJ4KMaIsrcIFk6tpQDVAX7WLfbAtZrsURQZ+OPo=\n-----END PUBLIC KEY-----\n"
+  },
+  "entries": [
+    {
+      "id": "demo.aligned",
+      "providerIdentity": "Aligned Reference Models (demo)",
+      "status": "active",
+      "authorizedEndpoints": [
+        "http://127.0.0.1:8811/v1"
+      ],
+      "models": [
+        "aligned-1"
+      ],
+      "keys": [
+        {
+          "selector": "s1",
+          "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAI1T3iYV22FOiohf8uYVJUhG3fULOAEoH26D42qICF+Q=\n-----END PUBLIC KEY-----\n",
+          "status": "current"
+        }
+      ],
+      "sealPolicy": "all"
+    },
+    {
+      "id": "demo.companion",
+      "providerIdentity": "Companion Labs (demo)",
+      "status": "active",
+      "authorizedEndpoints": [
+        "http://127.0.0.1:8812/v1"
+      ],
+      "models": [
+        "companion-1"
+      ],
+      "keys": [
+        {
+          "selector": "s1",
+          "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAGWgUp2rmKBKbS1KicHPKP7hgVCIWbfXbyEGz4i71yVk=\n-----END PUBLIC KEY-----\n",
+          "status": "current"
+        }
+      ],
+      "sealPolicy": "all"
+    },
+    {
+      "id": "demo.legacy",
+      "providerIdentity": "Legacy Serving Co (demo, seals nothing)",
+      "status": "active",
+      "authorizedEndpoints": [
+        "http://127.0.0.1:8813/v1"
+      ],
+      "models": [
+        "legacy-1"
+      ],
+      "keys": [],
+      "sealPolicy": "none"
+    },
+    {
+      "id": "demo.excluded",
+      "providerIdentity": "Excluded Serving Co (demo)",
+      "status": "active",
+      "authorizedEndpoints": [
+        "http://127.0.0.1:8814/v1"
+      ],
+      "models": [
+        "excluded-1"
+      ],
+      "keys": [],
+      "sealPolicy": "none"
+    }
+  ]
+}

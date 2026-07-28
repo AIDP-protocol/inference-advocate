@@ -18,7 +18,11 @@ import { ServingRegister } from './monitor/register.js';
 import { StandingRegistry } from './telemetry/standing.js';
 import { Taxonomy } from './monitor/taxonomy.js';
 import { SemanticMonitor, type Evaluator } from './monitor/semantic.js';
-import { RuleEvaluator } from './monitor/evaluators/rule-evaluator.js';
+import {
+  discoverEvaluatorConfig,
+  resolveEvaluator,
+  type EvaluatorConfig,
+} from './monitor/evaluator-config.js';
 import { DeliveryPolicy } from './policy/config.js';
 import { Jurisdiction } from './policy/jurisdiction.js';
 import { Advocate } from './advocate.js';
@@ -33,7 +37,13 @@ export interface SetupOptions {
   providersPath?: string;
   jurisdictionId?: string;
   attestations?: AttestationPackage;
+  /** An evaluator instance, if you are constructing one yourself. Wins over evaluatorPath. */
   evaluator?: Evaluator;
+  /**
+   * Path to an evaluator config file. Falls back to the AIDP_EVALUATOR_CONFIG environment
+   * variable, and then to the rule evaluator. See data/evaluator.example.json.
+   */
+  evaluatorPath?: string;
   fetchImpl?: typeof fetch;
   now?: () => Date;
   /**
@@ -99,7 +109,26 @@ export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
   const db = new AdvocateDb({ path: opts.storePath });
   const master = loadOrCreateMaster(db, opts.devKeyfile, warnings);
 
-  const evaluator = opts.evaluator ?? new RuleEvaluator(taxonomy);
+  let evaluator: Evaluator;
+  let outboundContentPaths: string[] = [];
+  if (opts.evaluator) {
+    evaluator = opts.evaluator;
+  } else {
+    let config: EvaluatorConfig | undefined;
+    try {
+      config = discoverEvaluatorConfig(opts.evaluatorPath);
+    } catch (err) {
+      warnings.push(`${(err as Error).message}; falling back to the rule evaluator`);
+    }
+    const resolved = resolveEvaluator({
+      taxonomy,
+      ...(config ? { config } : {}),
+      providerBaseUrls: providers.list().map((p) => p.baseUrl),
+    });
+    evaluator = resolved.evaluator;
+    outboundContentPaths = resolved.outboundContentPaths;
+    warnings.push(...resolved.warnings);
+  }
   const monitor = new SemanticMonitor(evaluator, taxonomy);
 
   const attestations: AttestationPackage = opts.attestations ?? {
@@ -123,6 +152,7 @@ export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
     jurisdiction,
     monitor,
     attestations,
+    outboundContentPaths,
     ...(opts.fetchImpl ? { fetchImpl: opts.fetchImpl } : {}),
     ...(opts.now ? { now: opts.now } : {}),
   });

@@ -44,6 +44,14 @@ export { Taxonomy, type TaxonomyDocument, type FlagDefinition, type Criterion } 
 export { SemanticMonitor, type Evaluator, type EvaluationRequest } from './monitor/semantic.js';
 export { RuleEvaluator } from './monitor/evaluators/rule-evaluator.js';
 export { ModelEvaluator, type ModelEvaluatorOptions } from './monitor/evaluators/model-evaluator.js';
+export {
+  resolveEvaluator,
+  loadEvaluatorConfig,
+  discoverEvaluatorConfig,
+  type EvaluatorConfig,
+  type ModelEvaluatorConfig,
+  type ResolvedEvaluator,
+} from './monitor/evaluator-config.js';
 
 export {
   DeliveryPolicy,

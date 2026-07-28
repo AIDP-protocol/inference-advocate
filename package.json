@@ -1,0 +1,31 @@
+{
+  "name": "inference-advocate",
+  "version": "0.1.0-pre",
+  "private": true,
+  "description": "Reference implementation of the client side of the Accountable Inference Delivery Protocol (AIDP)",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "workspaces": [
+    "packages/core",
+    "packages/daemon",
+    "packages/demo",
+    "packages/ui"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @aidp/core && npm run build --workspace @aidp/daemon && npm run build --workspace @aidp/demo",
+    "build:ui": "npm run build --workspace @aidp/ui",
+    "typecheck": "npm run build --workspace @aidp/core && npm run typecheck --workspaces --if-present",
+    "test": "npm run build && npm run test --workspace @aidp/core",
+    "demo": "npm run build && node packages/demo/dist/scenario.js",
+    "daemon": "npm run build && node packages/daemon/dist/server.js",
+    "ui": "npm run dev --workspace @aidp/ui",
+    "keys": "node tools/mint-demo-keys.mjs",
+    "mocks": "npm run build --workspace @aidp/demo && node packages/demo/dist/mock-servers.js"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}

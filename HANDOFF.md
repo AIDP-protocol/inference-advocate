@@ -45,16 +45,18 @@ them without being told each time: paper-section headers on every module, no em-
 before code, honesty about gaps, and the structural boundaries that hold the privacy claims up.
 If your editor reads a root `.cursorrules` file instead, copy that file's body there.
 
-## The one thing not yet on main
+## Continuous integration
 
-A CI workflow at `.github/workflows/ci.yml` that runs the typecheck, the test suite, the demo
-end to end, and the interface build on Node 22 and 24. It could not be pushed by the token that
-pushed the rest of this, because writing to `.github/workflows` needs a scope that token does
-not have. The file content is in the session bundle, or write it fresh: it is twenty lines.
+`.github/workflows/ci.yml` runs the typecheck, the test suite, the demo end to end, and the
+interface build on Node 22 and 24, on every push and pull request.
 
-The demo belongs in CI on purpose. This repository's central claim is that one scripted scenario
-executes the paper's argument, and a claim like that should break the build when it stops being
-true.
+The demo is in CI on purpose rather than only the unit tests. This repository's central claim is
+that one scripted scenario executes the paper's argument, and a claim like that should break the
+build when it stops being true.
+
+Several commits on `main` were pushed through a bridge that authored file contents by hand
+rather than uploading bytes. The first green CI run is the check on that. Look at it before
+linking this repository anywhere.
 
 ## Known good next steps
 

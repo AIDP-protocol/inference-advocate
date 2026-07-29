@@ -1,83 +1,70 @@
 # Handoff
 
-What this is, how to get it into the repository, and what to read first.
+Where this stands, and how to pick it up in an editor.
 
-## What happened
+## State
 
-The session that built this had GitHub access through the desktop bridge. The bridge went
-offline partway through, so the work could not be pushed. Everything is here instead, as a
-working tree with a commit-replay script, so the history still lands as a build narrative rather
-than as one enormous commit.
-
-## Getting it into the repository
+All five phases of PLAN.md and the demo milestone are implemented. 59 tests passing, clean
+typecheck, the demo runs end to end, the interface builds and runs. Verified on Linux and on
+Windows with Node 24.
 
 ```bash
 git clone https://github.com/AIDP-protocol/inference-advocate
 cd inference-advocate
-
-# copy everything from the extracted bundle over the clone.
-# README.md, PLAN.md and .gitignore are updated versions of the files already there.
-rsync -a --exclude .git /path/to/inference-advocate-build/ .
-
-bash tools/commit-sequence.sh
-git push
+npm install
+npm test          # 59 passing
+npm run doctor    # what this advocate resolved: paths, config, providers, what would leave
+npm run demo      # the scripted scenario, about 40 seconds
 ```
 
-`tools/commit-sequence.sh` stages and commits in fifteen steps, skipping anything that is
-already committed, so it is safe to run more than once. Read it before running it if you would
-rather commit by hand; the messages are in there.
-
-If you prefer the history exactly as it was built, `inference-advocate.bundle` in the same
-directory is a git bundle of the local repository. It has no ancestor in common with the remote,
-so it is a reference rather than something to merge.
-
-## Verify it works
+To use the interface, in three terminals:
 
 ```bash
-npm install
-npm test        # builds the core, runs 52 tests
-npm run demo    # the scripted scenario, about 40 seconds of output
+mkdir -p .advocate && cp data/providers.demo.json .advocate/providers.json
+npm run mocks     # the demo providers on 8811, 8812, 8813
+npm run daemon    # the advocate on 127.0.0.1:8790
+npm run build:ui  # then open http://127.0.0.1:8790
 ```
 
-The demo needs ports 8811, 8812 and 8813 on the loopback interface. Nothing else touches the
-network.
+## Read in this order
 
-## Read first
+1. **ARCHITECTURE.md.** The module-to-paper map, the design decisions worth arguing with, and
+   the section titled "What this build does not have". That last list is deliberate and as
+   complete as I know it to be.
+2. **DECISIONS.md.** Open decisions with a recommendation attached to each. Three are live:
+   repository visibility, whether to build escalation at all, and how to label a law that has
+   not been signed.
+3. **`packages/core/src/advocate.ts`.** One response through the paper's fourteen steps, top to
+   bottom. If that file stops matching the numbered list in its header, one of the two is wrong.
+4. The demo output. It is the fastest way to see whether the thing does what the paper says.
 
-1. **DECISIONS.md** is the short list of things that need you. Nine items, each with a
-   recommendation attached. Items 1 through 4 are the ones with consequences.
-2. **ARCHITECTURE.md** has the module-to-paper map and, more usefully, the section titled
-   "What this build does not have". That list is deliberate and complete as far as I know it.
-3. The demo output is the fastest way to see whether the thing does what the paper says.
+## Working in an editor
 
-## What was built
+`.cursor/rules/inference-advocate.mdc` carries the working agreements so an assistant follows
+them without being told each time: paper-section headers on every module, no em-dashes, data
+before code, honesty about gaps, and the structural boundaries that hold the privacy claims up.
+If your editor reads a root `.cursorrules` file instead, copy that file's body there.
 
-All five phases of PLAN.md and the demo milestone.
+## The one thing not yet on main
 
-- **Phase 1**, the pipe: Interchange over the OpenAI-compatible format, named providers with
-  keys read from environment variables, transcripts in a single on-device SQLite file.
-- **Phase 2**, monitor and ledger: seal verification against a pinned signed Serving Register,
-  taxonomy v0 as versioned data, severity weighting, append-only hash-chained per-provider
-  ledger.
-- **Phase 3**, Delivery Policy: rolling window scoring seeded by standing, the four outcomes,
-  release authority keyed to classification, carryover, mode floors, the policy published as
-  readable prose and loaded as JSON, and two illustrative jurisdiction rulesets that visibly
-  change outcomes.
-- **Phase 4**, telemetry: rates with a granularity floor and a traffic-class denominator, an
-  emitter that holds the ledger key and refuses any other, a stubbed reporting wire format, and
-  an export view that puts the outbound bytes beside an inventory of what stays.
-- **Phase 5**, UI: chat surface, pinned non-dismissable notices, monitor panel with threshold
-  proximity per provider, the Delivery Policy readable in-app, and the export view.
+A CI workflow at `.github/workflows/ci.yml` that runs the typecheck, the test suite, the demo
+end to end, and the interface build on Node 22 and 24. It could not be pushed by the token that
+pushed the rest of this, because writing to `.github/workflows` needs a scope that token does
+not have. The file content is in the session bundle, or write it fresh: it is twenty lines.
 
-The demo runs the whole argument in one script: clean delivery, drift across the warn line,
-withholding at the block line, release authority, the ledger forgetting at the stated rate, a
-provider excluded at population level refused before a request is sent, an unsealed response
-under a jurisdiction that requires provenance to be noticed, and the export.
+The demo belongs in CI on purpose. This repository's central claim is that one scripted scenario
+executes the paper's argument, and a claim like that should break the build when it stops being
+true.
 
-## A note on what I did not do
+## Known good next steps
 
-I did not build anything the paper describes as adopt-not-build, and I did not build the
-escalation channel. Both are in DECISIONS.md. Where a mechanism is missing, the code says so
-rather than pretending: the advocate prints its own gaps at startup and the UI renders them in
-the monitor panel under "What this build does not have". That posture is deliberate. A reference
-implementation that overstates itself is worse than none.
+- **Run the semantic evaluator against a real endpoint.** Everything is wired: copy
+  `data/evaluator.example.json` to `.advocate/evaluator.json`, set `AIDP_EVALUATOR_CONFIG`, and
+  `npm run doctor` confirms it resolved. What is missing is a run, and what it produces is the
+  first real data on whether the demo-scale thresholds mean anything.
+- **A `status` field per jurisdiction rule** so the interface can label a provision "pending"
+  where a bill has passed but not been signed. DECISIONS item 4.
+- **Desktop packaging.** PLAN.md defers Tauri until the core demo works. It works.
+- **The demo's withheld lines read `no flags` while the score sits at 9**, which is correct and
+  confusing at a glance. `no new flags`, plus the window contribution beside the score, would
+  read better in front of an audience.

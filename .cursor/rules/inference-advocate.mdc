@@ -1,0 +1,62 @@
+---
+description: Working agreements for the inference advocate reference implementation
+globs:
+alwaysApply: true
+---
+
+# Working agreements
+
+This repository is the reference implementation of the client side of the Accountable Inference
+Delivery Protocol (AIDP), described in a paper by Justin Philip Flores. The code exists to be an
+existence proof and to be read. Optimize for legibility over cleverness.
+
+Read `ARCHITECTURE.md` before making structural changes. It maps every module to the paper
+section and step it implements, and it lists what the build deliberately does not have.
+
+## Rules that are not negotiable
+
+**Every module states its paper section and step at the top of the file.** If you add a module,
+add that header. If you change what a module does, change the header with it. The code and the
+paper are meant to stay in register, and that comment is the register.
+
+**No em-dashes in any prose file.** Not in markdown, not in comments, not in strings. Use
+commas, periods, colons or parentheses. This applies to anything you write in this repository.
+
+**Data before code.** Taxonomies, delivery policy, jurisdiction rulesets, the serving register
+and the standing document are versioned documents under `data/`, not constants in TypeScript.
+Whose values define a flag is an open question the paper puts in Section 9, and that argument
+cannot be held over a compiled constant. Do not move any of it into code.
+
+**Honesty over polish.** The advocate reports its own gaps at startup and the UI renders them.
+When you add a mechanism that is partial, say so in the code, in `ARCHITECTURE.md` under "What
+this build does not have", and in the runtime warnings if a user could otherwise assume it is
+complete. A reference implementation that overstates itself is worse than none.
+
+**Every claim the code makes about itself needs a test that would fail if it stopped being
+true.** The two that matter most are in `packages/core/test/store.test.ts`, which reads raw
+SQLite rows and asserts conversation content is not in the ledger, and
+`packages/core/test/telemetry.test.ts`, which asserts a telemetry batch contains no words.
+
+**Small, message-disciplined commits.** The history is meant to read as a build narrative.
+
+## Structural boundaries
+
+- `packages/core` has no UI dependency and no framework, and reaches the network only to talk
+  to configured providers and the configured evaluator. Keep it that way.
+- `packages/daemon` binds to 127.0.0.1 only. It is the seam between a core that needs a
+  filesystem and a UI that runs in a browser tab. Desktop packaging replaces it later.
+- The telemetry emitter is constructed with a ledger-scoped key and nothing else, which is what
+  makes "it cannot transmit conversation content" a structural fact rather than a promise.
+  Adding a transcript dependency to that class breaks the central privacy claim of the paper.
+- Evidence spans are conversation content, so they live in the transcript store under the
+  transcript key, and the ledger holds only an opaque reference. Do not move them.
+
+## Style
+
+TypeScript, strict, ES modules, `.js` extensions on relative imports because the build targets
+NodeNext. No runtime dependencies: `node:sqlite` for persistence and `node:crypto` for signing.
+Adding a runtime dependency to `packages/core` is a decision worth arguing for out loud, not a
+convenience.
+
+Comments explain why, not what. Several files in this repository carry a paragraph of reasoning
+at the top. That is deliberate and it is the house style.

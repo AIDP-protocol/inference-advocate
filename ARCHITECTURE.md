@@ -90,9 +90,25 @@ evaluator is a commons-maintained reference evaluation model, defined by three p
 reproducible verdicts, inspectable basis, and provenance independent of any audited provider.
 No such model exists. The shipped rule evaluator satisfies all three properties completely and
 has no judgment at all, which is the opposite failure from the one a hosted frontier model
-would have. `ModelEvaluator` is there for anyone running a local model, with the independence
-warning written on the file. A demo that quietly used a frontier model to police frontier
-models would be arguing against its own paper.
+would have. A demo that quietly used a frontier model to police frontier models would be
+arguing against its own paper.
+
+The evaluator is chosen by configuration rather than by code: an evaluator config file, or the
+`AIDP_EVALUATOR_CONFIG` environment variable, selects between the rule evaluator and any
+OpenAI-compatible endpoint. `packages/core/src/monitor/evaluator-config.ts` is where the two
+costs of that choice are made visible rather than buried. A hosted evaluator receives response
+content, so its origin appears in the export view as an outbound content path and the advocate
+names it at startup; an evaluator on the loopback interface does not, because nothing left. And
+an evaluator served from the same origin as a provider under evaluation is reported as the
+self-audit conflict of the provisional's Section 3.4. The origin check catches the obvious case
+and cannot catch the subtle ones, which the code says in its own comments.
+
+**`npm run doctor` prints the configuration that actually resolved.** It exists because of a
+real failure: someone set an evaluator config, ran the demo, and could not tell from the output
+whether it had taken effect. Configuration that silently does nothing is worse than
+configuration that fails loudly, so there is now one command that answers what this advocate is
+going to do with the files and environment variables it can see. It sends no requests to
+anyone.
 
 **Carryover lowers thresholds rather than multiplying severities.** The provisional discloses
 both. A number the user can watch move is easier to argue with than a multiplier buried in a
@@ -172,3 +188,7 @@ in the author's own notes, and building it quietly would have been the wrong way
 - Every claim the code makes about itself should have a test that would fail if it stopped
   being true. The ones that matter most are in `packages/core/test/telemetry.test.ts` and
   `packages/core/test/store.test.ts`.
+- CI runs the typecheck, the test suite, the demo end to end, and the interface build on Node
+  22 and 24. The demo is in CI on purpose: the repository's central claim is that one scripted
+  scenario executes the paper's argument, and a claim like that should break the build when it
+  stops being true.

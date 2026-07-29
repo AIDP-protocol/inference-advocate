@@ -3,41 +3,48 @@
 Things I could not settle without you. Each one has my recommendation, because a list of
 questions with no view attached is just work handed back.
 
-## 1. The repository could not be pushed from this session
+Items 2 and 8 are resolved and kept here with their resolutions rather than deleted, so the
+reasoning stays visible. The live ones are 1, 3 and 4: make the repository public, decide
+whether escalation gets built at all, and decide how an unsigned bill should be labeled when the
+advocate applies it.
 
-Blocker, and the reason this arrived as a bundle rather than as commits.
+## 1. Repository visibility (LIVE)
 
-The GitHub access in this session came through the desktop bridge, and the bridge went offline
-partway through the build, presumably when the laptop slept. Everything is committed to a local
-git repository with a legible history. Restore it with the instructions in HANDOFF.md and push,
-or reconnect the desktop and I will push it.
+The push problem is solved. `main` carries the full build, replayed as fifteen commits from your
+machine, plus several pushed through the GitHub bridge from the session. What remains is the
+question underneath it.
 
-Related: `git clone https://github.com/AIDP-protocol/inference-advocate` without credentials
-fails, so the repository is private. If the paper is going to name it as the reference
-implementation, it has to be public before the paper circulates. **Recommendation:** make it
-public at the same time the paper goes out, not before.
+`git clone https://github.com/AIDP-protocol/inference-advocate` without credentials fails, so
+the repository is private. If the paper or the essay is going to name it as the reference
+implementation, a link to it is a 404 for every reader.
 
-## 2. The semantic evaluator for the August demo
+**Recommendation:** make it public at the same time the essay goes out, not before. The
+repository's honesty is an asset for the audience you are writing for: a reference
+implementation that lists what it does not have, and prints its own gaps at startup, reads as
+the work of someone who is not selling anything. Do not sand any of that down before publishing.
 
-The default evaluator is a rule evaluator: lexical patterns from the taxonomy file. It satisfies
-all three properties the paper requires of a reference evaluator (reproducible verdicts,
-inspectable basis, independent provenance) and has no judgment whatsoever. It cannot tell a
-relational hook from innocent warmth, which is precisely the determination the semantic layer
-exists to make.
+One caveat worth acting on before it goes public. Several commits on `main` were pushed through
+the bridge, which means the file contents were authored by hand rather than uploaded as bytes.
+`npm test` and the CI workflow are the check on that. Run one or the other before you link the
+repository anywhere.
 
-Three options for the demo:
+## 2. The semantic evaluator for the August demo (RESOLVED, needs a run)
 
-- **(a) Rule evaluator only.** Honest, reproducible, and visibly crude. A hostile reviewer says
-  "this is a regex."
-- **(b) A local model as the evaluator, rule evaluator as fallback.** `ModelEvaluator` is built
-  and points at any OpenAI-compatible endpoint, so a local llama.cpp or Ollama server works
-  today with a pinned model and fixed decoding. This is the paper's preferred tier, on-device
-  execution, and it demonstrates the thing the paper actually claims.
-- **(c) A hosted frontier model.** Fastest, and it breaks the independence property in the way
-  the paper spends a section warning about.
+Resolved on 2026-07-28. The evaluator is now selected by configuration rather than compiled in.
+Copy `data/evaluator.example.json` to `.advocate/evaluator.json`, point it at any
+OpenAI-compatible endpoint, set `AIDP_EVALUATOR_CONFIG`, and the same demo and the same daemon
+run against it with no code change. A local server is one line of config away when you want the
+on-device tier the paper prefers.
 
-**Recommendation: (b).** It needs a model choice and a laptop that can run it during the demo.
-If neither is available on the day, (a) with the crudeness named out loud beats (c).
+Two guards ship with it. A hosted evaluator is named at startup and listed in the export view as
+an outbound content path, because response content leaving the device is what that choice costs.
+An evaluator served from the same origin as a provider under evaluation is reported as the
+self-audit conflict of the provisional's Section 3.4.
+
+What is left is not a decision, it is a run. Point it at a real endpoint and see what the flags
+look like when a model is doing the reading. `npm run doctor` will tell you in one screen
+whether the configuration took effect, which was the thing that was hard to tell on the first
+attempt.
 
 ## 3. Whether to build escalation at all
 
@@ -108,18 +115,12 @@ note in the README.
 itself so the screenshot includes the explanation. I did not add that file because it is your
 call whether the tradeoff is worth the optics.
 
-## 8. `node:sqlite` is experimental
+## 8. `node:sqlite` is experimental (RESOLVED)
 
-Local persistence uses Node's built-in SQLite, which means zero runtime dependencies and no
-native compilation for anyone cloning this. It is marked experimental in Node 22 and prints a
-warning on every run, including in the demo output.
-
-Alternatives: `better-sqlite3` (mature, needs prebuilt binaries or a compiler), or suppress the
-warning with `--no-warnings`, which I did not do because suppressing a warning in a repository
-about honest labeling seemed like the wrong instinct.
-
-**Recommendation:** keep it and let the warning print. Node 22 is in long-term support and the
-API surface used here is small enough to swap in an afternoon if it ever changes.
+Resolved by evidence rather than by argument. The demo run on Node 24.16 printed no
+`ExperimentalWarning`, so the API has settled on the version you are actually running. Keep the
+built-in and the zero runtime dependencies. CI runs the suite on 22 and 24, so a regression on
+the floor version shows up as a failed build rather than as a surprise.
 
 ## 9. Small things I picked a default for
 

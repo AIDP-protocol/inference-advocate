@@ -73,10 +73,11 @@ export function resolveEvaluator(input: ResolveEvaluatorInput): ResolvedEvaluato
   const config = input.config ?? { kind: 'rule' };
 
   if (config.kind === 'rule') {
+    const evaluator = new RuleEvaluator(input.taxonomy);
     warnings.push(
-      'the semantic layer is running the rule evaluator, which is reproducible and inspectable and has no judgment. See ARCHITECTURE.md',
+      `the semantic layer is running ${evaluator.id}@${evaluator.version}, which is reproducible and inspectable and has no judgment. See ARCHITECTURE.md`,
     );
-    return { evaluator: new RuleEvaluator(input.taxonomy), outboundContentPaths: [], warnings };
+    return { evaluator, outboundContentPaths: [], warnings };
   }
 
   const env = input.env ?? process.env;
@@ -117,8 +118,15 @@ export function resolveEvaluator(input: ResolveEvaluatorInput): ResolvedEvaluato
   };
   if (apiKey) options.apiKey = apiKey;
 
+  const evaluator = new ModelEvaluator(input.taxonomy, options);
+  // Named first, and unconditionally, so that anyone reading the startup lines can tell which
+  // evaluator actually ran. Configuration that silently does nothing is worse than none.
+  warnings.unshift(
+    `the semantic layer is running ${evaluator.id}@${evaluator.version} against ${evaluatorOrigin}`,
+  );
+
   return {
-    evaluator: new ModelEvaluator(input.taxonomy, options),
+    evaluator,
     // An evaluator on the loopback interface is not content leaving the device, which is the
     // whole reason the provisional prefers that tier.
     outboundContentPaths: local ? [] : [`${evaluatorOrigin} (semantic evaluator, receives response content)`],

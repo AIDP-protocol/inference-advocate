@@ -23,7 +23,8 @@
     "daemon": "npm run build && node packages/daemon/dist/server.js",
     "ui": "npm run dev --workspace @aidp/ui",
     "keys": "node tools/mint-demo-keys.mjs",
-    "mocks": "npm run build --workspace @aidp/demo && node packages/demo/dist/mock-servers.js"
+    "mocks": "npm run build --workspace @aidp/demo && node packages/demo/dist/mock-servers.js",
+    "doctor": "npm run build --workspace @aidp/core && npm run build --workspace @aidp/daemon && node packages/daemon/dist/doctor.js"
   },
   "devDependencies": {
     "typescript": "^5.6.3"

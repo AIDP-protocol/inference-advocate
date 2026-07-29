@@ -15,6 +15,7 @@ test('no config means the rule evaluator, and it says so', () => {
   const resolved = resolveEvaluator({ taxonomy });
   assert.equal(resolved.evaluator.id, 'aidp-rule-evaluator');
   assert.equal(resolved.outboundContentPaths.length, 0);
+  assert.ok(resolved.warnings.some((w) => w.includes('aidp-rule-evaluator@')));
   assert.ok(resolved.warnings.some((w) => w.includes('has no judgment')));
 });
 
@@ -35,7 +36,9 @@ test('a local evaluator is not reported as outbound', () => {
     config: { kind: 'model', baseUrl: 'http://127.0.0.1:11434/v1', model: 'm' },
   });
   assert.equal(resolved.outboundContentPaths.length, 0);
-  assert.equal(resolved.warnings.length, 0);
+  // The evaluator is still named, because "which evaluator ran" is always worth printing.
+  assert.equal(resolved.warnings.length, 1);
+  assert.ok(resolved.warnings[0]?.includes('aidp-model-evaluator@'));
 });
 
 test('an evaluator served by a provider under evaluation is flagged as a self audit conflict', () => {

@@ -64,9 +64,4 @@ linking this repository anywhere.
   `data/evaluator.example.json` to `.advocate/evaluator.json`, set `AIDP_EVALUATOR_CONFIG`, and
   `npm run doctor` confirms it resolved. What is missing is a run, and what it produces is the
   first real data on whether the demo-scale thresholds mean anything.
-- **A `status` field per jurisdiction rule** so the interface can label a provision "pending"
-  where a bill has passed but not been signed. DECISIONS item 4.
 - **Desktop packaging.** PLAN.md defers Tauri until the core demo works. It works.
-- **The demo's withheld lines read `no flags` while the score sits at 9**, which is correct and
-  confusing at a glance. `no new flags`, plus the window contribution beside the score, would
-  read better in front of an audience.

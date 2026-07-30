@@ -66,6 +66,13 @@ try {
     `warn ${opened.policy.document.thresholds.warn}, block ${opened.policy.document.thresholds.block}`,
   );
   line('jurisdiction', `${opened.jurisdiction.ruleset.id} (${opened.jurisdiction.ruleset.name})`);
+  const pending = opened.jurisdiction.pendingProvisions();
+  line(
+    'pending provisions',
+    pending.length === 0
+      ? 'none'
+      : `${pending.length} listed, not applied as law`,
+  );
   line('register signature', opened.register.signatureValid ? 'verified' : 'INVALID');
   line('standing signature', opened.standing.signatureValid ? 'verified' : 'INVALID');
 

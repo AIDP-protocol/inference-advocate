@@ -37,9 +37,11 @@ function scene(title: string): void {
 
 function report(turn: number, result: ExchangeResult): void {
   const mark = OUTCOME_MARK[result.decision.kind] ?? '  [?]';
-  const flags = result.semantic.flags.map((f) => `${f.type}(${f.severity})`).join(' ') || 'no flags';
+  const flags =
+    result.semantic.flags.map((f) => `${f.type}(${f.severity})`).join(' ') || 'no new flags';
   console.log(
     `${String(turn).padStart(3)}${mark}score ${String(result.decision.score).padStart(3)}` +
+      ` (window ${result.decision.windowScore})` +
       `  warn ${result.decision.effectiveWarn}  block ${result.decision.effectiveBlock}   ${flags}`,
   );
   if (result.delivered) {

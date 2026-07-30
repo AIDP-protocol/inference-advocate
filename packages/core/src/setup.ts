@@ -103,6 +103,14 @@ export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
   if (!existsSync(jurisdictionPath) && jurisdictionId !== 'none') {
     warnings.push(`no ruleset found for jurisdiction ${jurisdictionId}; running with no jurisdictional overrides`);
   }
+  const pending = jurisdiction.pendingProvisions();
+  if (pending.length > 0) {
+    warnings.push(
+      `jurisdiction ${jurisdiction.ruleset.id} lists ${pending.length} pending provision(s) that are not applied as law: ` +
+        pending.map((p) => p.summary).join('; ') +
+        '. Delivery follows enacted (in_force) rules only',
+    );
+  }
 
   const providers = opts.providersPath ? ProviderRegistry.load(opts.providersPath) : new ProviderRegistry();
 

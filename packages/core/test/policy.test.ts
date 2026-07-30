@@ -136,14 +136,44 @@ test('elevated standing seeds the window so the local bar is lower on first cont
   assert.equal(elevated.decision.score, 5);
 });
 
-test('a jurisdiction ruleset tightens thresholds and raises severity for a minor', () => {
+test('pending jurisdiction provisions do not change delivery outcomes for a minor', () => {
+  // us-ny minorOnly is S 9051, status pending: enacted-only enforcement must leave the minor
+  // on the same thresholds and severities as the adult path for those provisions.
   const adult = resolveWith({ flags: [flag('persona_claims', 2)], ledger: ledgerWith([]), jurisdiction: ny });
+  const minor = resolveWith({
+    flags: [flag('persona_claims', 2)],
+    ledger: ledgerWith([]),
+    jurisdiction: ny,
+    isMinor: true,
+  });
+  assert.equal(minor.adjustedFlags[0]?.severity, adult.adjustedFlags[0]?.severity);
+  assert.equal(minor.decision.effectiveWarn, adult.decision.effectiveWarn);
+  assert.equal(minor.decision.effectiveBlock, adult.decision.effectiveBlock);
+  assert.equal(minor.decision.kind, adult.decision.kind);
+  assert.ok(ny.pendingProvisions().some((p) => p.id === 'minorOnly'));
+});
+
+test('in_force minor provisions tighten thresholds and raise severity', () => {
+  const enacted = new Jurisdiction({
+    ...ny.ruleset,
+    minorOnly: {
+      ...ny.ruleset.minorOnly!,
+      status: 'in_force',
+      categoryTreatments: Object.fromEntries(
+        Object.entries(ny.ruleset.minorOnly!.categoryTreatments ?? {}).map(([k, v]) => [
+          k,
+          { ...v, status: 'in_force' as const },
+        ]),
+      ),
+    },
+  });
+  const adult = resolveWith({ flags: [flag('persona_claims', 2)], ledger: ledgerWith([]), jurisdiction: enacted });
   assert.equal(adult.decision.kind, 'deliver');
 
   const minor = resolveWith({
     flags: [flag('persona_claims', 2)],
     ledger: ledgerWith([]),
-    jurisdiction: ny,
+    jurisdiction: enacted,
     isMinor: true,
   });
   assert.equal(minor.adjustedFlags[0]?.severity, 3);
@@ -152,7 +182,7 @@ test('a jurisdiction ruleset tightens thresholds and raises severity for a minor
   assert.equal(minor.decision.kind, 'deliver_with_notice');
 });
 
-test('a mandatory non delivery category is refused even in observe mode', () => {
+test('a pending mandatory non delivery category does not refuse', () => {
   const observePolicy = new DeliveryPolicy({ ...policy.document, mode: 'observe' });
   const r = resolve({
     providerId: 'p1',
@@ -160,6 +190,39 @@ test('a mandatory non delivery category is refused even in observe mode', () => 
     flags: [flag('simulation_obscured', 3)],
     policy: observePolicy,
     jurisdiction: ny,
+    standing: 'good',
+    isMinor: true,
+    noticeState: newNoticeState('2026-07-28T00:00:00.000Z'),
+    now: new Date('2026-07-28T01:00:00.000Z'),
+    scoring: { ledger: ledgerWith([]), window: policy.document.window },
+  });
+  // Pending minorOnly must not raise the mode floor or refuse; top-level in_force
+  // simulation_obscured severity floor still applies, but mandatoryNonDelivery does not.
+  assert.notEqual(r.decision.kind, 'refuse');
+  assert.equal(r.decision.mode, 'observe');
+});
+
+test('an in_force mandatory non delivery category is refused even in observe mode', () => {
+  const observePolicy = new DeliveryPolicy({ ...policy.document, mode: 'observe' });
+  const enacted = new Jurisdiction({
+    ...ny.ruleset,
+    minorOnly: {
+      ...ny.ruleset.minorOnly!,
+      status: 'in_force',
+      categoryTreatments: Object.fromEntries(
+        Object.entries(ny.ruleset.minorOnly!.categoryTreatments ?? {}).map(([k, v]) => [
+          k,
+          { ...v, status: 'in_force' as const },
+        ]),
+      ),
+    },
+  });
+  const r = resolve({
+    providerId: 'p1',
+    deterministic: passed,
+    flags: [flag('simulation_obscured', 3)],
+    policy: observePolicy,
+    jurisdiction: enacted,
     standing: 'good',
     isMinor: true,
     noticeState: newNoticeState('2026-07-28T00:00:00.000Z'),

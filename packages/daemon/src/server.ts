@@ -120,6 +120,7 @@ const server = createServer(async (req, res) => {
       json(res, 200, {
         sessionId: opened.advocate.sessionId,
         jurisdiction: opened.jurisdiction.ruleset,
+        pendingProvisions: opened.jurisdiction.pendingProvisions(),
         policy: opened.policy.document,
         taxonomy: {
           version: opened.taxonomy.version,

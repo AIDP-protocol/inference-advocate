@@ -123,6 +123,8 @@ main { display: flex; flex: 1; min-height: 0; }
 .policy, .export { overflow-y: auto; padding: 12px 0; }
 .policy-head { display: flex; gap: 16px; color: var(--muted); font-size: 12px; margin-bottom: 10px; }
 .disclaimer { border: 1px solid var(--line); border-left: 3px solid var(--warn); padding: 10px 12px; border-radius: 4px; font-size: 13px; }
+.pending-provisions { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); color: var(--warn); }
+.pending-provisions ul { margin: 6px 0; padding-left: 18px; }
 .markdown { white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; line-height: 1.55; }
 .taxonomy { width: 100%; border-collapse: collapse; font-size: 13px; }
 .taxonomy th, .taxonomy td { border-bottom: 1px solid var(--line); text-align: left; padding: 6px 8px; vertical-align: top; }

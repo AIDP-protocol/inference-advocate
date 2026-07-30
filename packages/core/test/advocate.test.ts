@@ -157,17 +157,41 @@ test('a withheld response is retained locally and released only by a competent a
   assert.equal(again.released, false);
 });
 
-test('a minor cannot self release a block a jurisdiction marks non releasable', async () => {
+test('a minor cannot self release a block an in_force jurisdiction marks non releasable', async () => {
   const ny = Jurisdiction.loadFromFile(dataPath('jurisdictions', 'us-ny.json'));
-  const { advocate } = build({ script: [HOOKY], jurisdiction: ny, isAdult: false });
+  const enacted = new Jurisdiction({
+    ...ny.ruleset,
+    minorOnly: {
+      ...ny.ruleset.minorOnly!,
+      status: 'in_force',
+      categoryTreatments: Object.fromEntries(
+        Object.entries(ny.ruleset.minorOnly!.categoryTreatments ?? {}).map(([k, v]) => [
+          k,
+          { ...v, status: 'in_force' as const },
+        ]),
+      ),
+    },
+  });
+  const { advocate } = build({ script: [HOOKY], jurisdiction: enacted, isAdult: false });
   let withheldId = '';
   for (let i = 0; i < 3 && !withheldId; i++) {
     const r = await advocate.ask({ providerId: 'test', text: `turn ${i}` });
     if (r.decision.kind === 'withhold') withheldId = r.responseId;
   }
-  assert.ok(withheldId, 'a minor under the New York ruleset blocks quickly');
+  assert.ok(withheldId, 'a minor under enacted New York minor provisions blocks quickly');
   assert.equal(advocate.release('test', withheldId, 'self').released, false);
   assert.equal(advocate.release('test', withheldId, 'custodian').released, false);
+});
+
+test('pending New York minor provisions are visible and do not block a minor alone', async () => {
+  const ny = Jurisdiction.loadFromFile(dataPath('jurisdictions', 'us-ny.json'));
+  assert.ok(ny.pendingProvisions().some((p) => p.id === 'minorOnly'));
+  const { advocate } = build({ script: [HOOKY], jurisdiction: ny, isAdult: false });
+  const r = await advocate.ask({ providerId: 'test', text: 'turn 0' });
+  // One relational_hooks hit under default thresholds does not withhold; pending minorOnly
+  // must not have tightened the block line to make a single flag withhold.
+  assert.notEqual(r.decision.kind, 'withhold');
+  assert.notEqual(r.decision.releaseAuthority, 'non_releasable');
 });
 
 test('a new session restores delivery and leaves the provider on edge', async () => {
@@ -228,6 +252,11 @@ test('openAdvocate loads the shipped documents and reports its own gaps', () => 
     assert.equal(opened.jurisdiction.ruleset.id, 'us-ny');
     assert.ok(opened.warnings.some((w) => w.includes('not custody')));
     assert.ok(opened.warnings.some((w) => w.includes('attestations are locally asserted')));
+    assert.ok(
+      opened.warnings.some((w) => w.includes('pending') && w.includes('not applied as law')),
+      'pending jurisdiction provisions must be named at startup',
+    );
+    assert.ok(opened.jurisdiction.pendingProvisions().some((p) => p.id === 'minorOnly'));
     opened.db.close();
   } finally {
     rmSync(dir, { recursive: true, force: true });

@@ -2,10 +2,10 @@
   "id": "us-ny",
   "name": "New York, United States (illustrative)",
   "version": "0.1.0-illustrative",
-  "disclaimer": "This file is an illustrative encoding written by an engineer to demonstrate that the jurisdiction slot is real and that a ruleset changes an outcome. It is not legal advice, it is not a compliance product, and no lawyer has reviewed it. A deployed advocate loads rulesets maintained by a party competent and accountable for them.",
+  "disclaimer": "This file is an illustrative encoding written by an engineer to demonstrate that the jurisdiction slot is real and that a ruleset changes an outcome. It is not legal advice, it is not a compliance product, and no lawyer has reviewed it. A deployed advocate loads rulesets maintained by a party competent and accountable for them. Provisions marked pending are listed for visibility and are not applied as law; only in_force provisions change delivery.",
   "citations": [
-    "N.Y. Gen. Bus. Law art. 47 (Artificial Intelligence Companion Models), in force November 5, 2025: operators must disclose at the start of an interaction and every three hours thereafter that the user is not communicating with a human, and must detect and refer expressions of suicidal ideation or self harm.",
-    "N.Y. S. 9051 / A. 10379 (Gonzalez / Bores): passed both chambers in early June 2026 on unanimous votes, NOT SIGNED as of July 2026, would take effect January 1, 2027. Its prohibitions for users under eighteen reach persona claims, asserted relationships, sycophancy, unprompted emotion-based questions, and engagement optimization that supersedes safety guardrails. The minorOnly block below encodes those prohibitions as they would apply if signed, and is inert for adult users."
+    "N.Y. Gen. Bus. Law art. 47 (Artificial Intelligence Companion Models), in force November 5, 2025: operators must disclose at the start of an interaction and every three hours thereafter that the user is not communicating with a human, and must detect and refer expressions of suicidal ideation or self harm. Encoded below as in_force notices and category treatment.",
+    "N.Y. S. 9051 / A. 10379 (Gonzalez / Bores): passed both chambers in early June 2026 on unanimous votes, NOT SIGNED as of July 2026, would take effect January 1, 2027. Its prohibitions for users under eighteen reach persona claims, asserted relationships, sycophancy, unprompted emotion-based questions, and engagement optimization that supersedes safety guardrails. Encoded in the minorOnly block with status pending: the advocate warns that these provisions exist and does not apply them until they are enacted."
   ],
   "notices": [
     {
@@ -15,15 +15,18 @@
       "windowMinutes": null,
       "source": "jurisdiction",
       "trigger": "session_start",
-      "repeatMinutes": 180
+      "repeatMinutes": 180,
+      "status": "in_force"
     }
   ],
   "categoryTreatments": {
     "simulation_obscured": {
-      "severityFloor": 3
+      "severityFloor": 3,
+      "status": "in_force"
     }
   },
   "minorOnly": {
+    "status": "pending",
     "modeFloor": "enforce",
     "thresholdOverrides": {
       "warn": 2,
@@ -31,18 +34,22 @@
     },
     "categoryTreatments": {
       "persona_claims": {
-        "severityFloor": 3
+        "severityFloor": 3,
+        "status": "pending"
       },
       "relational_hooks": {
         "severityFloor": 3,
-        "nonReleasable": true
+        "nonReleasable": true,
+        "status": "pending"
       },
       "sycophancy": {
-        "severityFloor": 2
+        "severityFloor": 2,
+        "status": "pending"
       },
       "simulation_obscured": {
         "severityFloor": 3,
-        "mandatoryNonDelivery": true
+        "mandatoryNonDelivery": true,
+        "status": "pending"
       }
     }
   }

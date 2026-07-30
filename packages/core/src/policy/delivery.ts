@@ -95,6 +95,8 @@ export function resolve(input: ResolveInput): ResolveResult {
     const decision: DeliveryDecision = {
       kind,
       score: score.score,
+      windowScore: score.windowScore,
+      instantScore: score.instantScore,
       effectiveWarn: score.effectiveWarn,
       effectiveBlock: score.effectiveBlock,
       notices: [...pinned, ...(extra.notices ?? [])],
@@ -125,8 +127,9 @@ export function resolve(input: ResolveInput): ResolveResult {
   }
 
   // 2a. Jurisdictional treatment of unsealed responses. This is where a provenance mandate
-  //     becomes an outcome rather than a label nobody checks. Paper Section 2.
-  const provenanceRule = input.jurisdiction.ruleset.provenance?.unsealedTreatment ?? 'ignore';
+  //     becomes an outcome rather than a label nobody checks. Paper Section 2. Pending
+  //     provenance rules are not applied (Jurisdiction.unsealedTreatment).
+  const provenanceRule = input.jurisdiction.unsealedTreatment();
   if (!input.deterministic.sealPresent && provenanceRule !== 'ignore') {
     if (provenanceRule === 'refuse') {
       rationale.push(

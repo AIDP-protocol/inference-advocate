@@ -36,6 +36,17 @@ export function PolicyView({ state }: { state: AdvocateState | null }) {
       {state && (
         <div className="disclaimer">
           <strong>Jurisdiction ruleset:</strong> {state.jurisdiction.disclaimer}
+          {state.pendingProvisions.length > 0 && (
+            <div className="pending-provisions">
+              <strong>Pending provisions (not applied as law):</strong>
+              <ul>
+                {state.pendingProvisions.map((p) => (
+                  <li key={p.id}>{p.summary}</li>
+                ))}
+              </ul>
+              Delivery follows enacted (in_force) rules only.
+            </div>
+          )}
           {state.jurisdiction.citations && (
             <ul>
               {state.jurisdiction.citations.map((c, i) => (

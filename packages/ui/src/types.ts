@@ -23,6 +23,8 @@ export interface Flag {
 export interface Decision {
   kind: 'deliver' | 'deliver_with_notice' | 'withhold' | 'refuse';
   score: number;
+  windowScore: number;
+  instantScore: number;
   effectiveWarn: number;
   effectiveBlock: number;
   releaseAuthority?: string;
@@ -66,9 +68,21 @@ export interface ProviderState {
   evaluatedTotal: number;
 }
 
+export interface PendingProvision {
+  id: string;
+  summary: string;
+}
+
 export interface AdvocateState {
   sessionId: string;
-  jurisdiction: { id: string; name: string; version: string; disclaimer: string; citations?: string[] };
+  jurisdiction: {
+    id: string;
+    name: string;
+    version: string;
+    disclaimer: string;
+    citations?: string[];
+  };
+  pendingProvisions: PendingProvision[];
   policy: {
     policyVersion: string;
     scale: string;

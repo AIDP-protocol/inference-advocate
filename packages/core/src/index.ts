@@ -62,7 +62,12 @@ export {
   type StandingSeedConfig,
   type TelemetryConfig,
 } from './policy/config.js';
-export { Jurisdiction, type JurisdictionRuleset, type CategoryTreatment } from './policy/jurisdiction.js';
+export {
+  Jurisdiction,
+  type JurisdictionRuleset,
+  type CategoryTreatment,
+  type PendingProvision,
+} from './policy/jurisdiction.js';
 export { computeScore, windowEntries, type ScoreInput, type ScoreResult } from './policy/score.js';
 export { resolve as resolveDelivery, type ResolveInput, type ResolveResult } from './policy/delivery.js';
 export { newNoticeState, selectNotices, stillDisplayed, type NoticeState } from './policy/notices.js';

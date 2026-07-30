@@ -258,6 +258,8 @@ export class Advocate {
       decision: {
         kind: 'refuse',
         score: 0,
+        windowScore: 0,
+        instantScore: 0,
         effectiveWarn: this.#opts.policy.document.thresholds.warn,
         effectiveBlock: this.#opts.policy.document.thresholds.block,
         notices: [],

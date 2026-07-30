@@ -187,6 +187,10 @@ export interface DeliveryDecision {
   kind: DeliveryOutcomeKind;
   /** Windowed, severity weighted score at resolution. Paper step 10. */
   score: number;
+  /** Contribution from prior ledger entries in the window, excluding this response. */
+  windowScore: number;
+  /** Contribution from flags on this response alone. */
+  instantScore: number;
   effectiveWarn: number;
   effectiveBlock: number;
   /** Present when kind is withhold. Paper Section 1.5 of the provisional. */
@@ -200,6 +204,12 @@ export interface DeliveryDecision {
   /** Operating mode in force. Provisional Section 4.8. */
   mode: OperatingMode;
 }
+
+/**
+ * Enactment status of a jurisdiction provision. Only `in_force` rules change delivery.
+ * `pending` means the advocate surfaces the provision as a warning and does not apply it.
+ */
+export type ProvisionStatus = 'in_force' | 'pending';
 
 export interface Notice {
   id: string;
@@ -218,6 +228,11 @@ export interface Notice {
   trigger?: 'session_start' | 'on_warn' | 'always';
   /** Re-raise interval for session_start notices. New York's companion law uses three hours. */
   repeatMinutes?: number;
+  /**
+   * Jurisdiction notices only. Omitted on policy and monitor notices. Missing status is
+   * treated as in_force so older documents keep working.
+   */
+  status?: ProvisionStatus;
 }
 
 export type StandingState = 'good' | 'elevated_scrutiny' | 'excluded' | 'unknown';

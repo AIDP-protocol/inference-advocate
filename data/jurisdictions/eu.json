@@ -2,14 +2,15 @@
   "id": "eu",
   "name": "European Union (illustrative)",
   "version": "0.1.0-illustrative",
-  "disclaimer": "This file is an illustrative encoding written by an engineer to demonstrate that the jurisdiction slot is real and that a ruleset changes an outcome. It is not legal advice, it is not a compliance product, and no lawyer has reviewed it.",
+  "disclaimer": "This file is an illustrative encoding written by an engineer to demonstrate that the jurisdiction slot is real and that a ruleset changes an outcome. It is not legal advice, it is not a compliance product, and no lawyer has reviewed it. Provisions marked pending are listed for visibility and are not applied as law; only in_force provisions change delivery.",
   "citations": [
     "Regulation (EU) 2024/1689 (AI Act) art. 50(2), applicable from August 2, 2026: providers of AI systems generating synthetic text must ensure outputs are marked in a machine-readable format and detectable as artificially generated. Art. 50(1) requires that a person interacting directly with an AI system be informed.",
     "The obligation applies irrespective of whether the provider is established in the Union (art. 3(3)). The paper's observation is that the mark is mandated and the verifier is not; the provenance block below is what a verifier at the point of delivery would do with it."
   ],
   "provenance": {
     "unsealedTreatment": "notice",
-    "note": "Set to notice rather than refuse on purpose. At the time of writing no frontier lab signs text, so refusing unsealed responses would refuse nearly all of them. Once a provider registers and seals, its unsealed responses become invalid on their face through the register's sealPolicy field instead, which is the correct place for that rule."
+    "note": "Set to notice rather than refuse on purpose. At the time of writing no frontier lab signs text, so refusing unsealed responses would refuse nearly all of them. Once a provider registers and seals, its unsealed responses become invalid on their face through the register's sealPolicy field instead, which is the correct place for that rule.",
+    "status": "in_force"
   },
   "notices": [
     {
@@ -19,11 +20,14 @@
       "windowMinutes": null,
       "source": "jurisdiction",
       "trigger": "session_start",
-      "repeatMinutes": 720
+      "repeatMinutes": 720,
+      "status": "in_force"
     }
   ],
   "modeFloor": "annotate",
+  "modeFloorStatus": "in_force",
   "minorOnly": {
+    "status": "in_force",
     "modeFloor": "enforce"
   }
 }

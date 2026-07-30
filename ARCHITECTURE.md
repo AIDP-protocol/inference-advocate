@@ -173,6 +173,10 @@ open here.
 **The jurisdiction rulesets are illustrative.** They were written by an engineer to prove the
 slot changes an outcome. They are not legal advice and no lawyer has reviewed them. Each file
 carries that disclaimer in its own `disclaimer` field, and the UI renders it above the policy.
+Provisions may be marked `in_force` or `pending`. Only `in_force` rules change delivery.
+Pending provisions (for example New York's unsigned S 9051 minor-protection block) appear in
+startup warnings, doctor output, and the policy view, and do not tighten thresholds or refuse
+responses. That is deliberate: listing a bill is not the same as applying it as law.
 
 **Escalation.** Section 1.6 of the provisional discloses de-identified escalation for
 designated severe categories. The `escalating` release-authority class exists in the type

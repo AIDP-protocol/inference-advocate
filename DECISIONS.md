@@ -3,10 +3,9 @@
 Things I could not settle without you. Each one has my recommendation, because a list of
 questions with no view attached is just work handed back.
 
-Items 2 and 8 are resolved and kept here with their resolutions rather than deleted, so the
-reasoning stays visible. The live ones are 1, 3 and 4: make the repository public, decide
-whether escalation gets built at all, and decide how an unsigned bill should be labeled when the
-advocate applies it.
+Items 2, 4 and 8 are resolved and kept here with their resolutions rather than deleted, so the
+reasoning stays visible. The live ones are 1 and 3: make the repository public, and decide
+whether escalation gets built at all.
 
 ## 1. Repository visibility (LIVE)
 
@@ -58,24 +57,18 @@ have been the wrong way to answer that.
 architecture that ships a reporting channel before it has settled who receives the report is
 exactly the thing the paper's Section 6 argues against.
 
-## 4. Shipping an unsigned bill's provisions as active policy
+## 4. Shipping an unsigned bill's provisions as active policy (RESOLVED)
 
-`data/jurisdictions/us-ny.json` encodes two different things. The article 47 notice cadence is
-law in force. The S 9051 prohibitions for users under eighteen are passed but unsigned, and the
-Governor has until the end of 2026. I put them in a `minorOnly` block that becomes active
-whenever the attestation package says the user is not an adult, and I documented the status in
-the file's `citations` array.
+Resolved on 2026-07-30. `data/jurisdictions/us-ny.json` still encodes both article 47 (in force)
+and S 9051 (passed, unsigned). Each provision now carries a `status` of `in_force` or
+`pending`. Only `in_force` rules change delivery thresholds, severity floors, mode floors,
+mandatory non-delivery, provenance treatment, or pinned notices. Pending provisions are listed
+in startup warnings, in `npm run doctor`, and in the policy view, with the explicit statement
+that they are not applied as law.
 
-That is defensible for a demo and slightly wrong as a matter of fact: an advocate applying an
-unsigned bill is applying something that is not law.
-
-Options: leave as is with the citation carrying the caveat; move the S 9051 block into a
-separate `us-ny-pending.json` that has to be selected deliberately; or add a `status` field per
-rule so the UI can label a provision "pending" where it appears.
-
-**Recommendation:** the third. It costs one field and one line of UI, and "your advocate is
-applying a law that has not been signed, and here is where it says so" is a better demo moment
-than either alternative.
+That overrides the earlier recommendation to apply pending rules with a UI label. Warning plus
+enacted-only enforcement is the honest reading of "not signed yet," and it keeps the demo from
+quietly treating a bill as statute.
 
 ## 5. Demo-scale thresholds
 
@@ -117,10 +110,12 @@ call whether the tradeoff is worth the optics.
 
 ## 8. `node:sqlite` is experimental (RESOLVED)
 
-Resolved by evidence rather than by argument. The demo run on Node 24.16 printed no
-`ExperimentalWarning`, so the API has settled on the version you are actually running. Keep the
-built-in and the zero runtime dependencies. CI runs the suite on 22 and 24, so a regression on
-the floor version shows up as a failed build rather than as a surprise.
+Resolved by evidence rather than by argument, with a version-scoped caveat. On Node 24 (including
+24.18 used for local runs) the built-in prints no `ExperimentalWarning`. On Node 22, which is
+the CI floor, the warning still appears. Keep the built-in and the zero runtime dependencies.
+CI runs the suite on 22 and 24, so a regression on the floor version shows up as a failed build
+rather than as a surprise. Do not suppress the warning in code: the version difference is the
+honest signal.
 
 ## 9. Small things I picked a default for
 

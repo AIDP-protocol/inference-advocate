@@ -10,23 +10,24 @@
   },
   "workspaces": [
     "packages/core",
+    "packages/store-sqlite",
     "packages/daemon",
     "packages/demo",
     "packages/ui",
     "packages/desktop"
   ],
   "scripts": {
-    "build": "npm run build --workspace @aidp/core && npm run build --workspace @aidp/daemon && npm run build --workspace @aidp/demo",
+    "build": "npm run build --workspace @aidp/core && npm run build --workspace @aidp/store-sqlite && npm run build --workspace @aidp/daemon && npm run build --workspace @aidp/demo",
     "build:ui": "npm run build --workspace @aidp/ui",
-    "typecheck": "npm run build --workspace @aidp/core && npm run typecheck --workspaces --if-present",
-    "test": "npm run build && npm run test --workspace @aidp/core && npm run test --workspace @aidp/daemon",
+    "typecheck": "npm run build --workspace @aidp/core && npm run build --workspace @aidp/store-sqlite && npm run typecheck --workspaces --if-present",
+    "test": "npm run build && npm run test --workspace @aidp/core && npm run test --workspace @aidp/store-sqlite && npm run test --workspace @aidp/daemon",
     "demo": "npm run build && node packages/demo/dist/scenario.js",
     "daemon": "npm run build && node packages/daemon/dist/server.js",
     "desktop": "npm run dev --workspace @aidp/desktop",
     "ui": "npm run dev --workspace @aidp/ui",
     "keys": "node tools/mint-demo-keys.mjs",
     "mocks": "npm run build --workspace @aidp/demo && node packages/demo/dist/mock-servers.js",
-    "doctor": "npm run build --workspace @aidp/core && npm run build --workspace @aidp/daemon && node packages/daemon/dist/doctor.js"
+    "doctor": "npm run build --workspace @aidp/core && npm run build --workspace @aidp/store-sqlite && npm run build --workspace @aidp/daemon && node packages/daemon/dist/doctor.js"
   },
   "devDependencies": {
     "typescript": "^5.6.3"

@@ -1,13 +1,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Taxonomy } from '../src/monitor/taxonomy.js';
-import { RuleEvaluator } from '../src/monitor/evaluators/rule-evaluator.js';
-import { ModelEvaluator } from '../src/monitor/evaluators/model-evaluator.js';
-import { ServingRegister } from '../src/monitor/register.js';
-import { runDeterministicPass } from '../src/monitor/deterministic.js';
-import { generateSealKeypair, signSeal } from '../src/crypto/seal.js';
 import { dataPath } from './helpers.js';
-import type { ProviderConfig, ProviderResponse } from '../src/types.js';
+import {
+  generateSealKeypair,
+  ModelEvaluator,
+  RuleEvaluator,
+  runDeterministicPass,
+  ServingRegister,
+  signSeal,
+  Taxonomy,
+} from '@aidp/core';
+import type { ProviderConfig, ProviderResponse } from '@aidp/core';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
 

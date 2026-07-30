@@ -1,18 +1,23 @@
 # Desktop packaging (Tauri)
 
-First slice of desktop packaging for the inference advocate.
+Tauri 2 shell for the inference advocate. Advocate operations use `HostSession` over
+stdio IPC, not HTTP.
 
 ## What this is
 
-A Tauri 2 window that starts the existing Node daemon as a **loopback sidecar**
-(`AIDP_DESKTOP=1`, bind `127.0.0.1` only) and loads `http://127.0.0.1:8790` in the
-webview. The UI still talks HTTP. Conversation content does not gain a new outbound path
-through this shell.
+A Tauri window that:
 
-That is scaffolding toward the shape ARCHITECTURE.md describes: replacing the daemon with
-an in-process call (Tauri commands over `HostSession` in `packages/daemon/src/host.ts`).
-It is not that replacement yet. The sidecar sets a startup warning the UI already renders
-under "What this build does not have".
+1. Spawns `packages/daemon/dist/ipc-host.js` (Node child, `AIDP_DESKTOP=1`, no HTTP listener).
+2. Loads the built UI from `packages/ui/dist`.
+3. Forwards UI calls through the `host_call` command into that HostSession over line-delimited
+   JSON on stdin/stdout.
+
+The browser-tab path (`npm run daemon`) still uses the loopback HTTP daemon. Both seams share
+`HostSession` and `dispatchHostMethod` in `packages/daemon/src/host.ts`.
+
+Conversation content does not gain a new outbound path through this shell. The remaining
+packaging gap is honest: HostSession still runs in a Node child process, not inside the Rust
+binary. That warning is reported at startup when `AIDP_DESKTOP=1`.
 
 ## Prerequisites
 
@@ -35,7 +40,7 @@ From the repository root:
 ```bash
 mkdir -p .advocate && cp data/providers.demo.json .advocate/providers.json
 npm run mocks          # terminal one, if using demo providers
-npm run desktop        # builds if needed, checks deps, starts Tauri + sidecar
+npm run desktop        # builds if needed, checks deps, starts Tauri + IPC host
 ```
 
 Or:
@@ -49,9 +54,8 @@ Environment the shell honors:
 | Variable | Role |
 | --- | --- |
 | `AIDP_REPO_ROOT` | Repository root (set automatically by `npm run desktop`) |
-| `AIDP_PORT` | Loopback port (default 8790) |
-| `AIDP_NODE` | Node binary for the sidecar (defaults to the Node running the launcher) |
-| `AIDP_DESKTOP` | Set to `1` by the shell so HostSession reports the HTTP gap |
+| `AIDP_NODE` | Node binary for the IPC host (defaults to the Node running the launcher) |
+| `AIDP_DESKTOP` | Set to `1` by the shell so HostSession reports the Node-process gap |
 
 ## Check without launching
 
@@ -61,8 +65,5 @@ npm run check-deps --workspace @aidp/desktop
 
 ## Next slice
 
-1. Tauri `invoke` commands that call `HostSession` methods (Node sidecar over stdio IPC, or
-   another embedding that does not open an HTTP listener).
-2. Point the UI at those commands instead of `fetch('/api/...')`.
-3. Stop binding a port when running inside the desktop shell.
-4. Real app icons and `bundle.active` once the bridge is honest.
+1. Embed or otherwise host `HostSession` inside the Tauri binary (retire the Node child).
+2. Real app icons and `bundle.active` once that packaging claim is honest.

@@ -1,7 +1,7 @@
 [package]
 name = "inference-advocate"
 version = "0.1.0"
-description = "AIDP inference advocate desktop shell (Tauri over the local daemon)"
+description = "AIDP inference advocate desktop shell (Tauri over HostSession stdio IPC)"
 authors = ["Justin Philip Flores"]
 edition = "2021"
 license = "Apache-2.0"

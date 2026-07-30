@@ -11,7 +11,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
-import { openAdvocate, ProviderRegistry, type ExchangeResult } from '@aidp/core';
+import { ProviderRegistry, type ExchangeResult } from '@aidp/core';
+import { openAdvocate } from '@aidp/store-sqlite';
 import { startMockProvider, type RunningMockProvider } from './mock-provider.js';
 import { ALIGNED_SCRIPT, COMPANION_RECOVERY, COMPANION_SCRIPT, LEGACY_SCRIPT } from './scripts.js';
 
@@ -210,7 +211,7 @@ async function main(): Promise<void> {
       devKeyfile: join(runDir, 'dev-eu.key'),
     });
     report(1, await euOpened.advocate.ask({ providerId: 'legacy', text: 'when does article 50 apply?' }));
-    euOpened.db.close();
+    euOpened.store.close();
 
     scene('SCENE 7  What leaves the device, and what never does');
     const windowStart = '2000-01-01T00:00:00.000Z';
@@ -246,7 +247,7 @@ async function main(): Promise<void> {
 
     console.log('');
     console.log('Demo complete. Store and keys are under a temporary directory and are removed now.');
-    opened.db.close();
+    opened.store.close();
   } finally {
     await Promise.all(servers.map((s) => s.close()));
     rmSync(runDir, { recursive: true, force: true });

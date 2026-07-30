@@ -1,15 +1,18 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { AdvocateDb } from '../src/store/db.js';
-import { MasterSecret } from '../src/crypto/keys.js';
-import { LedgerStore } from '../src/store/ledger.js';
-import { DeliveryPolicy } from '../src/policy/config.js';
-import { Jurisdiction } from '../src/policy/jurisdiction.js';
-import { resolve } from '../src/policy/delivery.js';
-import { computeScore } from '../src/policy/score.js';
-import { newNoticeState, selectNotices } from '../src/policy/notices.js';
+import { openSqliteStore } from '@aidp/store-sqlite';
 import { dataPath } from './helpers.js';
-import type { DeterministicVerdict, Flag, Notice } from '../src/types.js';
+import {
+  computeScore,
+  DeliveryPolicy,
+  Jurisdiction,
+  LedgerStore,
+  MasterSecret,
+  newNoticeState,
+  resolveDelivery,
+  selectNotices,
+} from '@aidp/core';
+import type { DeterministicVerdict, Flag, Notice } from '@aidp/core';
 
 const policy = DeliveryPolicy.loadFromFile(dataPath('policy', 'delivery-policy.json'));
 const noJurisdiction = Jurisdiction.none();
@@ -17,8 +20,8 @@ const ny = Jurisdiction.loadFromFile(dataPath('jurisdictions', 'us-ny.json'));
 const eu = Jurisdiction.loadFromFile(dataPath('jurisdictions', 'eu.json'));
 
 function ledgerWith(severitiesPerResponse: number[][]): LedgerStore {
-  const db = new AdvocateDb({ path: ':memory:' });
-  const ledger = new LedgerStore(db, MasterSecret.generate().deriveStoreKey('ledger'));
+  const store = openSqliteStore(':memory:');
+  const ledger = new LedgerStore(store, MasterSecret.generate().deriveStoreKey('ledger'));
   severitiesPerResponse.forEach((sevs, i) => {
     ledger.append({
       providerId: 'p1',
@@ -62,7 +65,7 @@ function resolveWith(opts: {
   standing?: 'good' | 'elevated_scrutiny' | 'excluded' | 'unknown';
   deterministic?: DeterministicVerdict;
 }) {
-  return resolve({
+  return resolveDelivery({
     providerId: 'p1',
     deterministic: opts.deterministic ?? passed,
     flags: opts.flags,
@@ -184,7 +187,7 @@ test('in_force minor provisions tighten thresholds and raise severity', () => {
 
 test('a pending mandatory non delivery category does not refuse', () => {
   const observePolicy = new DeliveryPolicy({ ...policy.document, mode: 'observe' });
-  const r = resolve({
+  const r = resolveDelivery({
     providerId: 'p1',
     deterministic: passed,
     flags: [flag('simulation_obscured', 3)],
@@ -217,7 +220,7 @@ test('an in_force mandatory non delivery category is refused even in observe mod
       ),
     },
   });
-  const r = resolve({
+  const r = resolveDelivery({
     providerId: 'p1',
     deterministic: passed,
     flags: [flag('simulation_obscured', 3)],
@@ -237,7 +240,7 @@ test('an in_force mandatory non delivery category is refused even in observe mod
 
 test('observe mode takes no gate action on an accumulation block', () => {
   const observePolicy = new DeliveryPolicy({ ...policy.document, mode: 'observe' });
-  const r = resolve({
+  const r = resolveDelivery({
     providerId: 'p1',
     deterministic: passed,
     flags: [flag('relational_hooks', 3)],
@@ -255,7 +258,7 @@ test('observe mode takes no gate action on an accumulation block', () => {
 
 test('annotate mode limits a block to a notice', () => {
   const annotatePolicy = new DeliveryPolicy({ ...policy.document, mode: 'annotate' });
-  const r = resolve({
+  const r = resolveDelivery({
     providerId: 'p1',
     deterministic: passed,
     flags: [flag('relational_hooks', 3)],

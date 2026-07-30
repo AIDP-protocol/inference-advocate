@@ -1,20 +1,23 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { AdvocateDb } from '../src/store/db.js';
-import { MasterSecret } from '../src/crypto/keys.js';
-import { LedgerStore } from '../src/store/ledger.js';
-import { TranscriptStore } from '../src/store/transcripts.js';
-import { TelemetryEmitter } from '../src/telemetry/emitter.js';
-import { canonicalBatch, computeRates } from '../src/telemetry/rates.js';
-import { buildExportView } from '../src/telemetry/export.js';
-import { StandingRegistry } from '../src/telemetry/standing.js';
+import { openSqliteStore } from '@aidp/store-sqlite';
 import { dataPath } from './helpers.js';
+import {
+  buildExportView,
+  canonicalBatch,
+  computeRates,
+  LedgerStore,
+  MasterSecret,
+  StandingRegistry,
+  TelemetryEmitter,
+  TranscriptStore,
+} from '@aidp/core';
 
 function fixture(responses: number) {
-  const db = new AdvocateDb({ path: ':memory:' });
+  const store = openSqliteStore(':memory:');
   const master = MasterSecret.generate();
-  const ledger = new LedgerStore(db, master.deriveStoreKey('ledger'));
-  const transcripts = new TranscriptStore(db, master.deriveStoreKey('transcript'));
+  const ledger = new LedgerStore(store, master.deriveStoreKey('ledger'));
+  const transcripts = new TranscriptStore(store, master.deriveStoreKey('transcript'));
   for (let i = 0; i < responses; i++) {
     const secret = `a private thing the user said number ${i}`;
     transcripts.append({
@@ -36,7 +39,7 @@ function fixture(responses: number) {
       taxonomyVersion: 'v0.1.0',
     });
   }
-  return { db, master, ledger, transcripts };
+  return { store, master, ledger, transcripts };
 }
 
 test('rates carry counts and no content', () => {

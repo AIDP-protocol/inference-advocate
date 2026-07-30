@@ -16,7 +16,16 @@ export {
   type SealSubject,
 } from './crypto/seal.js';
 
-export { AdvocateDb, type OpenOptions } from './store/db.js';
+export {
+  type StoreBackend,
+  type LedgerRow,
+  type CarryoverRow,
+  type BlockRow,
+  type TranscriptRow,
+  type EvidenceRow,
+  type ResidencyCounts,
+} from './store/port.js';
+export { runStoreConformance, type StoreFactory } from './store/conformance.js';
 export { TranscriptStore, type StoredTurn } from './store/transcripts.js';
 export {
   LedgerStore,
@@ -26,6 +35,8 @@ export {
   type BlockRecord,
 } from './store/ledger.js';
 export { PreferenceStore } from './store/preferences.js';
+export { sha256Hex } from './crypto/sha256.js';
+export { sha512 } from './crypto/sha512.js';
 
 export * from './interchange/wire.js';
 export { send, resolveApiKey, ProviderError, type SendOptions } from './interchange/openai-adapter.js';

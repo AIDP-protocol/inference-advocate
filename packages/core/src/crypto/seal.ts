@@ -5,9 +5,22 @@
 // The advocate only ever verifies. The signing half lives here too because the reference
 // repository ships a mock provider that seals, and because a register of public keys is
 // not testable without something that can produce a signature against it.
+//
+// Ed25519 is pure TypeScript (ed25519.ts / vendored noble), so this module does not import
+// node:crypto. PEM encode/decode is fixed-size SPKI and PKCS8 for Ed25519 only.
 
-import { createPrivateKey, createPublicKey, generateKeyPairSync, sign, verify } from 'node:crypto';
 import type { ProvenanceSeal } from '../types.js';
+import {
+  ed25519PublicKeyFromSeed,
+  ed25519RandomSeed,
+  ed25519Sign,
+  ed25519Verify,
+} from './ed25519.js';
+
+/** SPKI prefix for a 32-byte Ed25519 public key (RFC 8410). */
+const SPKI_PREFIX = Buffer.from('302a300506032b6570032100', 'hex');
+/** PKCS8 prefix for a 32-byte Ed25519 seed (RFC 8410). */
+const PKCS8_PREFIX = Buffer.from('302e020100300506032b657004220420', 'hex');
 
 export interface SealSubject {
   registerEntryId: string;
@@ -38,17 +51,58 @@ export function canonicalSealPayload(s: SealSubject): Buffer {
   return Buffer.from(lines.join('\n'), 'utf8');
 }
 
+function toPem(label: string, der: Buffer): string {
+  const b64 = der.toString('base64');
+  const lines = b64.match(/.{1,64}/g) ?? [];
+  return `-----BEGIN ${label}-----\n${lines.join('\n')}\n-----END ${label}-----\n`;
+}
+
+function fromPem(pem: string, label: string): Buffer {
+  const begin = `-----BEGIN ${label}-----`;
+  const end = `-----END ${label}-----`;
+  const start = pem.indexOf(begin);
+  const stop = pem.indexOf(end);
+  if (start < 0 || stop < 0 || stop <= start) throw new Error(`missing ${label} PEM envelope`);
+  const body = pem.slice(start + begin.length, stop).replace(/\s+/g, '');
+  return Buffer.from(body, 'base64');
+}
+
+function encodePublicKeyPem(publicKey: Uint8Array): string {
+  return toPem('PUBLIC KEY', Buffer.concat([SPKI_PREFIX, Buffer.from(publicKey)]));
+}
+
+function encodePrivateKeyPem(seed: Uint8Array): string {
+  return toPem('PRIVATE KEY', Buffer.concat([PKCS8_PREFIX, Buffer.from(seed)]));
+}
+
+function decodePublicKeyPem(pem: string): Uint8Array {
+  const der = fromPem(pem, 'PUBLIC KEY');
+  if (der.length !== SPKI_PREFIX.length + 32 || !der.subarray(0, SPKI_PREFIX.length).equals(SPKI_PREFIX)) {
+    throw new Error('unsupported Ed25519 public key PEM');
+  }
+  return new Uint8Array(der.subarray(SPKI_PREFIX.length));
+}
+
+function decodePrivateKeyPem(pem: string): Uint8Array {
+  const der = fromPem(pem, 'PRIVATE KEY');
+  if (der.length !== PKCS8_PREFIX.length + 32 || !der.subarray(0, PKCS8_PREFIX.length).equals(PKCS8_PREFIX)) {
+    throw new Error('unsupported Ed25519 private key PEM');
+  }
+  return new Uint8Array(der.subarray(PKCS8_PREFIX.length));
+}
+
 export function generateSealKeypair(): { publicKeyPem: string; privateKeyPem: string } {
-  const { publicKey, privateKey } = generateKeyPairSync('ed25519');
+  const seed = ed25519RandomSeed();
+  const publicKey = ed25519PublicKeyFromSeed(seed);
   return {
-    publicKeyPem: publicKey.export({ type: 'spki', format: 'pem' }).toString(),
-    privateKeyPem: privateKey.export({ type: 'pkcs8', format: 'pem' }).toString(),
+    publicKeyPem: encodePublicKeyPem(publicKey),
+    privateKeyPem: encodePrivateKeyPem(seed),
   };
 }
 
 export function signSeal(subject: SealSubject, privateKeyPem: string): ProvenanceSeal {
-  const key = createPrivateKey(privateKeyPem);
-  const signature = sign(null, canonicalSealPayload(subject), key);
+  const seed = decodePrivateKeyPem(privateKeyPem);
+  const signature = ed25519Sign(canonicalSealPayload(subject), seed);
   return {
     registerEntryId: subject.registerEntryId,
     selector: subject.selector,
@@ -56,16 +110,15 @@ export function signSeal(subject: SealSubject, privateKeyPem: string): Provenanc
     providerIdentity: subject.providerIdentity,
     signedAt: subject.signedAt,
     alg: 'ed25519',
-    signature: signature.toString('base64url'),
+    signature: Buffer.from(signature).toString('base64url'),
   };
 }
 
 export function verifySeal(seal: ProvenanceSeal, content: string, publicKeyPem: string): boolean {
   if (seal.alg !== 'ed25519') return false;
   try {
-    const key = createPublicKey(publicKeyPem);
-    return verify(
-      null,
+    return ed25519Verify(
+      Buffer.from(seal.signature, 'base64url'),
       canonicalSealPayload({
         registerEntryId: seal.registerEntryId,
         selector: seal.selector,
@@ -74,8 +127,7 @@ export function verifySeal(seal: ProvenanceSeal, content: string, publicKeyPem: 
         signedAt: seal.signedAt,
         content,
       }),
-      key,
-      Buffer.from(seal.signature, 'base64url'),
+      decodePublicKeyPem(publicKeyPem),
     );
   } catch {
     return false;
@@ -84,12 +136,16 @@ export function verifySeal(seal: ProvenanceSeal, content: string, publicKeyPem: 
 
 /** Detached signature over an arbitrary document, used for the register and standing files. */
 export function signDocument(bytes: Buffer, privateKeyPem: string): string {
-  return sign(null, bytes, createPrivateKey(privateKeyPem)).toString('base64url');
+  return Buffer.from(ed25519Sign(bytes, decodePrivateKeyPem(privateKeyPem))).toString('base64url');
 }
 
 export function verifyDocument(bytes: Buffer, signature: string, publicKeyPem: string): boolean {
   try {
-    return verify(null, bytes, createPublicKey(publicKeyPem), Buffer.from(signature, 'base64url'));
+    return ed25519Verify(
+      Buffer.from(signature, 'base64url'),
+      bytes,
+      decodePublicKeyPem(publicKeyPem),
+    );
   } catch {
     return false;
   }

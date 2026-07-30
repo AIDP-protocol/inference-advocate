@@ -1,10 +1,10 @@
-// Desktop shell entry. Spawns the Node daemon as a loopback sidecar, then loads it in a window.
+// Desktop shell entry. Spawns the Node HostSession IPC host, then loads the UI in a window.
 //
 // Paper: steps 1 and 12.
 //
-// This is the first slice, not the finished shape. The architectural target is an in-process
-// (or IPC) call from the shell into HostSession, retiring the HTTP listener. Until that lands,
-// AIDP_DESKTOP=1 makes the advocate say so at startup.
+// Advocate operations go through Tauri commands over stdio IPC into HostSession. There is no
+// HTTP listener for the core API. AIDP_DESKTOP=1 reports that HostSession still lives in a
+// Node child process rather than inside this binary.
 
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 

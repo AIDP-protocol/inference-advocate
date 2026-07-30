@@ -11,6 +11,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AdvocateState, ExchangeResult, Notice } from './types';
+import { hostCall } from './host-client';
 import { MonitorPanel } from './MonitorPanel';
 import { PolicyView } from './PolicyView';
 import { ExportView } from './ExportView';
@@ -34,8 +35,7 @@ export function App() {
   const [detailFor, setDetailFor] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
-    const res = await fetch('/api/state');
-    const next = (await res.json()) as AdvocateState;
+    const next = (await hostCall('state')) as AdvocateState;
     setState(next);
     setProvider((p) => p || next.providers[0]?.id || '');
   }, []);
@@ -68,12 +68,10 @@ export function App() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch('/api/ask', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ providerId: provider, text }),
-      });
-      const body = (await res.json()) as { result?: ExchangeResult; error?: string };
+      const body = (await hostCall('ask', { providerId: provider, text })) as {
+        result?: ExchangeResult;
+        error?: string;
+      };
       if (body.error || !body.result) throw new Error(body.error ?? 'no result');
       const result = body.result;
       setTurns((t) => [
@@ -89,12 +87,11 @@ export function App() {
   }
 
   async function release(result: ExchangeResult, actor: 'self' | 'custodian') {
-    const res = await fetch('/api/release', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ providerId: result.providerId, responseId: result.responseId, actor }),
-    });
-    const body = (await res.json()) as { released: boolean; reason?: string; content?: string };
+    const body = (await hostCall('release', {
+      providerId: result.providerId,
+      responseId: result.responseId,
+      actor,
+    })) as { released: boolean; reason?: string; content?: string };
     if (body.released && body.content) {
       setTurns((t) =>
         t.map((turn) =>
@@ -108,7 +105,7 @@ export function App() {
   }
 
   async function newSession() {
-    await fetch('/api/session/new', { method: 'POST' });
+    await hostCall('session.new');
     setTurns([]);
     await refresh();
   }

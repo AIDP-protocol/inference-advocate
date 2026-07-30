@@ -4,6 +4,7 @@
   "description": "Default capability for the advocate desktop shell. No remote permissions.",
   "windows": ["main"],
   "permissions": [
-    "core:default"
+    "core:default",
+    "allow-host-call"
   ]
 }

@@ -7,10 +7,10 @@
 // different key. A component holding only the ledger key sees that a sycophancy flag of
 // severity 1 occurred at a time, and cannot see a single word of what was said.
 
-import { createHash } from 'node:crypto';
-import type { AdvocateDb } from './db.js';
+import { sha256Hex } from '../crypto/sha256.js';
 import type { StoreKey } from '../crypto/keys.js';
 import type { DeliveryOutcomeKind, LedgerEntry, LedgerFlag, ReleaseAuthority } from '../types.js';
+import type { StoreBackend } from './port.js';
 
 export interface AppendInput {
   providerId: string;
@@ -49,11 +49,11 @@ export interface LedgerReader {
 const GENESIS = '0'.repeat(64);
 
 export class LedgerStore implements LedgerReader {
-  readonly #db: AdvocateDb;
+  readonly #store: StoreBackend;
 
-  constructor(db: AdvocateDb, key: StoreKey) {
+  constructor(store: StoreBackend, key: StoreKey) {
     if (key.store !== 'ledger') throw new Error('LedgerStore requires the ledger key');
-    this.#db = db;
+    this.#store = store;
   }
 
   static hashEntry(input: {
@@ -77,7 +77,7 @@ export class LedgerStore implements LedgerReader {
       input.flags.map((f) => `${f.type}:${f.severity}:${f.evidenceRef}`).join(','),
       input.prevHash,
     ].join('\n');
-    return createHash('sha256').update(canonical, 'utf8').digest('hex');
+    return sha256Hex(canonical);
   }
 
   append(input: AppendInput): LedgerEntry {
@@ -85,54 +85,27 @@ export class LedgerStore implements LedgerReader {
     const seq = (head?.seq ?? 0) + 1;
     const prevHash = head?.hash ?? GENESIS;
     const hash = LedgerStore.hashEntry({ ...input, seq, prevHash });
-    this.#db.raw
-      .prepare(
-        `INSERT INTO ledger(provider_id, seq, response_id, at, outcome, score,
-           evaluator_version, taxonomy_version, flags_json, prev_hash, hash)
-         VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
-      )
-      .run(
-        input.providerId,
-        seq,
-        input.responseId,
-        input.at,
-        input.outcome,
-        input.score,
-        input.evaluatorVersion,
-        input.taxonomyVersion,
-        JSON.stringify(input.flags),
-        prevHash,
-        hash,
-      );
-    return { ...input, seq, prevHash, hash };
+    const entry: LedgerEntry = { ...input, seq, prevHash, hash };
+    this.#store.insertLedgerEntry(entry);
+    return entry;
   }
 
   head(providerId: string): LedgerEntry | undefined {
-    const row = this.#db.raw
-      .prepare('SELECT * FROM ledger WHERE provider_id = ? ORDER BY seq DESC LIMIT 1')
-      .get(providerId) as Record<string, unknown> | undefined;
-    return row ? rowToEntry(row) : undefined;
+    return this.#store.getLedgerHead(providerId);
   }
 
   providerIds(): string[] {
-    const rows = this.#db.raw.prepare('SELECT DISTINCT provider_id AS p FROM ledger').all() as Array<{ p: string }>;
-    return rows.map((r) => r.p);
+    return this.#store.listLedgerProviderIds();
   }
 
   /** Count-based window: the trailing N evaluated responses. Provisional Section 1.3. */
   recent(providerId: string, n: number): LedgerEntry[] {
-    const rows = this.#db.raw
-      .prepare('SELECT * FROM ledger WHERE provider_id = ? ORDER BY seq DESC LIMIT ?')
-      .all(providerId, n) as Array<Record<string, unknown>>;
-    return rows.map(rowToEntry).reverse();
+    return this.#store.listLedgerRecent(providerId, n);
   }
 
   /** Time-based window. Provisional Section 1.3. */
   entriesInWindow(providerId: string, since: string, until: string): LedgerEntry[] {
-    const rows = this.#db.raw
-      .prepare('SELECT * FROM ledger WHERE provider_id = ? AND at >= ? AND at < ? ORDER BY seq')
-      .all(providerId, since, until) as Array<Record<string, unknown>>;
-    return rows.map(rowToEntry);
+    return this.#store.listLedgerInWindow(providerId, since, until);
   }
 
   /**
@@ -141,12 +114,9 @@ export class LedgerStore implements LedgerReader {
    * in the provisional and is not implemented at reference stage; see ARCHITECTURE.md.
    */
   verifyChain(providerId: string): { ok: true } | { ok: false; brokenAtSeq: number } {
-    const rows = this.#db.raw
-      .prepare('SELECT * FROM ledger WHERE provider_id = ? ORDER BY seq')
-      .all(providerId) as Array<Record<string, unknown>>;
+    const rows = this.#store.listLedgerOrdered(providerId);
     let prev = GENESIS;
-    for (const row of rows) {
-      const e = rowToEntry(row);
+    for (const e of rows) {
       if (e.prevHash !== prev) return { ok: false, brokenAtSeq: e.seq };
       const expect = LedgerStore.hashEntry({ ...e, prevHash: prev });
       if (expect !== e.hash) return { ok: false, brokenAtSeq: e.seq };
@@ -158,26 +128,11 @@ export class LedgerStore implements LedgerReader {
   // Carryover, provisional Section 1.8.
 
   getCarryover(providerId: string): CarryoverState | undefined {
-    const row = this.#db.raw.prepare('SELECT * FROM carryover WHERE provider_id = ?').get(providerId) as
-      | { provider_id: string; multiplier: number; clean_remaining: number; set_at: string }
-      | undefined;
-    if (!row) return undefined;
-    return {
-      providerId: row.provider_id,
-      multiplier: row.multiplier,
-      cleanRemaining: row.clean_remaining,
-      setAt: row.set_at,
-    };
+    return this.#store.getCarryover(providerId);
   }
 
   setCarryover(state: CarryoverState): void {
-    this.#db.raw
-      .prepare(
-        `INSERT INTO carryover(provider_id, multiplier, clean_remaining, set_at) VALUES (?,?,?,?)
-         ON CONFLICT(provider_id) DO UPDATE SET multiplier=excluded.multiplier,
-           clean_remaining=excluded.clean_remaining, set_at=excluded.set_at`,
-      )
-      .run(state.providerId, state.multiplier, state.cleanRemaining, state.setAt);
+    this.#store.setCarryover(state);
   }
 
   /** A clean response decays the carryover by one. At zero the modifier is removed. */
@@ -185,7 +140,7 @@ export class LedgerStore implements LedgerReader {
     const c = this.getCarryover(providerId);
     if (!c) return;
     if (c.cleanRemaining <= 1) {
-      this.#db.raw.prepare('DELETE FROM carryover WHERE provider_id = ?').run(providerId);
+      this.#store.deleteCarryover(providerId);
       return;
     }
     this.setCarryover({ ...c, cleanRemaining: c.cleanRemaining - 1 });
@@ -194,47 +149,14 @@ export class LedgerStore implements LedgerReader {
   // Blocks, provisional Sections 1.5 and 1.8.
 
   raiseBlock(rec: Omit<BlockRecord, 'releasedAt' | 'releasedBy'>): void {
-    this.#db.raw
-      .prepare('INSERT OR REPLACE INTO blocks(provider_id, response_id, authority, raised_at) VALUES (?,?,?,?)')
-      .run(rec.providerId, rec.responseId, rec.authority, rec.raisedAt);
+    this.#store.upsertBlock(rec);
   }
 
   openBlocks(providerId: string): BlockRecord[] {
-    const rows = this.#db.raw
-      .prepare('SELECT * FROM blocks WHERE provider_id = ? AND released_at IS NULL ORDER BY raised_at')
-      .all(providerId) as Array<{
-      provider_id: string;
-      response_id: string;
-      authority: string;
-      raised_at: string;
-    }>;
-    return rows.map((r) => ({
-      providerId: r.provider_id,
-      responseId: r.response_id,
-      authority: r.authority as ReleaseAuthority,
-      raisedAt: r.raised_at,
-    }));
+    return this.#store.listOpenBlocks(providerId);
   }
 
   releaseBlock(providerId: string, responseId: string, releasedBy: string, at: string): void {
-    this.#db.raw
-      .prepare('UPDATE blocks SET released_at = ?, released_by = ? WHERE provider_id = ? AND response_id = ?')
-      .run(at, releasedBy, providerId, responseId);
+    this.#store.releaseBlock(providerId, responseId, releasedBy, at);
   }
-}
-
-function rowToEntry(row: Record<string, unknown>): LedgerEntry {
-  return {
-    seq: row['seq'] as number,
-    providerId: row['provider_id'] as string,
-    responseId: row['response_id'] as string,
-    at: row['at'] as string,
-    flags: JSON.parse(row['flags_json'] as string) as LedgerFlag[],
-    outcome: row['outcome'] as DeliveryOutcomeKind,
-    score: row['score'] as number,
-    evaluatorVersion: row['evaluator_version'] as string,
-    taxonomyVersion: row['taxonomy_version'] as string,
-    prevHash: row['prev_hash'] as string,
-    hash: row['hash'] as string,
-  };
 }

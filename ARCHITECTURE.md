@@ -12,24 +12,27 @@ response through fourteen steps. That path is the spine of this repository.
 ## Shape of the repository
 
 ```
-packages/core       provider-agnostic library, no UI dependencies, no network beyond providers
-packages/daemon     local HTTP server on 127.0.0.1, and HostSession (the callable API surface)
-packages/ui         React chat surface
-packages/desktop    Tauri shell (first slice: window over the loopback daemon sidecar)
-packages/demo       mock providers and the scripted end-to-end scenario
-data/               taxonomy, policy, jurisdictions, register, standing: documents, not code
-tools/              demo key minting
+packages/core          provider-agnostic library, no UI dependencies, no network beyond providers
+packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped persistence implementation
+packages/daemon        local HTTP server on 127.0.0.1, and HostSession (HTTP + desktop stdio IPC)
+packages/ui            React chat surface
+packages/desktop       Tauri shell (HostSession over stdio IPC, no HTTP listener for the core API)
+packages/demo          mock providers and the scripted end-to-end scenario
+data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code
+tools/                 demo key minting
 ```
 
 Three deliberate boundaries.
 
 The core has no UI dependency and no framework. It is a library that could be driven by a CLI,
-a desktop shell, or a phone, and the daemon exists only because SQLite and the filesystem do
-not live in a browser tab. Desktop packaging has started: `packages/desktop` is a Tauri 2
-shell that spawns the Node daemon as a 127.0.0.1 sidecar and loads it in a webview. That is
-scaffolding, not the finished shape. Replacing the HTTP listener with an in-process (or IPC)
-call into `HostSession` (`packages/daemon/src/host.ts`) is the next slice, and
-`AIDP_DESKTOP=1` makes the advocate say so at startup.
+a desktop shell, or a phone. Persistence is a capability the host injects through
+`StoreBackend` (`packages/core/src/store/port.ts`). The SQLite adapter lives in
+`packages/store-sqlite` and is the only shipped implementation. The daemon exists because
+filesystem paths and a browser tab do not meet; it constructs the SQLite adapter and calls
+into core. Desktop packaging uses the same `HostSession` (`packages/daemon/src/host.ts`) over
+stdio IPC from a Node child process (`ipc-host.ts`), with Tauri commands as the bridge. The
+browser-tab path still uses the loopback HTTP listener. Embedding HostSession inside the Tauri
+binary is a later slice; `AIDP_DESKTOP=1` makes the advocate say so at startup.
 
 The trust artifacts are data files with detached signatures and pinned public keys, not
 hardcoded constants. The Serving Register, the Standing document, the flag taxonomy, the
@@ -54,7 +57,7 @@ it is discussed below.
 | 6 | the sealed response returns | `core/src/interchange/openai-adapter.ts` |
 | 7 | deterministic layer | `core/src/monitor/deterministic.ts`, `core/src/monitor/register.ts`, `core/src/crypto/seal.ts` |
 | 8 | semantic layer | `core/src/monitor/semantic.ts`, `core/src/monitor/taxonomy.ts`, `core/src/monitor/evaluators/` |
-| 9 | the ledger | `core/src/store/ledger.ts`, `core/src/store/db.ts` |
+| 9 | the ledger | `core/src/store/ledger.ts`, `core/src/store/port.ts`, adapter: `store-sqlite` |
 | 10 | the score | `core/src/policy/score.ts`, `core/src/policy/config.ts` |
 | 11 | the resolution | `core/src/policy/delivery.ts`, `core/src/policy/jurisdiction.ts` |
 | 12 | delivery, with pinned notices | `core/src/policy/notices.ts`, `ui/src/App.tsx`, host: `daemon/src/host.ts` |
@@ -65,7 +68,7 @@ The provisional patent application's four mechanisms map on top of the same file
 | Mechanism | Provisional | Module |
 | --- | --- | --- |
 | 1. Deferred-delivery gate with rolling-window accumulation | Sections 1.1 to 1.9 | `core/src/policy/score.ts`, `delivery.ts`, `core/src/store/ledger.ts` |
-| 2. Local-custody split with portable corpus | Sections 2.1 to 2.8 | `core/src/crypto/keys.ts`, `core/src/store/` |
+| 2. Local-custody split with portable corpus | Sections 2.1 to 2.8 | `core/src/crypto/keys.ts`, `core/src/store/`, `store-sqlite` |
 | 3. Independent monitor with integrity attestation | Sections 3.1 to 3.8 | `core/src/monitor/` |
 | 4. Statistical enforcement engine | Sections 4.1 to 4.8 | `core/src/telemetry/` |
 
@@ -111,8 +114,25 @@ and cannot catch the subtle ones, which the code says in its own comments.
 real failure: someone set an evaluator config, ran the demo, and could not tell from the output
 whether it had taken effect. Configuration that silently does nothing is worse than
 configuration that fails loudly, so there is now one command that answers what this advocate is
-going to do with the files and environment variables it can see. It sends no requests to
-anyone.
+going to do with the files and environment variables it can see. It names the storage adapter
+that resolved. It sends no requests to anyone.
+
+## Persistence port
+
+`StoreBackend` in `packages/core/src/store/port.ts` is the seam between decisions and storage.
+Core keeps the ledger's canonical serialization and hash chaining, sequence assignment,
+`verifyChain`, key-scope guards, evidence-under-transcript, and carryover and block semantics.
+The host supplies opening, closing, migrating, and row-level reads and writes.
+`@aidp/store-sqlite` is the shipped adapter: schema, WAL, pragmas, and path handling.
+`runStoreConformance` in core is the behavioral suite a second adapter must pass.
+
+Ledger hashing uses a small pure-TypeScript SHA-256 in core so `hashEntry` stays synchronous
+and free of `node:crypto`. Ed25519 seal sign/verify uses the same tradeoff: vendored
+`@noble/ed25519` plus a pure-TypeScript SHA-512 in core, so `signSeal` / `verifySeal` stay
+synchronous and portable. Random seeds use `globalThis.crypto.getRandomValues` (Web Crypto),
+not `node:crypto`. Store custody crypto in `crypto/keys.ts` (scrypt, HKDF, AES-256-GCM, and
+`randomBytes` for master secrets and IVs) is still Node-bound; that is a separate portability
+question from seals.
 
 **Carryover lowers thresholds rather than multiplying severities.** The provisional discloses
 both. A number the user can watch move is easier to argue with than a multiplier buried in a
@@ -187,12 +207,13 @@ designated severe categories. The `escalating` release-authority class exists in
 system and nothing implements it. Whether to build it at all is an open design-ethics question
 in the author's own notes, and building it quietly would have been the wrong way to answer it.
 
-**In-process desktop bridge.** The Tauri shell exists and can wrap the local UI, but the UI
-still talks HTTP to the loopback daemon. `HostSession` is the shared API the next slice should
-call without a listener. Until then, the desktop packaging warning is reported at startup when
-`AIDP_DESKTOP=1`. Bundled installers (`bundle.active`) are off; icons are placeholders.
-Building the shell needs Rust and Tauri 2 system libraries (webkit2gtk 4.1 on Linux). See
-`packages/desktop/README.md`.
+**Desktop HostSession still lives in Node.** The Tauri shell loads the built UI from disk and
+calls `HostSession` through Tauri commands over stdio IPC (`packages/daemon/src/ipc-host.ts`).
+There is no HTTP listener for advocate operations in the desktop path. The browser-tab path
+still uses the loopback daemon. HostSession is not yet embedded in the Tauri binary;
+`AIDP_DESKTOP=1` reports that gap at startup. Bundled installers (`bundle.active`) are off;
+icons are placeholders. Building the shell needs Rust and Tauri 2 system libraries
+(webkit2gtk 4.1 on Linux). See `packages/desktop/README.md`.
 
 ## Working agreements
 

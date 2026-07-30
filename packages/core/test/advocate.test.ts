@@ -3,21 +3,26 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { Advocate } from '../src/advocate.js';
-import { AdvocateDb } from '../src/store/db.js';
-import { MasterSecret } from '../src/crypto/keys.js';
-import { ProviderRegistry } from '../src/interchange/providers.js';
-import { ServingRegister } from '../src/monitor/register.js';
-import { StandingRegistry } from '../src/telemetry/standing.js';
-import { Taxonomy } from '../src/monitor/taxonomy.js';
-import { RuleEvaluator } from '../src/monitor/evaluators/rule-evaluator.js';
-import { SemanticMonitor } from '../src/monitor/semantic.js';
-import { DeliveryPolicy } from '../src/policy/config.js';
-import { Jurisdiction } from '../src/policy/jurisdiction.js';
-import { openAdvocate } from '../src/setup.js';
-import { HEADER_ATTESTATIONS, HEADER_SEAL, decodeAttestations, encodeSeal } from '../src/interchange/wire.js';
-import { generateSealKeypair, signSeal } from '../src/crypto/seal.js';
+import { openSqliteStore, openAdvocate } from '@aidp/store-sqlite';
 import { dataPath } from './helpers.js';
+import {
+  Advocate,
+  decodeAttestations,
+  DeliveryPolicy,
+  encodeSeal,
+  generateSealKeypair,
+  HEADER_ATTESTATIONS,
+  HEADER_SEAL,
+  Jurisdiction,
+  MasterSecret,
+  ProviderRegistry,
+  RuleEvaluator,
+  SemanticMonitor,
+  ServingRegister,
+  signSeal,
+  StandingRegistry,
+  Taxonomy,
+} from '@aidp/core';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
 const policy = DeliveryPolicy.loadFromFile(dataPath('policy', 'delivery-policy.json'));
@@ -82,9 +87,9 @@ function build(opts: {
     opts.script,
     opts.sealed ? { privateKeyPem: keys.privateKeyPem, entryId: 'e.test', model: 'test-model' } : undefined,
   );
-  const db = new AdvocateDb({ path: ':memory:' });
+  const store = openSqliteStore(':memory:');
   const advocate = new Advocate({
-    db,
+    store,
     master: MasterSecret.generate(),
     providers: new ProviderRegistry([
       {
@@ -103,7 +108,7 @@ function build(opts: {
     attestations: { isAdult: opts.isAdult ?? true, jurisdiction: 'none', issuer: 'test' },
     fetchImpl,
   });
-  return { advocate, seen, db };
+  return { advocate, seen, store };
 }
 
 const CLEAN = 'The capital of Nepal is Kathmandu.';
@@ -257,7 +262,7 @@ test('openAdvocate loads the shipped documents and reports its own gaps', () => 
       'pending jurisdiction provisions must be named at startup',
     );
     assert.ok(opened.jurisdiction.pendingProvisions().some((p) => p.id === 'minorOnly'));
-    opened.db.close();
+    opened.store.close();
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

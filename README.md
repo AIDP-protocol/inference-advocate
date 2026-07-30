@@ -29,8 +29,10 @@ Not a gateway for developers. Not a moderation product for schools or employers.
 
 ## Running it
 
-Requires Node 22.5 or later. There are no runtime dependencies: local persistence uses the
-built-in `node:sqlite`, and signing and verification use `node:crypto`.
+Requires Node 22.5 or later. Core has no npm runtime dependencies: Provenance Seal sign and
+verify are pure TypeScript (vendored Ed25519), ledger hashing is pure TypeScript SHA-256, and
+persistence is injected through `StoreBackend` (`@aidp/store-sqlite` uses `node:sqlite`). Store
+custody crypto in `crypto/keys.ts` (scrypt, HKDF, AES-GCM) is still Node-bound.
 
 ```bash
 npm install
@@ -65,7 +67,7 @@ Desktop shell (optional; needs Rust and Tauri 2 system libraries, see
 
 ```bash
 npm run mocks     # if using demo providers
-npm run desktop   # Tauri window; still a loopback daemon under the hood
+npm run desktop   # Tauri window; HostSession over stdio IPC (no HTTP for the core API)
 ```
 
 ## The semantic evaluator
@@ -111,12 +113,13 @@ Two costs of a hosted evaluator, both surfaced by the advocate rather than burie
 ## Layout
 
 ```
-packages/core     the advocate itself. Provider agnostic, no UI dependencies.
-packages/daemon   local HTTP server on 127.0.0.1, and HostSession for a future in-process bridge.
-packages/ui       React chat surface, monitor panel, policy view, export view.
-packages/desktop  Tauri shell (first slice: window over the loopback daemon sidecar).
-packages/demo     mock providers and the scripted scenario.
-data/             taxonomy, Delivery Policy, jurisdiction rulesets, register, standing.
+packages/core          the advocate itself. Provider agnostic, no UI dependencies.
+packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped persistence implementation.
+packages/daemon        local HTTP server on 127.0.0.1 for the browser tab, and HostSession (also stdio IPC for desktop).
+packages/ui            React chat surface, monitor panel, policy view, export view.
+packages/desktop       Tauri shell (HostSession over stdio IPC; no HTTP listener for the core API).
+packages/demo          mock providers and the scripted scenario.
+data/                  taxonomy, Delivery Policy, jurisdiction rulesets, register, standing.
 ```
 
 See **ARCHITECTURE.md** for the module-to-paper map, the design decisions worth arguing with,

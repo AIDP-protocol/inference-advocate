@@ -1,21 +1,10 @@
-// Local persistence. One SQLite file on the user's device. No cloud component anywhere.
+// SQLite schema for the on-device advocate store.
 //
-// Paper: Section 6 ("an operator who never holds a thing cannot be compelled to produce it").
-// Provisional: Mechanism 2, Section 2.2 (store segregation).
-// The segregation is logical within one file and cryptographic by column: each store's
-// content is sealed under that store's key. One file is the residency promise made literal;
-// separate keys are what stop a compromise of one function from yielding the whole person.
+// Paper: Section 6. Provisional: Mechanism 2, Section 2.2.
+// Schema shape is a backend concern. Logical segregation lives in the table layout and in the
+// seal column; cryptographic segregation is the per-store key held above the adapter.
 
-import { DatabaseSync } from 'node:sqlite';
-import { mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
-
-export interface OpenOptions {
-  /** Path to the single on-device file. Use ':memory:' in tests. */
-  path: string;
-}
-
-const SCHEMA = `
+export const SCHEMA = `
 CREATE TABLE IF NOT EXISTS meta (
   key   TEXT PRIMARY KEY,
   value TEXT NOT NULL
@@ -92,34 +81,3 @@ CREATE TABLE IF NOT EXISTS telemetry_batches (
   payload_json  TEXT NOT NULL
 );
 `;
-
-export class AdvocateDb {
-  readonly raw: DatabaseSync;
-  readonly path: string;
-
-  constructor(opts: OpenOptions) {
-    this.path = opts.path;
-    if (opts.path !== ':memory:') mkdirSync(dirname(opts.path), { recursive: true });
-    this.raw = new DatabaseSync(opts.path);
-    this.raw.exec('PRAGMA journal_mode = WAL;');
-    this.raw.exec('PRAGMA foreign_keys = ON;');
-    this.raw.exec(SCHEMA);
-  }
-
-  getMeta(key: string): string | undefined {
-    const row = this.raw.prepare('SELECT value FROM meta WHERE key = ?').get(key) as
-      | { value: string }
-      | undefined;
-    return row?.value;
-  }
-
-  setMeta(key: string, value: string): void {
-    this.raw
-      .prepare('INSERT INTO meta(key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value')
-      .run(key, value);
-  }
-
-  close(): void {
-    this.raw.close();
-  }
-}

@@ -1,6 +1,6 @@
 // Launches `tauri` after ensuring Node builds and the Rust toolchain are on PATH.
 //
-// Paper: steps 1 and 12. The shell sets AIDP_DESKTOP=1 so HostSession reports the HTTP gap.
+// Paper: steps 1 and 12. The shell sets AIDP_DESKTOP=1 so HostSession reports the Node IPC gap.
 
 import { spawn, spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
@@ -26,7 +26,6 @@ const env = {
   PATH: pathParts.join(process.platform === 'win32' ? ';' : ':'),
   AIDP_REPO_ROOT: repoRoot,
   AIDP_DESKTOP: '1',
-  AIDP_PORT: process.env.AIDP_PORT ?? '8790',
   AIDP_NODE: process.env.AIDP_NODE ?? process.execPath,
 };
 

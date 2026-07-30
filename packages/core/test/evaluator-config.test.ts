@@ -4,10 +4,9 @@ import { createServer } from 'node:http';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { Taxonomy } from '../src/monitor/taxonomy.js';
-import { resolveEvaluator, discoverEvaluatorConfig } from '../src/monitor/evaluator-config.js';
-import { openAdvocate } from '../src/setup.js';
+import { openAdvocate } from '@aidp/store-sqlite';
 import { dataPath } from './helpers.js';
+import { discoverEvaluatorConfig, resolveEvaluator, Taxonomy } from '@aidp/core';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
 
@@ -130,7 +129,7 @@ test('openAdvocate picks up an evaluator config and reports the outbound path in
     const view = opened.advocate.exportView('2000-01-01T00:00:00.000Z', '2030-01-01T00:00:00.000Z');
     assert.equal(view.outboundContentPaths.length, 1);
     assert.ok(view.outboundContentPaths[0]?.includes('evaluator.example.com'));
-    opened.db.close();
+    opened.store.close();
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

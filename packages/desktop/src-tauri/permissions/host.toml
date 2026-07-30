@@ -1,0 +1,4 @@
+[[permission]]
+identifier = "allow-host-call"
+description = "Allows the UI to call HostSession methods over the desktop stdio IPC bridge."
+commands.allow = ["host_call"]

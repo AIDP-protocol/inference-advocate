@@ -6,6 +6,9 @@
 // What is real here: the derivation, the per-store separation, and the fact that a component
 // handed one store key cannot read another store. What is deferred: hardware backing, the
 // recovery spectrum, and the attestation wallet. Those are named in ARCHITECTURE.md as gaps.
+//
+// This module is still Node-bound (scrypt, HKDF, AES-256-GCM, randomBytes). Ed25519 seals
+// are not derived here; they live in seal.ts / ed25519.ts and are portable.
 
 import { hkdfSync, scryptSync, randomBytes, createCipheriv, createDecipheriv } from 'node:crypto';
 

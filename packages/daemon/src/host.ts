@@ -1,23 +1,22 @@
 // The advocate host session: core opened once, API operations as function calls.
 //
 // Paper: steps 1 and 12.
-// Desktop packaging replaces this HTTP seam with an in-process (or IPC) call from a
-// Tauri shell.
+// Desktop packaging calls these methods over stdio IPC (ipc-host.ts) via Tauri commands.
+// The browser-tab UI still reaches them through the loopback HTTP daemon (server.ts).
 //
 // Why this file exists separately from server.ts. The daemon is an HTTP surface because the
 // UI runs in a browser tab that cannot open SQLite. Desktop packaging wants the same
 // operations without pretending HTTP is the product. Extracting the session means the loopback
-// server and a future Tauri command bridge share one implementation. The first Tauri slice
-// still speaks HTTP to this host; the next slice should call these methods without a listener.
+// server and the Tauri IPC bridge share one implementation.
 
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   ProviderRegistry,
-  openAdvocate,
   type ExchangeResult,
   type OpenedAdvocate,
 } from '@aidp/core';
+import { openAdvocate } from '@aidp/store-sqlite';
 
 export interface HostPaths {
   dataDir: string;
@@ -41,10 +40,49 @@ export function packagingWarnings(env: NodeJS.ProcessEnv = process.env): string[
   const out: string[] = [];
   if (env['AIDP_DESKTOP'] === '1') {
     out.push(
-      'desktop packaging is a Tauri shell over the loopback daemon; the UI still talks HTTP to 127.0.0.1. Replacing that with in-process Tauri commands is the next slice',
+      'desktop packaging calls HostSession over stdio IPC from a Node child process; the advocate is not yet embedded in-process in the Tauri binary',
     );
   }
   return out;
+}
+
+/**
+ * Named operations shared by the HTTP daemon and the desktop stdio IPC host.
+ * Keeping the method table in one place means the two seams cannot drift.
+ */
+export async function dispatchHostMethod(
+  host: HostSession,
+  method: string,
+  params: Record<string, unknown> = {},
+): Promise<unknown> {
+  switch (method) {
+    case 'state':
+      return host.state();
+    case 'policy':
+      return { markdown: host.policyMarkdown() };
+    case 'transcript':
+      return host.transcript();
+    case 'ask':
+      return host.ask(String(params['providerId'] ?? ''), String(params['text'] ?? ''));
+    case 'release': {
+      const actor = params['actor'] === 'custodian' ? 'custodian' : 'self';
+      return host.release(
+        String(params['providerId'] ?? ''),
+        String(params['responseId'] ?? ''),
+        actor,
+      );
+    }
+    case 'session.new':
+      return host.newSession();
+    case 'export': {
+      const floor = params['floor'];
+      const n =
+        floor === undefined || floor === null || floor === '' ? undefined : Number(floor);
+      return host.exportView(n !== undefined && Number.isFinite(n) ? n : undefined);
+    }
+    default:
+      throw new Error(`unknown host method: ${method}`);
+  }
 }
 
 export class HostSession {

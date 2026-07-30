@@ -5,11 +5,12 @@
   "identifier": "org.aidp.advocate",
   "build": {
     "beforeDevCommand": "node scripts/ensure-built.mjs",
-    "devUrl": "http://127.0.0.1:8790",
+    "devUrl": "../../ui/dist",
     "beforeBuildCommand": "node scripts/ensure-built.mjs",
-    "frontendDist": "http://127.0.0.1:8790"
+    "frontendDist": "../../ui/dist"
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [
       {
         "label": "main",

@@ -1,6 +1,6 @@
-// Ensures core, daemon, and UI are built before the Tauri shell starts the sidecar.
+// Ensures core, daemon, and UI are built before the Tauri shell starts the IPC host.
 //
-// Paper: steps 1 and 12. Desktop packaging: the shell still needs the Node daemon on disk.
+// Paper: steps 1 and 12. Desktop packaging needs the Node HostSession IPC entry and the UI dist.
 
 import { existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -18,10 +18,10 @@ function need(path, label) {
   }
 }
 
-const daemonJs = join(repoRoot, 'packages', 'daemon', 'dist', 'server.js');
+const ipcHostJs = join(repoRoot, 'packages', 'daemon', 'dist', 'ipc-host.js');
 const uiIndex = join(repoRoot, 'packages', 'ui', 'dist', 'index.html');
 
-if (!existsSync(daemonJs) || !existsSync(uiIndex)) {
+if (!existsSync(ipcHostJs) || !existsSync(uiIndex)) {
   console.log('building core, daemon, and UI for the desktop shell...');
   const r = spawnSync('npm', ['run', 'build'], { cwd: repoRoot, stdio: 'inherit', shell: process.platform === 'win32' });
   if (r.status !== 0) process.exit(r.status ?? 1);
@@ -29,6 +29,6 @@ if (!existsSync(daemonJs) || !existsSync(uiIndex)) {
   if (u.status !== 0) process.exit(u.status ?? 1);
 }
 
-need(daemonJs, 'daemon entry');
+need(ipcHostJs, 'daemon IPC host entry');
 need(uiIndex, 'UI build');
 console.log('desktop prerequisites present');

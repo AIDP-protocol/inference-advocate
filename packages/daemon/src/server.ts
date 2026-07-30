@@ -3,17 +3,17 @@
 // Paper: steps 1 and 12.
 //
 // Why this exists. The core needs a filesystem and a SQLite file, so it runs in a process
-// rather than in a browser tab, and the UI needs to talk to it. This daemon is that seam. It
-// listens on the loopback interface only, has no authentication because it has no remote
-// surface to authenticate, and is the piece that a desktop packaging step (Tauri) replaces
-// with an in-process call. The first Tauri slice still launches this listener inside the
-// desktop shell; HostSession (host.ts) is the API surface that slice and the next one share.
+// rather than in a browser tab, and the UI needs to talk to it. This daemon is that seam for
+// the browser-tab path. It listens on the loopback interface only, has no authentication
+// because it has no remote surface to authenticate. Desktop packaging uses ipc-host.ts
+// instead (stdio into HostSession, no listener). Both seams share HostSession and
+// dispatchHostMethod.
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
 import { extname, join, normalize, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { HostSession } from './host.js';
+import { dispatchHostMethod, HostSession } from './host.js';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const dataDir = process.env['AIDP_DATA_DIR'] ?? join(repoRoot, 'data');
@@ -65,40 +65,40 @@ const server = createServer(async (req, res) => {
 
   try {
     if (url.pathname === '/api/state') {
-      json(res, 200, host.state());
+      json(res, 200, await dispatchHostMethod(host, 'state'));
       return;
     }
 
     if (url.pathname === '/api/policy') {
-      json(res, 200, { markdown: host.policyMarkdown() });
+      json(res, 200, await dispatchHostMethod(host, 'policy'));
       return;
     }
 
     if (url.pathname === '/api/transcript') {
-      json(res, 200, host.transcript());
+      json(res, 200, await dispatchHostMethod(host, 'transcript'));
       return;
     }
 
     if (url.pathname === '/api/ask' && req.method === 'POST') {
       const body = await readBody<{ providerId: string; text: string }>(req);
-      json(res, 200, await host.ask(body.providerId, body.text));
+      json(res, 200, await dispatchHostMethod(host, 'ask', { ...body }));
       return;
     }
 
     if (url.pathname === '/api/release' && req.method === 'POST') {
       const body = await readBody<{ providerId: string; responseId: string; actor: 'self' | 'custodian' }>(req);
-      json(res, 200, host.release(body.providerId, body.responseId, body.actor));
+      json(res, 200, await dispatchHostMethod(host, 'release', { ...body }));
       return;
     }
 
     if (url.pathname === '/api/session/new' && req.method === 'POST') {
-      json(res, 200, host.newSession());
+      json(res, 200, await dispatchHostMethod(host, 'session.new'));
       return;
     }
 
     if (url.pathname === '/api/export') {
       const floor = url.searchParams.get('floor');
-      json(res, 200, host.exportView(floor ? Number(floor) : undefined));
+      json(res, 200, await dispatchHostMethod(host, 'export', floor ? { floor } : {}));
       return;
     }
 
@@ -129,8 +129,7 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
-  const kind = process.env['AIDP_DESKTOP'] === '1' ? 'desktop sidecar' : 'daemon';
-  console.log(`inference advocate ${kind} on http://127.0.0.1:${PORT}`);
+  console.log(`inference advocate daemon on http://127.0.0.1:${PORT}`);
   console.log(`  store        ${join(runDir, 'advocate.sqlite')}`);
   console.log(`  providers    ${join(runDir, 'providers.json')}`);
   console.log(`  jurisdiction ${host.opened.jurisdiction.ruleset.id}`);

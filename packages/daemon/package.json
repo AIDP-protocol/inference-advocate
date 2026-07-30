@@ -1,7 +1,7 @@
 {
   "name": "@aidp/daemon",
   "version": "0.1.0-pre",
-  "description": "Local HTTP daemon exposing the advocate core to the UI on 127.0.0.1. No cloud component.",
+  "description": "Local HostSession host: HTTP daemon on 127.0.0.1 for the browser tab, and stdio IPC for desktop.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {
@@ -10,7 +10,8 @@
     "test": "npm run build && node --test test/host.test.mjs"
   },
   "dependencies": {
-    "@aidp/core": "*"
+    "@aidp/core": "*",
+    "@aidp/store-sqlite": "*"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

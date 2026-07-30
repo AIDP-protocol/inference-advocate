@@ -12,7 +12,7 @@ import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { openAdvocate } from '@aidp/core';
+import { openAdvocate } from '@aidp/store-sqlite';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const dataDir = process.env['AIDP_DATA_DIR'] ?? join(repoRoot, 'data');
@@ -58,6 +58,8 @@ try {
 
   console.log('');
   console.log('resolved');
+  line('storage adapter', opened.store.adapterId);
+  line('store location', opened.store.location);
   line('taxonomy', `${opened.taxonomy.version} (${opened.taxonomy.document.status})`);
   line('policy', `${opened.policy.document.policyVersion}, ${opened.policy.document.scale} scale`);
   line('mode', opened.policy.document.mode);
@@ -98,7 +100,7 @@ try {
   console.log('what this advocate says about itself');
   for (const w of opened.warnings) console.log(`  - ${w}`);
 
-  opened.db.close();
+  opened.store.close();
 } catch (err) {
   console.log('');
   console.log(`could not open the advocate: ${(err as Error).message}`);

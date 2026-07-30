@@ -1,26 +1,32 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { AdvocateDb } from '../src/store/db.js';
-import { MasterSecret } from '../src/crypto/keys.js';
-import { LedgerStore } from '../src/store/ledger.js';
-import { TranscriptStore } from '../src/store/transcripts.js';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { openSqliteStore, type SqliteStore } from '@aidp/store-sqlite';
+import {
+  LedgerStore,
+  MasterSecret,
+  TranscriptStore,
+  type AppendInput,
+} from '@aidp/core';
+import { repoRoot } from './helpers.js';
 
 function fixture() {
-  const db = new AdvocateDb({ path: ':memory:' });
+  const store = openSqliteStore(':memory:');
   const master = MasterSecret.generate();
   return {
-    db,
+    store,
     master,
-    ledger: new LedgerStore(db, master.deriveStoreKey('ledger')),
-    transcripts: new TranscriptStore(db, master.deriveStoreKey('transcript')),
+    ledger: new LedgerStore(store, master.deriveStoreKey('ledger')),
+    transcripts: new TranscriptStore(store, master.deriveStoreKey('transcript')),
   };
 }
 
 test('a store refuses a key scoped to another store', () => {
-  const db = new AdvocateDb({ path: ':memory:' });
+  const store = openSqliteStore(':memory:');
   const master = MasterSecret.generate();
-  assert.throws(() => new LedgerStore(db, master.deriveStoreKey('transcript')));
-  assert.throws(() => new TranscriptStore(db, master.deriveStoreKey('ledger')));
+  assert.throws(() => new LedgerStore(store, master.deriveStoreKey('transcript')));
+  assert.throws(() => new TranscriptStore(store, master.deriveStoreKey('ledger')));
 });
 
 test('the ledger chains and the chain verifies', () => {
@@ -43,7 +49,7 @@ test('the ledger chains and the chain verifies', () => {
 });
 
 test('rewriting a ledger row breaks the chain at that row', () => {
-  const { db, ledger } = fixture();
+  const { store, ledger } = fixture();
   for (let i = 0; i < 3; i++) {
     ledger.append({
       providerId: 'p1',
@@ -56,12 +62,14 @@ test('rewriting a ledger row breaks the chain at that row', () => {
       taxonomyVersion: 'v0.1.0',
     });
   }
-  db.raw.prepare("UPDATE ledger SET outcome = 'refuse' WHERE seq = 2 AND provider_id = 'p1'").run();
+  (store as SqliteStore).raw
+    .prepare("UPDATE ledger SET outcome = 'refuse' WHERE seq = 2 AND provider_id = 'p1'")
+    .run();
   assert.deepEqual(ledger.verifyChain('p1'), { ok: false, brokenAtSeq: 2 });
 });
 
 test('evidence lives under the transcript key and the ledger only holds a reference', () => {
-  const { ledger, transcripts, db } = fixture();
+  const { ledger, transcripts, store } = fixture();
   const ref = transcripts.putEvidence('r1', [{ start: 0, end: 5, text: 'hello' }]);
   ledger.append({
     providerId: 'p1',
@@ -75,12 +83,16 @@ test('evidence lives under the transcript key and the ledger only holds a refere
   });
 
   // What the ledger row actually contains, read straight out of the table.
-  const row = db.raw.prepare('SELECT flags_json FROM ledger WHERE provider_id = ?').get('p1') as { flags_json: string };
+  const row = (store as SqliteStore).raw
+    .prepare('SELECT flags_json FROM ledger WHERE provider_id = ?')
+    .get('p1') as { flags_json: string };
   assert.equal(row.flags_json.includes('hello'), false);
   assert.equal(row.flags_json.includes(ref), true);
 
   // And the evidence itself is sealed, so the raw row is not readable either.
-  const ev = db.raw.prepare('SELECT sealed FROM evidence WHERE ref = ?').get(ref) as { sealed: string };
+  const ev = (store as SqliteStore).raw.prepare('SELECT sealed FROM evidence WHERE ref = ?').get(ref) as {
+    sealed: string;
+  };
   assert.equal(ev.sealed.includes('hello'), false);
   assert.deepEqual(transcripts.getEvidence(ref), [{ start: 0, end: 5, text: 'hello' }]);
 });
@@ -92,4 +104,46 @@ test('carryover decays one clean response at a time', () => {
   assert.equal(ledger.getCarryover('p1')?.cleanRemaining, 1);
   ledger.decayCarryover('p1');
   assert.equal(ledger.getCarryover('p1'), undefined);
+});
+
+test('a pre-refactor ledger fixture verifies with identical hashes', () => {
+  const fixturePath = join(repoRoot, 'packages', 'core', 'test', 'fixtures', 'ledger-chain-prerefactor.json');
+  const captured = JSON.parse(readFileSync(fixturePath, 'utf8')) as {
+    providerId: string;
+    appendInputs: AppendInput[];
+    entries: Array<{ seq: number; prevHash: string; hash: string; score: number }>;
+    verifyChain: { ok: true };
+    hashEntryGoldens: string[];
+  };
+
+  for (let i = 0; i < captured.entries.length; i++) {
+    const input = captured.appendInputs[i]!;
+    const expected = captured.entries[i]!;
+    const hash = LedgerStore.hashEntry({
+      ...input,
+      seq: expected.seq,
+      prevHash: expected.prevHash,
+    });
+    assert.equal(hash, expected.hash, `hashEntry mismatch at seq ${expected.seq}`);
+  }
+
+  const store = openSqliteStore(':memory:');
+  const ledger = new LedgerStore(store, MasterSecret.generate().deriveStoreKey('ledger'));
+  const written = captured.appendInputs.map((input) => ledger.append(input));
+  for (let i = 0; i < written.length; i++) {
+    assert.equal(written[i]!.hash, captured.entries[i]!.hash, `append hash mismatch at seq ${i + 1}`);
+    assert.equal(written[i]!.prevHash, captured.entries[i]!.prevHash);
+  }
+  assert.deepEqual(ledger.verifyChain(captured.providerId), captured.verifyChain);
+  assert.equal(LedgerStore.hashEntry({
+    providerId: 'fixture-p',
+    seq: 1,
+    responseId: 'r0',
+    at: '2026-07-28T00:00:00.000Z',
+    flags: [],
+    outcome: 'deliver',
+    score: 0,
+    prevHash: '0'.repeat(64),
+  }), captured.hashEntryGoldens[0]);
+  store.close();
 });

@@ -28,7 +28,7 @@ import type {
   ProviderConfig,
   StandingState,
 } from './types.js';
-import { AdvocateDb } from './store/db.js';
+import type { StoreBackend } from './store/port.js';
 import { MasterSecret } from './crypto/keys.js';
 import { TranscriptStore } from './store/transcripts.js';
 import { LedgerStore } from './store/ledger.js';
@@ -47,7 +47,7 @@ import { TelemetryEmitter, type EmitterOptions } from './telemetry/emitter.js';
 import { buildExportView, type ExportView } from './telemetry/export.js';
 
 export interface AdvocateOptions {
-  db: AdvocateDb;
+  store: StoreBackend;
   master: MasterSecret;
   providers: ProviderRegistry;
   register: ServingRegister;
@@ -80,9 +80,9 @@ export class Advocate {
 
   constructor(opts: AdvocateOptions) {
     this.#opts = opts;
-    this.transcripts = new TranscriptStore(opts.db, opts.master.deriveStoreKey('transcript'));
-    this.ledger = new LedgerStore(opts.db, opts.master.deriveStoreKey('ledger'));
-    this.preferences = new PreferenceStore(opts.db, opts.master.deriveStoreKey('preference'));
+    this.transcripts = new TranscriptStore(opts.store, opts.master.deriveStoreKey('transcript'));
+    this.ledger = new LedgerStore(opts.store, opts.master.deriveStoreKey('ledger'));
+    this.preferences = new PreferenceStore(opts.store, opts.master.deriveStoreKey('preference'));
     this.#sessionId = randomUUID();
     this.#noticeStates.set(this.#sessionId, newNoticeState(this.#now().toISOString()));
   }
@@ -335,7 +335,7 @@ export class Advocate {
       batch,
       ledger: this.ledger,
       transcripts: this.transcripts,
-      storePath: this.#opts.db.path,
+      storePath: this.#opts.store.location,
       ...(this.#opts.outboundContentPaths ? { outboundContentPaths: this.#opts.outboundContentPaths } : {}),
       now: this.#now(),
     });

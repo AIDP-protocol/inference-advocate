@@ -8,6 +8,7 @@
 // contained content would be its own refutation.
 
 import { useEffect, useState } from 'react';
+import { hostCall } from './host-client';
 
 interface ExportPayload {
   generatedAt: string;
@@ -27,10 +28,9 @@ export function ExportView() {
   const [floor, setFloor] = useState<number | null>(null);
 
   useEffect(() => {
-    const url = floor === null ? '/api/export' : `/api/export?floor=${floor}`;
-    fetch(url)
-      .then((r) => r.json() as Promise<ExportPayload>)
-      .then(setData)
+    const params = floor === null ? {} : { floor };
+    hostCall('export', params)
+      .then((b) => setData(b as ExportPayload))
       .catch(() => setData(null));
   }, [floor]);
 

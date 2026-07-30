@@ -11,7 +11,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { randomBytes } from 'node:crypto';
-import { AdvocateDb } from './store/db.js';
+import type { StoreBackend } from './store/port.js';
 import { MasterSecret } from './crypto/keys.js';
 import { ProviderRegistry } from './interchange/providers.js';
 import { ServingRegister } from './monitor/register.js';
@@ -31,8 +31,8 @@ import type { AttestationPackage } from './types.js';
 export interface SetupOptions {
   /** Directory holding taxonomy, policy, jurisdictions, register and standing documents. */
   dataDir: string;
-  /** The single on-device store file. */
-  storePath: string;
+  /** Injected persistence. Constructed by the host (for example @aidp/store-sqlite). */
+  store: StoreBackend;
   /** Path to the providers file. Keys are read from named environment variables. */
   providersPath?: string;
   jurisdictionId?: string;
@@ -56,7 +56,7 @@ export interface SetupOptions {
 
 export interface OpenedAdvocate {
   advocate: Advocate;
-  db: AdvocateDb;
+  store: StoreBackend;
   register: ServingRegister;
   standing: StandingRegistry;
   taxonomy: Taxonomy;
@@ -69,6 +69,7 @@ export interface OpenedAdvocate {
 export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
   const warnings: string[] = [];
   const d = opts.dataDir;
+  const store = opts.store;
 
   const taxonomy = Taxonomy.loadFromFile(join(d, 'taxonomy', 'flags.v0.json'));
   const policy = DeliveryPolicy.loadFromFile(join(d, 'policy', 'delivery-policy.json'));
@@ -114,8 +115,7 @@ export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
 
   const providers = opts.providersPath ? ProviderRegistry.load(opts.providersPath) : new ProviderRegistry();
 
-  const db = new AdvocateDb({ path: opts.storePath });
-  const master = loadOrCreateMaster(db, opts.devKeyfile, warnings);
+  const master = loadOrCreateMaster(store, opts.devKeyfile, warnings);
 
   let evaluator: Evaluator;
   let outboundContentPaths: string[] = [];
@@ -151,7 +151,7 @@ export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
   }
 
   const advocate = new Advocate({
-    db,
+    store,
     master,
     providers,
     register,
@@ -165,10 +165,10 @@ export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
     ...(opts.now ? { now: opts.now } : {}),
   });
 
-  return { advocate, db, register, standing, taxonomy, policy, jurisdiction, providers, warnings };
+  return { advocate, store, register, standing, taxonomy, policy, jurisdiction, providers, warnings };
 }
 
-function loadOrCreateMaster(db: AdvocateDb, devKeyfile: string | undefined, warnings: string[]): MasterSecret {
+function loadOrCreateMaster(store: StoreBackend, devKeyfile: string | undefined, warnings: string[]): MasterSecret {
   if (!devKeyfile) {
     warnings.push('no key material configured; using an ephemeral master secret, so this store will not reopen');
     return MasterSecret.generate();
@@ -182,6 +182,6 @@ function loadOrCreateMaster(db: AdvocateDb, devKeyfile: string | undefined, warn
   const bytes = randomBytes(32);
   mkdirSync(join(devKeyfile, '..'), { recursive: true });
   writeFileSync(devKeyfile, bytes.toString('base64') + '\n', { mode: 0o600 });
-  db.setMeta('key.created_at', new Date().toISOString());
+  store.setMeta('key.created_at', new Date().toISOString());
   return MasterSecret.fromBytes(bytes);
 }

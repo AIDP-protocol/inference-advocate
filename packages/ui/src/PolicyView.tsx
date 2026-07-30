@@ -6,14 +6,14 @@
 
 import { useEffect, useState } from 'react';
 import type { AdvocateState } from './types';
+import { hostCall } from './host-client';
 
 export function PolicyView({ state }: { state: AdvocateState | null }) {
   const [markdown, setMarkdown] = useState<string>('');
 
   useEffect(() => {
-    fetch('/api/policy')
-      .then((r) => r.json() as Promise<{ markdown: string }>)
-      .then((b) => setMarkdown(b.markdown))
+    hostCall('policy')
+      .then((b) => setMarkdown((b as { markdown: string }).markdown))
       .catch(() => setMarkdown('The Delivery Policy file could not be read.'));
   }, []);
 

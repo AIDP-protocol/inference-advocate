@@ -1,0 +1,19 @@
+[package]
+name = "inference-advocate"
+version = "0.1.0"
+description = "AIDP inference advocate desktop shell (Tauri over the local daemon)"
+authors = ["Justin Philip Flores"]
+edition = "2021"
+license = "Apache-2.0"
+
+[lib]
+name = "inference_advocate_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

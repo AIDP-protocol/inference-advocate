@@ -8,7 +8,7 @@ An existence proof. The survey verdict was that no shipping product is simultane
 
 ## Stack
 
-TypeScript throughout. Core logic as a provider-agnostic library with no UI dependencies. React for the UI shell. Local persistence in SQLite as a single on-device file, which makes local-first residency literal rather than aspirational. Desktop packaging (Tauri) is deferred until the core demo works; a local web app is fine for the reference stage.
+TypeScript throughout. Core logic as a provider-agnostic library with no UI dependencies. React for the UI shell. Local persistence in SQLite as a single on-device file, which makes local-first residency literal rather than aspirational. Desktop packaging (Tauri) has a first slice in `packages/desktop`: a window over the loopback daemon sidecar. Replacing that HTTP seam with HostSession invoke is the next desktop step; a local web app remains supported.
 
 ## Phases
 
@@ -52,9 +52,11 @@ The repo is done at reference stage when one scripted scenario runs end to end: 
 
 ## Status note
 
-Phases 0 through 5 are implemented and the demo milestone runs end to end. What is not built is
-listed in ARCHITECTURE.md rather than left to be discovered, and the advocate reports several of
-those gaps about itself at startup. The open decisions that need a human are in DECISIONS.md.
+Phases 0 through 5 are implemented and the demo milestone runs end to end. Desktop packaging has
+started as scaffolding (Tauri shell + daemon sidecar), not as an in-process bridge. What is not
+built is listed in ARCHITECTURE.md rather than left to be discovered, and the advocate reports
+several of those gaps about itself at startup. The open decisions that need a human are in
+DECISIONS.md.
 
 ## Non-goals at reference stage
 

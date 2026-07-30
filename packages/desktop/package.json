@@ -1,0 +1,18 @@
+{
+  "name": "@aidp/desktop",
+  "version": "0.1.0-pre",
+  "description": "Tauri desktop shell for the inference advocate. First slice: window chrome over the loopback daemon.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ensure-built": "node ./scripts/ensure-built.mjs",
+    "check-deps": "node ./scripts/check-deps.mjs",
+    "dev": "node ./scripts/run-tauri.mjs dev",
+    "build": "node ./scripts/run-tauri.mjs build",
+    "typecheck": "node ./scripts/check-deps.mjs --quiet"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4"
+  }
+}

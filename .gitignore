@@ -1,6 +1,8 @@
 node_modules/
 dist/
 build/
+target/
+packages/desktop/src-tauri/target/
 .env
 *.local
 *.sqlite

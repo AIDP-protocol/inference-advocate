@@ -4,15 +4,15 @@ Where this stands, and how to pick it up in an editor.
 
 ## State
 
-All five phases of PLAN.md and the demo milestone are implemented. 59 tests passing, clean
-typecheck, the demo runs end to end, the interface builds and runs. Verified on Linux and on
-Windows with Node 24.
+All five phases of PLAN.md and the demo milestone are implemented. Desktop packaging has a
+first Tauri slice (shell over the loopback daemon). Tests include core plus daemon packaging
+warnings. Verified on Linux and on Windows with Node 24.
 
 ```bash
 git clone https://github.com/AIDP-protocol/inference-advocate
 cd inference-advocate
 npm install
-npm test          # 59 passing
+npm test          # core + daemon packaging tests
 npm run doctor    # what this advocate resolved: paths, config, providers, what would leave
 npm run demo      # the scripted scenario, about 40 seconds
 ```
@@ -26,6 +26,15 @@ npm run daemon    # the advocate on 127.0.0.1:8790
 npm run build:ui  # then open http://127.0.0.1:8790
 ```
 
+Desktop shell (needs Rust + Tauri 2 system libs; see `packages/desktop/README.md`):
+
+```bash
+npm run mocks     # if using demo providers
+npm run desktop   # Tauri window + Node sidecar on 127.0.0.1:8790
+```
+
+Honest gap: the desktop UI still talks HTTP to the sidecar. `HostSession` is extracted for the
+next slice (Tauri commands without a listener).
 ## Read in this order
 
 1. **ARCHITECTURE.md.** The module-to-paper map, the design decisions worth arguing with, and
@@ -64,4 +73,6 @@ linking this repository anywhere.
   `data/evaluator.example.json` to `.advocate/evaluator.json`, set `AIDP_EVALUATOR_CONFIG`, and
   `npm run doctor` confirms it resolved. What is missing is a run, and what it produces is the
   first real data on whether the demo-scale thresholds mean anything.
-- **Desktop packaging.** PLAN.md defers Tauri until the core demo works. It works.
+- **Desktop invoke bridge.** `packages/desktop` is a Tauri shell over the loopback daemon.
+  Next: Tauri commands calling `HostSession`, retire the HTTP listener inside the shell, then
+  turn on bundling.

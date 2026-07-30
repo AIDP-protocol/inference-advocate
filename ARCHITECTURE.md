@@ -13,8 +13,9 @@ response through fourteen steps. That path is the spine of this repository.
 
 ```
 packages/core       provider-agnostic library, no UI dependencies, no network beyond providers
-packages/daemon     local HTTP server on 127.0.0.1, the seam between core and browser
+packages/daemon     local HTTP server on 127.0.0.1, and HostSession (the callable API surface)
 packages/ui         React chat surface
+packages/desktop    Tauri shell (first slice: window over the loopback daemon sidecar)
 packages/demo       mock providers and the scripted end-to-end scenario
 data/               taxonomy, policy, jurisdictions, register, standing: documents, not code
 tools/              demo key minting
@@ -24,8 +25,11 @@ Three deliberate boundaries.
 
 The core has no UI dependency and no framework. It is a library that could be driven by a CLI,
 a desktop shell, or a phone, and the daemon exists only because SQLite and the filesystem do
-not live in a browser tab. Desktop packaging (Tauri) is deferred per PLAN.md until the core
-demo works, and replacing the daemon with an in-process call is the shape that change takes.
+not live in a browser tab. Desktop packaging has started: `packages/desktop` is a Tauri 2
+shell that spawns the Node daemon as a 127.0.0.1 sidecar and loads it in a webview. That is
+scaffolding, not the finished shape. Replacing the HTTP listener with an in-process (or IPC)
+call into `HostSession` (`packages/daemon/src/host.ts`) is the next slice, and
+`AIDP_DESKTOP=1` makes the advocate say so at startup.
 
 The trust artifacts are data files with detached signatures and pinned public keys, not
 hardcoded constants. The Serving Register, the Standing document, the flag taxonomy, the
@@ -42,7 +46,7 @@ it is discussed below.
 | Step | Paper | Module |
 | --- | --- | --- |
 | before | attestation package assembled at setup, Section 4 and Section 6 | `core/src/setup.ts`, `AttestationPackage` in `core/src/types.ts` |
-| 1 | the prompt | `ui/src/App.tsx`, `core/src/advocate.ts` (`ask`) |
+| 1 | the prompt | `ui/src/App.tsx`, `core/src/advocate.ts` (`ask`), desktop: `packages/desktop` |
 | 2 | attach the attestations, jurisdiction already loaded | `core/src/interchange/openai-adapter.ts`, `core/src/policy/jurisdiction.ts` |
 | 3 | the request goes out over the Interchange | `core/src/interchange/wire.ts`, `openai-adapter.ts` |
 | 4 | the provider serves from a registered endpoint | `demo/src/mock-provider.ts` (the provider half, for the demo) |
@@ -53,7 +57,7 @@ it is discussed below.
 | 9 | the ledger | `core/src/store/ledger.ts`, `core/src/store/db.ts` |
 | 10 | the score | `core/src/policy/score.ts`, `core/src/policy/config.ts` |
 | 11 | the resolution | `core/src/policy/delivery.ts`, `core/src/policy/jurisdiction.ts` |
-| 12 | delivery, with pinned notices | `core/src/policy/notices.ts`, `ui/src/App.tsx` |
+| 12 | delivery, with pinned notices | `core/src/policy/notices.ts`, `ui/src/App.tsx`, host: `daemon/src/host.ts` |
 | 13, 14 | telemetry as rates, standing consumed back into step 10 | `core/src/telemetry/rates.ts`, `emitter.ts`, `standing.ts`, `export.ts` |
 
 The provisional patent application's four mechanisms map on top of the same files:
@@ -182,6 +186,13 @@ responses. That is deliberate: listing a bill is not the same as applying it as 
 designated severe categories. The `escalating` release-authority class exists in the type
 system and nothing implements it. Whether to build it at all is an open design-ethics question
 in the author's own notes, and building it quietly would have been the wrong way to answer it.
+
+**In-process desktop bridge.** The Tauri shell exists and can wrap the local UI, but the UI
+still talks HTTP to the loopback daemon. `HostSession` is the shared API the next slice should
+call without a listener. Until then, the desktop packaging warning is reported at startup when
+`AIDP_DESKTOP=1`. Bundled installers (`bundle.active`) are off; icons are placeholders.
+Building the shell needs Rust and Tauri 2 system libraries (webkit2gtk 4.1 on Linux). See
+`packages/desktop/README.md`.
 
 ## Working agreements
 

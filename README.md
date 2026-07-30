@@ -60,6 +60,14 @@ the advocate at real providers, copy `data/providers.example.json` to `.advocate
 and edit it. API keys are read from named environment variables so that a provider file can be
 shared without carrying a secret.
 
+Desktop shell (optional; needs Rust and Tauri 2 system libraries, see
+`packages/desktop/README.md`):
+
+```bash
+npm run mocks     # if using demo providers
+npm run desktop   # Tauri window; still a loopback daemon under the hood
+```
+
 ## The semantic evaluator
 
 The monitor's second pass is the one that requires reading meaning. By default this repository
@@ -104,8 +112,9 @@ Two costs of a hosted evaluator, both surfaced by the advocate rather than burie
 
 ```
 packages/core     the advocate itself. Provider agnostic, no UI dependencies.
-packages/daemon   local HTTP server on 127.0.0.1. The seam between core and browser.
+packages/daemon   local HTTP server on 127.0.0.1, and HostSession for a future in-process bridge.
 packages/ui       React chat surface, monitor panel, policy view, export view.
+packages/desktop  Tauri shell (first slice: window over the loopback daemon sidecar).
 packages/demo     mock providers and the scripted scenario.
 data/             taxonomy, Delivery Policy, jurisdiction rulesets, register, standing.
 ```

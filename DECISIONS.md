@@ -127,5 +127,6 @@ honest signal.
 - **The daemon has no authentication.** It binds to 127.0.0.1 and has no remote surface. That is
   correct for the reference stage and would need revisiting if anyone ever ran it on a shared
   machine.
-- **Desktop packaging (Tauri) not started.** PLAN.md defers it until the core demo works. The
-  core demo works now, so it is unblocked whenever you want it.
+- **Desktop packaging (Tauri) first slice landed.** The shell spawns the Node daemon as a
+  loopback sidecar; the UI still uses HTTP. `HostSession` is the API for the next slice. See
+  ARCHITECTURE.md ("In-process desktop bridge") and `packages/desktop/README.md`.

@@ -5,16 +5,15 @@
 // Why this exists. The core needs a filesystem and a SQLite file, so it runs in a process
 // rather than in a browser tab, and the UI needs to talk to it. This daemon is that seam. It
 // listens on the loopback interface only, has no authentication because it has no remote
-// surface to authenticate, and is the piece that a desktop packaging step (Tauri) would
-// replace with an in-process call. PLAN defers desktop packaging until the core demo works,
-// and a local web app is fine for the reference stage.
+// surface to authenticate, and is the piece that a desktop packaging step (Tauri) replaces
+// with an in-process call. The first Tauri slice still launches this listener inside the
+// desktop shell; HostSession (host.ts) is the API surface that slice and the next one share.
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
-import { extname, join, normalize } from 'node:path';
+import { extname, join, normalize, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
-import { ProviderRegistry, openAdvocate, type ExchangeResult, type OpenedAdvocate } from '@aidp/core';
+import { HostSession } from './host.js';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const dataDir = process.env['AIDP_DATA_DIR'] ?? join(repoRoot, 'data');
@@ -22,18 +21,14 @@ const runDir = process.env['AIDP_RUN_DIR'] ?? join(repoRoot, '.advocate');
 const uiDist = join(repoRoot, 'packages', 'ui', 'dist');
 const PORT = Number(process.env['AIDP_PORT'] ?? 8790);
 
-const providersPath = join(runDir, 'providers.json');
-
-const opened: OpenedAdvocate = openAdvocate({
+const host = new HostSession({
   dataDir,
+  runDir,
+  providersPath: join(runDir, 'providers.json'),
   storePath: join(runDir, 'advocate.sqlite'),
-  providersPath,
-  jurisdictionId: process.env['AIDP_JURISDICTION'] ?? 'us-ny',
   devKeyfile: join(runDir, 'dev.key'),
+  jurisdictionId: process.env['AIDP_JURISDICTION'] ?? 'us-ny',
 });
-
-/** Notices raised so far this session, so the UI can keep them pinned across turns. */
-const pinned: Array<{ notice: ExchangeResult['decision']['notices'][number]; raisedAt: string }> = [];
 
 const MIME: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -60,52 +55,6 @@ async function readBody<T>(req: IncomingMessage): Promise<T> {
   return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}') as T;
 }
 
-/**
- * Re-read the provider file on every state poll. The daemon used to load it once at boot,
- * which meant adding a provider and wondering why the Send button did nothing. Configuration
- * that only takes effect on restart is a trap in a reference implementation people are
- * supposed to be able to poke at.
- */
-function reloadProviders(): void {
-  if (!existsSync(providersPath)) return;
-  try {
-    const fresh = ProviderRegistry.load(providersPath);
-    for (const p of fresh.list()) opened.providers.add(p);
-    for (const existing of opened.providers.list()) {
-      if (!fresh.get(existing.id)) opened.providers.remove(existing.id);
-    }
-  } catch {
-    // A half-written file during an edit is not worth taking the daemon down for.
-  }
-}
-
-function monitorState() {
-  const policy = opened.policy.document;
-  return opened.providers.list().map((p) => {
-    const entries = opened.advocate.ledger.recent(p.id, policy.window.n ?? 10);
-    const windowScore = entries.reduce((s, e) => s + e.flags.reduce((t, f) => t + f.severity, 0), 0);
-    const flagCounts: Record<string, number> = {};
-    for (const e of entries) for (const f of e.flags) flagCounts[f.type] = (flagCounts[f.type] ?? 0) + 1;
-    const carryover = opened.advocate.ledger.getCarryover(p.id);
-    return {
-      id: p.id,
-      label: p.label,
-      model: p.model,
-      registerEntryId: p.registerEntryId ?? null,
-      standing: opened.advocate.standingFor(p),
-      windowScore,
-      windowSize: entries.length,
-      warn: policy.thresholds.warn,
-      block: policy.thresholds.block,
-      flagCounts,
-      carryover: carryover ? { cleanRemaining: carryover.cleanRemaining } : null,
-      openBlocks: opened.advocate.ledger.openBlocks(p.id),
-      chain: opened.advocate.ledger.verifyChain(p.id),
-      evaluatedTotal: opened.advocate.ledger.recent(p.id, Number.MAX_SAFE_INTEGER).length,
-    };
-  });
-}
-
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? '/', `http://127.0.0.1:${PORT}`);
 
@@ -116,78 +65,40 @@ const server = createServer(async (req, res) => {
 
   try {
     if (url.pathname === '/api/state') {
-      reloadProviders();
-      json(res, 200, {
-        sessionId: opened.advocate.sessionId,
-        jurisdiction: opened.jurisdiction.ruleset,
-        pendingProvisions: opened.jurisdiction.pendingProvisions(),
-        policy: opened.policy.document,
-        taxonomy: {
-          version: opened.taxonomy.version,
-          status: opened.taxonomy.document.status,
-          flags: opened.taxonomy.flags.map((f) => ({
-            type: f.type,
-            title: f.title,
-            definition: f.definition,
-            severity: f.severity,
-          })),
-        },
-        register: { signatureValid: opened.register.signatureValid, entries: opened.register.entries().length },
-        standing: { signatureValid: opened.standing.signatureValid, issuedAt: opened.standing.document.issuedAt },
-        providers: monitorState(),
-        warnings: opened.warnings,
-        pinned,
-      });
+      json(res, 200, host.state());
       return;
     }
 
     if (url.pathname === '/api/policy') {
-      const md = readFileSync(join(dataDir, 'policy', 'delivery-policy.md'), 'utf8');
-      json(res, 200, { markdown: md });
+      json(res, 200, { markdown: host.policyMarkdown() });
       return;
     }
 
     if (url.pathname === '/api/transcript') {
-      const turns = opened.advocate.transcripts.session(opened.advocate.sessionId);
-      json(res, 200, { sessionId: opened.advocate.sessionId, turns });
+      json(res, 200, host.transcript());
       return;
     }
 
     if (url.pathname === '/api/ask' && req.method === 'POST') {
       const body = await readBody<{ providerId: string; text: string }>(req);
-      const result = await opened.advocate.ask({ providerId: body.providerId, text: body.text });
-      const at = new Date().toISOString();
-      for (const notice of result.decision.notices) {
-        if (!pinned.some((p) => p.notice.id === notice.id)) pinned.push({ notice, raisedAt: at });
-      }
-      json(res, 200, { result, providers: monitorState(), pinned });
+      json(res, 200, await host.ask(body.providerId, body.text));
       return;
     }
 
     if (url.pathname === '/api/release' && req.method === 'POST') {
       const body = await readBody<{ providerId: string; responseId: string; actor: 'self' | 'custodian' }>(req);
-      const outcome = opened.advocate.release(body.providerId, body.responseId, body.actor);
-      const content = outcome.released
-        ? opened.advocate.withheldContent(opened.advocate.sessionId, body.responseId)
-        : undefined;
-      json(res, 200, { ...outcome, content, providers: monitorState() });
+      json(res, 200, host.release(body.providerId, body.responseId, body.actor));
       return;
     }
 
     if (url.pathname === '/api/session/new' && req.method === 'POST') {
-      pinned.length = 0;
-      json(res, 200, { sessionId: opened.advocate.newSession() });
+      json(res, 200, host.newSession());
       return;
     }
 
     if (url.pathname === '/api/export') {
       const floor = url.searchParams.get('floor');
-      const view = opened.advocate.exportView(
-        '2000-01-01T00:00:00.000Z',
-        new Date(Date.now() + 60_000).toISOString(),
-        floor ? Number(floor) : undefined,
-      );
-      json(res, 200, view);
+      json(res, 200, host.exportView(floor ? Number(floor) : undefined));
       return;
     }
 
@@ -218,12 +129,13 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
-  console.log(`inference advocate daemon on http://127.0.0.1:${PORT}`);
+  const kind = process.env['AIDP_DESKTOP'] === '1' ? 'desktop sidecar' : 'daemon';
+  console.log(`inference advocate ${kind} on http://127.0.0.1:${PORT}`);
   console.log(`  store        ${join(runDir, 'advocate.sqlite')}`);
   console.log(`  providers    ${join(runDir, 'providers.json')}`);
-  console.log(`  jurisdiction ${opened.jurisdiction.ruleset.id}`);
-  for (const w of opened.warnings) console.log(`  warning      ${w}`);
-  if (opened.providers.list().length === 0) {
+  console.log(`  jurisdiction ${host.opened.jurisdiction.ruleset.id}`);
+  for (const w of host.warnings) console.log(`  warning      ${w}`);
+  if (host.opened.providers.list().length === 0) {
     console.log('');
     console.log('  No providers configured. Copy data/providers.example.json to');
     console.log(`  ${join(runDir, 'providers.json')} and edit it, or run the demo instead.`);

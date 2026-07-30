@@ -5,9 +5,9 @@
 // Why this exists. The core needs a filesystem and a SQLite file, so it runs in a process
 // rather than in a browser tab, and the UI needs to talk to it. This daemon is that seam for
 // the browser-tab path. It listens on the loopback interface only, has no authentication
-// because it has no remote surface to authenticate. Desktop packaging uses ipc-host.ts
-// instead (stdio into HostSession, no listener). Both seams share HostSession and
-// dispatchHostMethod.
+// because it has no remote surface to authenticate. Desktop packaging constructs HostSession
+// in the Node launcher and uses host-rpc.ts (loopback NDJSON, no HTTP) so the Tauri shell
+// can call the same methods. Both seams share HostSession and dispatchHostMethod.
 
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';

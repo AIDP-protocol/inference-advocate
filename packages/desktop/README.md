@@ -1,23 +1,27 @@
 # Desktop packaging (Tauri)
 
-Tauri 2 shell for the inference advocate. Advocate operations use `HostSession` over
-stdio IPC, not HTTP.
+Tauri 2 shell for the inference advocate. Advocate operations use in-process `HostSession`
+in the Node launcher, reached from the UI shell over loopback RPC (not HTTP, not a Node
+stdio child).
 
 ## What this is
 
-A Tauri window that:
+A Node launcher that:
 
-1. Spawns `packages/daemon/dist/ipc-host.js` (Node child, `AIDP_DESKTOP=1`, no HTTP listener).
-2. Loads the built UI from `packages/ui/dist`.
-3. Forwards UI calls through the `host_call` command into that HostSession over line-delimited
-   JSON on stdin/stdout.
+1. Constructs `HostSession` in-process (`AIDP_DESKTOP=1`, library call into
+   `packages/daemon/src/host.ts`).
+2. Listens with `listenHostRpc` on `127.0.0.1` (line-delimited JSON, same method table as the
+   HTTP daemon).
+3. Starts the Tauri window, which loads the built UI from `packages/ui/dist` and forwards
+   `host_call` invokes to that RPC endpoint (`AIDP_HOST_ADDR`).
 
 The browser-tab path (`npm run daemon`) still uses the loopback HTTP daemon. Both seams share
 `HostSession` and `dispatchHostMethod` in `packages/daemon/src/host.ts`.
 
 Conversation content does not gain a new outbound path through this shell. The remaining
-packaging gap is honest: HostSession still runs in a Node child process, not inside the Rust
-binary. That warning is reported at startup when `AIDP_DESKTOP=1`.
+packaging gap is honest: HostSession still runs under Node in the launcher, not inside the
+Rust binary. Embedding it in-process in Tauri would need a JS runtime inside the binary, or a
+Rust port of the host and store. That warning is reported at startup when `AIDP_DESKTOP=1`.
 
 ## Prerequisites
 
@@ -40,7 +44,7 @@ From the repository root:
 ```bash
 mkdir -p .advocate && cp data/providers.demo.json .advocate/providers.json
 npm run mocks          # terminal one, if using demo providers
-npm run desktop        # builds if needed, checks deps, starts Tauri + IPC host
+npm run desktop        # builds if needed, checks deps, starts HostSession + Tauri
 ```
 
 Or:
@@ -54,8 +58,10 @@ Environment the shell honors:
 | Variable | Role |
 | --- | --- |
 | `AIDP_REPO_ROOT` | Repository root (set automatically by `npm run desktop`) |
-| `AIDP_NODE` | Node binary for the IPC host (defaults to the Node running the launcher) |
-| `AIDP_DESKTOP` | Set to `1` by the shell so HostSession reports the Node-process gap |
+| `AIDP_HOST_ADDR` | Loopback `host:port` for HostSession RPC (set by the launcher for Tauri) |
+| `AIDP_DESKTOP` | Set to `1` so HostSession reports the Node-launcher / not-in-Rust-binary gap |
+| `AIDP_RUN_DIR` | Advocate run directory (default `.advocate`) |
+| `AIDP_DATA_DIR` | Trust-document directory (default `data`) |
 
 ## Check without launching
 
@@ -65,5 +71,7 @@ npm run check-deps --workspace @aidp/desktop
 
 ## Next slice
 
-1. Embed or otherwise host `HostSession` inside the Tauri binary (retire the Node child).
-2. Real app icons and `bundle.active` once that packaging claim is honest.
+1. Embed a JS runtime in the Tauri binary, or port the host and a StoreBackend to Rust, so
+   HostSession does not need a Node launcher at all.
+2. Real app icons and `bundle.active` once that packaging claim is honest (a shipped binary
+   still needs the Node launcher today).

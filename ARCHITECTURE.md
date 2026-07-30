@@ -14,9 +14,9 @@ response through fourteen steps. That path is the spine of this repository.
 ```
 packages/core          provider-agnostic library, no UI dependencies, no network beyond providers
 packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped persistence implementation
-packages/daemon        local HTTP server on 127.0.0.1, and HostSession (HTTP + desktop stdio IPC)
+packages/daemon        local HTTP server on 127.0.0.1, and HostSession (HTTP + desktop loopback RPC)
 packages/ui            React chat surface
-packages/desktop       Tauri shell (HostSession over stdio IPC, no HTTP listener for the core API)
+packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC, no HTTP for the core API)
 packages/demo          mock providers and the scripted end-to-end scenario
 data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code
 tools/                 demo key minting
@@ -29,10 +29,12 @@ a desktop shell, or a phone. Persistence is a capability the host injects throug
 `StoreBackend` (`packages/core/src/store/port.ts`). The SQLite adapter lives in
 `packages/store-sqlite` and is the only shipped implementation. The daemon exists because
 filesystem paths and a browser tab do not meet; it constructs the SQLite adapter and calls
-into core. Desktop packaging uses the same `HostSession` (`packages/daemon/src/host.ts`) over
-stdio IPC from a Node child process (`ipc-host.ts`), with Tauri commands as the bridge. The
-browser-tab path still uses the loopback HTTP listener. Embedding HostSession inside the Tauri
-binary is a later slice; `AIDP_DESKTOP=1` makes the advocate say so at startup.
+into core. Desktop packaging constructs the same `HostSession` (`packages/daemon/src/host.ts`)
+in-process in the Node launcher and reaches it from Tauri over loopback RPC
+(`packages/daemon/src/host-rpc.ts`), with Tauri commands as the UI bridge. There is no Node
+stdio IPC child. The browser-tab path still uses the loopback HTTP listener. HostSession is
+still not inside the Rust binary; embedding it there needs an in-process JS runtime or a Rust
+port of the host and store. `AIDP_DESKTOP=1` makes the advocate say so at startup.
 
 The trust artifacts are data files with detached signatures and pinned public keys, not
 hardcoded constants. The Serving Register, the Standing document, the flag taxonomy, the
@@ -129,10 +131,12 @@ The host supplies opening, closing, migrating, and row-level reads and writes.
 Ledger hashing uses a small pure-TypeScript SHA-256 in core so `hashEntry` stays synchronous
 and free of `node:crypto`. Ed25519 seal sign/verify uses the same tradeoff: vendored
 `@noble/ed25519` plus a pure-TypeScript SHA-512 in core, so `signSeal` / `verifySeal` stay
-synchronous and portable. Random seeds use `globalThis.crypto.getRandomValues` (Web Crypto),
-not `node:crypto`. Store custody crypto in `crypto/keys.ts` (scrypt, HKDF, AES-256-GCM, and
-`randomBytes` for master secrets and IVs) is still Node-bound; that is a separate portability
-question from seals.
+synchronous and portable. Store custody crypto in `crypto/keys.ts` (scrypt, HKDF-SHA256,
+AES-256-GCM) uses vendored `@noble/hashes` and `@noble/ciphers` subsets for the same reason:
+`MasterSecret` / `StoreKey` stay synchronous and free of `node:crypto`. Random seeds, master
+secrets, salts, and IVs use `globalThis.crypto.getRandomValues` (Web Crypto), not
+`node:crypto`. Web Crypto has no scrypt, so a SubtleCrypto-only path would still need a
+pure-TS KDF and would force async seal/open.
 
 **Carryover lowers thresholds rather than multiplying severities.** The provisional discloses
 both. A number the user can watch move is easier to argue with than a multiplier buried in a
@@ -207,10 +211,11 @@ designated severe categories. The `escalating` release-authority class exists in
 system and nothing implements it. Whether to build it at all is an open design-ethics question
 in the author's own notes, and building it quietly would have been the wrong way to answer it.
 
-**Desktop HostSession still lives in Node.** The Tauri shell loads the built UI from disk and
-calls `HostSession` through Tauri commands over stdio IPC (`packages/daemon/src/ipc-host.ts`).
-There is no HTTP listener for advocate operations in the desktop path. The browser-tab path
-still uses the loopback daemon. HostSession is not yet embedded in the Tauri binary;
+**Desktop HostSession still lives under Node.** The Tauri shell loads the built UI from disk
+and calls `HostSession` through Tauri commands over loopback RPC into a HostSession the Node
+launcher constructed in-process (`packages/daemon/src/host-rpc.ts`). There is no HTTP listener
+for advocate operations in the desktop path, and no Node stdio IPC child. The browser-tab path
+still uses the loopback daemon. HostSession is not embedded inside the Tauri binary;
 `AIDP_DESKTOP=1` reports that gap at startup. Bundled installers (`bundle.active`) are off;
 icons are placeholders. Building the shell needs Rust and Tauri 2 system libraries
 (webkit2gtk 4.1 on Linux). See `packages/desktop/README.md`.

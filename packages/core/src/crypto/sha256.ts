@@ -5,7 +5,7 @@
 // WebCrypto's digest is async, and making hashEntry async would ripple through append and
 // verifyChain. A small pure-TypeScript SHA-256 keeps the ledger API synchronous and portable.
 // Ed25519 seals use the same pattern (sha512.ts plus vendored noble-ed25519). Store custody
-// crypto in keys.ts (scrypt, HKDF, AES-GCM) is still Node-bound.
+// crypto in keys.ts uses the same tradeoff (vendored noble hashes/ciphers, sync APIs).
 
 const K = new Uint32Array([
   0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,

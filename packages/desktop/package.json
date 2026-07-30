@@ -1,7 +1,7 @@
 {
   "name": "@aidp/desktop",
   "version": "0.1.0-pre",
-  "description": "Tauri desktop shell for the inference advocate. HostSession over stdio IPC, no HTTP listener for the core API.",
+  "description": "Tauri desktop shell for the inference advocate. HostSession in the Node launcher over loopback RPC, no HTTP listener for the core API.",
   "license": "Apache-2.0",
   "private": true,
   "type": "module",

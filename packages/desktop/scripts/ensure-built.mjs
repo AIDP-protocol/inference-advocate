@@ -1,6 +1,6 @@
-// Ensures core, daemon, and UI are built before the Tauri shell starts the IPC host.
+// Ensures core, daemon, and UI are built before the desktop launcher starts HostSession.
 //
-// Paper: steps 1 and 12. Desktop packaging needs the Node HostSession IPC entry and the UI dist.
+// Paper: steps 1 and 12. Desktop packaging needs the HostSession library and the UI dist.
 
 import { existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -18,10 +18,11 @@ function need(path, label) {
   }
 }
 
-const ipcHostJs = join(repoRoot, 'packages', 'daemon', 'dist', 'ipc-host.js');
+const hostJs = join(repoRoot, 'packages', 'daemon', 'dist', 'host.js');
+const hostRpcJs = join(repoRoot, 'packages', 'daemon', 'dist', 'host-rpc.js');
 const uiIndex = join(repoRoot, 'packages', 'ui', 'dist', 'index.html');
 
-if (!existsSync(ipcHostJs) || !existsSync(uiIndex)) {
+if (!existsSync(hostJs) || !existsSync(hostRpcJs) || !existsSync(uiIndex)) {
   console.log('building core, daemon, and UI for the desktop shell...');
   const r = spawnSync('npm', ['run', 'build'], { cwd: repoRoot, stdio: 'inherit', shell: process.platform === 'win32' });
   if (r.status !== 0) process.exit(r.status ?? 1);
@@ -29,6 +30,7 @@ if (!existsSync(ipcHostJs) || !existsSync(uiIndex)) {
   if (u.status !== 0) process.exit(u.status ?? 1);
 }
 
-need(ipcHostJs, 'daemon IPC host entry');
+need(hostJs, 'HostSession library');
+need(hostRpcJs, 'HostSession RPC listener');
 need(uiIndex, 'UI build');
 console.log('desktop prerequisites present');

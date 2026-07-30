@@ -1,112 +1,87 @@
-// Tauri application library: stdio IPC into the Node HostSession host.
+// Tauri application library: loopback RPC into the Node HostSession launcher.
 //
 // Paper: steps 1 and 12.
 //
-// Spawns packages/daemon/dist/ipc-host.js (no HTTP listener). The webview loads the built UI
-// from disk and calls HostSession through the host_call command. Conversation content still
-// does not leave through this shell; telemetry still cannot see the transcript key.
+// The desktop launcher (packages/desktop/scripts/run-tauri.mjs) constructs HostSession
+// in-process and listens with host-rpc.ts. This shell dials AIDP_HOST_ADDR and forwards
+// UI invokes through the host_call command. Conversation content still does not leave
+// through this shell; telemetry still cannot see the transcript key.
 //
-// Remaining honesty: HostSession still runs in a Node child process, not inside the Rust
-// binary. AIDP_DESKTOP=1 surfaces that packaging gap at startup.
+// Remaining honesty: HostSession still runs under Node in the launcher process, not inside
+// this Rust binary. AIDP_DESKTOP=1 surfaces that packaging gap at startup.
 
 use std::io::{BufRead, BufReader, Write};
-use std::path::PathBuf;
-use std::process::{Child, ChildStdin, Command, Stdio};
+use std::net::TcpStream;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 use serde_json::{json, Value};
 use tauri::{AppHandle, Manager, RunEvent};
 
 struct HostIpc {
-    child: Child,
-    stdin: ChildStdin,
-    stdout: BufReader<std::process::ChildStdout>,
+    stream: TcpStream,
+    reader: BufReader<TcpStream>,
     next_id: u64,
 }
 
 struct HostBridge(Mutex<HostIpc>);
 
-fn repo_root() -> PathBuf {
-    if let Ok(root) = std::env::var("AIDP_REPO_ROOT") {
-        return PathBuf::from(root);
-    }
-    // Dev default: packages/desktop/src-tauri -> repo root is ../../..
-    let mut dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-    for _ in 0..6 {
-        if dir
-            .join("packages")
-            .join("daemon")
-            .join("dist")
-            .join("ipc-host.js")
-            .is_file()
-        {
-            return dir;
-        }
-        if !dir.pop() {
-            break;
-        }
-    }
-    panic!(
-        "could not find the repository root (set AIDP_REPO_ROOT). Expected packages/daemon/dist/ipc-host.js"
-    );
+fn host_endpoint() -> Result<String, String> {
+    std::env::var("AIDP_HOST_ADDR").map_err(|_| {
+        "AIDP_HOST_ADDR is unset. Start the desktop shell with npm run desktop so the Node launcher can construct HostSession and publish the loopback RPC endpoint.".to_string()
+    })
 }
 
-fn spawn_ipc_host() -> Result<HostIpc, String> {
-    let root = repo_root();
-    let entry = root
-        .join("packages")
-        .join("daemon")
-        .join("dist")
-        .join("ipc-host.js");
-    if !entry.is_file() {
-        return Err(format!(
-            "missing {}; run npm run build from the repository root",
-            entry.display()
-        ));
-    }
-    let node = std::env::var("AIDP_NODE").unwrap_or_else(|_| "node".to_string());
-    let mut child = Command::new(&node)
-        .arg(&entry)
-        .current_dir(&root)
-        .env("AIDP_DESKTOP", "1")
-        .env("AIDP_REPO_ROOT", &root)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::inherit())
-        .spawn()
-        .map_err(|e| format!("failed to spawn {node} {}: {e}", entry.display()))?;
+fn connect_host_rpc() -> Result<HostIpc, String> {
+    let endpoint = host_endpoint()?;
+    let deadline = Instant::now() + Duration::from_secs(30);
+    let mut last_err = String::from("not attempted");
 
-    let stdin = child
-        .stdin
-        .take()
-        .ok_or_else(|| "ipc host stdin missing".to_string())?;
-    let stdout = child
-        .stdout
-        .take()
-        .ok_or_else(|| "ipc host stdout missing".to_string())?;
-    let mut stdout = BufReader::new(stdout);
+    let stream = loop {
+        match TcpStream::connect(&endpoint) {
+            Ok(s) => break s,
+            Err(e) => {
+                last_err = e.to_string();
+                if Instant::now() >= deadline {
+                    return Err(format!(
+                        "could not connect to HostSession RPC at {endpoint}: {last_err}"
+                    ));
+                }
+                std::thread::sleep(Duration::from_millis(50));
+            }
+        }
+    };
 
-    wait_for_ready(&mut stdout, Duration::from_secs(30))?;
+    stream
+        .set_read_timeout(Some(Duration::from_secs(120)))
+        .map_err(|e| format!("rpc set_read_timeout: {e}"))?;
+    stream
+        .set_write_timeout(Some(Duration::from_secs(30)))
+        .map_err(|e| format!("rpc set_write_timeout: {e}"))?;
+
+    let reader_stream = stream
+        .try_clone()
+        .map_err(|e| format!("rpc clone stream: {e}"))?;
+    let mut reader = BufReader::new(reader_stream);
+    wait_for_ready(&mut reader, Duration::from_secs(30))?;
 
     Ok(HostIpc {
-        child,
-        stdin,
-        stdout,
+        stream,
+        reader,
         next_id: 1,
     })
 }
 
 fn wait_for_ready(
-    stdout: &mut BufReader<std::process::ChildStdout>,
+    reader: &mut BufReader<TcpStream>,
     timeout: Duration,
 ) -> Result<(), String> {
     let deadline = Instant::now() + timeout;
     let mut line = String::new();
     while Instant::now() < deadline {
         line.clear();
-        match stdout.read_line(&mut line) {
+        match reader.read_line(&mut line) {
             Ok(0) => {
-                return Err("ipc host exited before ready".into());
+                return Err("host RPC closed before ready".into());
             }
             Ok(_) => {
                 let trimmed = line.trim();
@@ -114,19 +89,21 @@ fn wait_for_ready(
                     continue;
                 }
                 let msg: Value = serde_json::from_str(trimmed)
-                    .map_err(|e| format!("ipc ready parse: {e}"))?;
+                    .map_err(|e| format!("rpc ready parse: {e}"))?;
                 if msg.get("event").and_then(|e| e.as_str()) == Some("ready") {
                     return Ok(());
                 }
             }
-            Err(e) if e.kind() == std::io::ErrorKind::WouldBlock => {
+            Err(e) if e.kind() == std::io::ErrorKind::WouldBlock
+                || e.kind() == std::io::ErrorKind::TimedOut =>
+            {
                 std::thread::sleep(Duration::from_millis(20));
             }
-            Err(e) => return Err(format!("ipc ready read: {e}")),
+            Err(e) => return Err(format!("rpc ready read: {e}")),
         }
     }
     Err(format!(
-        "advocate IPC host did not become ready within {timeout:?}"
+        "HostSession RPC did not become ready within {timeout:?}"
     ))
 }
 
@@ -135,27 +112,27 @@ impl HostIpc {
         let id = self.next_id;
         self.next_id += 1;
         let req = json!({ "id": id, "method": method, "params": params });
-        writeln!(self.stdin, "{req}").map_err(|e| format!("ipc write: {e}"))?;
-        self.stdin
+        writeln!(self.stream, "{req}").map_err(|e| format!("rpc write: {e}"))?;
+        self.stream
             .flush()
-            .map_err(|e| format!("ipc flush: {e}"))?;
+            .map_err(|e| format!("rpc flush: {e}"))?;
 
         let mut line = String::new();
         loop {
             line.clear();
             let n = self
-                .stdout
+                .reader
                 .read_line(&mut line)
-                .map_err(|e| format!("ipc read: {e}"))?;
+                .map_err(|e| format!("rpc read: {e}"))?;
             if n == 0 {
-                return Err("ipc host closed stdout".into());
+                return Err("host RPC closed".into());
             }
             let trimmed = line.trim();
             if trimmed.is_empty() {
                 continue;
             }
             let msg: Value =
-                serde_json::from_str(trimmed).map_err(|e| format!("ipc response parse: {e}"))?;
+                serde_json::from_str(trimmed).map_err(|e| format!("rpc response parse: {e}"))?;
             let msg_id = msg.get("id").and_then(|v| {
                 v.as_u64()
                     .or_else(|| v.as_i64().map(|i| i as u64))
@@ -176,10 +153,9 @@ impl HostIpc {
     }
 }
 
-fn kill_ipc(bridge: &HostBridge) {
+fn shutdown_bridge(bridge: &HostBridge) {
     if let Ok(mut guard) = bridge.0.lock() {
-        let _ = guard.child.kill();
-        let _ = guard.child.wait();
+        let _ = guard.stream.shutdown(std::net::Shutdown::Both);
     }
 }
 
@@ -195,16 +171,16 @@ async fn host_call(
         bridge
             .0
             .lock()
-            .map_err(|_| "ipc host lock poisoned".to_string())?
+            .map_err(|_| "host RPC lock poisoned".to_string())?
             .call(&method, params)
     })
     .await
-    .map_err(|e| format!("ipc join: {e}"))?
+    .map_err(|e| format!("rpc join: {e}"))?
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let ipc = spawn_ipc_host().unwrap_or_else(|e| {
+    let ipc = connect_host_rpc().unwrap_or_else(|e| {
         eprintln!("inference-advocate desktop: {e}");
         std::process::exit(1);
     });
@@ -218,7 +194,7 @@ pub fn run() {
         .run(|app_handle, event| {
             if let RunEvent::Exit = event {
                 if let Some(bridge) = app_handle.try_state::<HostBridge>() {
-                    kill_ipc(&bridge);
+                    shutdown_bridge(&bridge);
                 }
             }
         });

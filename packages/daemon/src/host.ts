@@ -1,13 +1,14 @@
 // The advocate host session: core opened once, API operations as function calls.
 //
 // Paper: steps 1 and 12.
-// Desktop packaging calls these methods over stdio IPC (ipc-host.ts) via Tauri commands.
-// The browser-tab UI still reaches them through the loopback HTTP daemon (server.ts).
+// Desktop packaging constructs HostSession in-process in the Node launcher and reaches it
+// from the Tauri UI shell over host-rpc.ts (loopback NDJSON, not HTTP). The browser-tab UI
+// still reaches the same methods through the loopback HTTP daemon (server.ts).
 //
 // Why this file exists separately from server.ts. The daemon is an HTTP surface because the
 // UI runs in a browser tab that cannot open SQLite. Desktop packaging wants the same
-// operations without pretending HTTP is the product. Extracting the session means the loopback
-// server and the Tauri IPC bridge share one implementation.
+// operations as library calls. Extracting the session means the HTTP server and the desktop
+// RPC bridge share one implementation.
 
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -40,14 +41,14 @@ export function packagingWarnings(env: NodeJS.ProcessEnv = process.env): string[
   const out: string[] = [];
   if (env['AIDP_DESKTOP'] === '1') {
     out.push(
-      'desktop packaging calls HostSession over stdio IPC from a Node child process; the advocate is not yet embedded in-process in the Tauri binary',
+      'desktop packaging runs HostSession in-process in the Node launcher (library calls over a loopback RPC socket into the Tauri UI shell); HostSession is not embedded inside the Tauri binary, which would need an in-process JS runtime or a Rust port of the host and store',
     );
   }
   return out;
 }
 
 /**
- * Named operations shared by the HTTP daemon and the desktop stdio IPC host.
+ * Named operations shared by the HTTP daemon and the desktop HostSession RPC bridge.
  * Keeping the method table in one place means the two seams cannot drift.
  */
 export async function dispatchHostMethod(

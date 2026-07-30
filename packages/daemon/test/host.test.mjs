@@ -1,53 +1,57 @@
-// HostSession packaging warnings and stdio IPC.
+// HostSession packaging warnings and loopback RPC.
 //
 // Paper: steps 1 and 12. Desktop packaging honesty.
 // Runs against the compiled host module so the daemon package keeps rootDir=src.
 
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { spawn } from 'node:child_process';
+import { createConnection } from 'node:net';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline';
-import { packagingWarnings } from '../dist/host.js';
+import { packagingWarnings, HostSession } from '../dist/host.js';
+import { listenHostRpc } from '../dist/host-rpc.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..', '..');
-const ipcHostJs = join(here, '..', 'dist', 'ipc-host.js');
 
 test('packagingWarnings is empty without AIDP_DESKTOP', () => {
   assert.deepEqual(packagingWarnings({}), []);
   assert.deepEqual(packagingWarnings({ AIDP_DESKTOP: '0' }), []);
 });
 
-test('packagingWarnings names the Node stdio IPC gap when AIDP_DESKTOP=1', () => {
+test('packagingWarnings names the Node-launcher gap when AIDP_DESKTOP=1', () => {
   const w = packagingWarnings({ AIDP_DESKTOP: '1' });
   assert.equal(w.length, 1);
-  assert.match(w[0], /stdio IPC/);
-  assert.match(w[0], /Node child process/);
-  assert.match(w[0], /not yet embedded in-process/);
+  assert.match(w[0], /Node launcher/);
+  assert.match(w[0], /not embedded inside the Tauri binary/);
+  assert.doesNotMatch(w[0], /stdio IPC/);
+  assert.doesNotMatch(w[0], /Node child process/);
   assert.doesNotMatch(w[0], /loopback daemon/);
 });
 
-test('ipc-host answers state over stdio without binding HTTP', async () => {
-  const runDir = mkdtempSync(join(tmpdir(), 'aidp-ipc-'));
+test('listenHostRpc answers state over loopback without HTTP or a stdio child', async () => {
+  const runDir = mkdtempSync(join(tmpdir(), 'aidp-rpc-'));
+  const prevDesktop = process.env['AIDP_DESKTOP'];
+  process.env['AIDP_DESKTOP'] = '1';
   try {
     writeFileSync(join(runDir, 'providers.json'), JSON.stringify({ version: 1, providers: [] }));
-    const child = spawn(process.execPath, [ipcHostJs], {
-      cwd: repoRoot,
-      env: {
-        ...process.env,
-        AIDP_DESKTOP: '1',
-        AIDP_REPO_ROOT: repoRoot,
-        AIDP_DATA_DIR: join(repoRoot, 'data'),
-        AIDP_RUN_DIR: runDir,
-      },
-      stdio: ['pipe', 'pipe', 'pipe'],
+    const host = new HostSession({
+      dataDir: join(repoRoot, 'data'),
+      runDir,
+      providersPath: join(runDir, 'providers.json'),
+      storePath: join(runDir, 'advocate.sqlite'),
+      devKeyfile: join(runDir, 'dev.key'),
+      jurisdictionId: 'us-ny',
     });
 
-    const rl = createInterface({ input: child.stdout });
+    const rpc = await listenHostRpc(host);
+    assert.equal(rpc.address, '127.0.0.1');
+
+    const socket = createConnection({ host: rpc.address, port: rpc.port });
+    const rl = createInterface({ input: socket });
     const readJson = () =>
       new Promise((resolve, reject) => {
         const onLine = (line) => {
@@ -61,29 +65,33 @@ test('ipc-host answers state over stdio without binding HTTP', async () => {
           }
         };
         rl.on('line', onLine);
-        child.on('exit', (code) => reject(new Error(`ipc-host exited ${code}`)));
+        socket.on('error', reject);
       });
 
     const ready = await readJson();
     assert.equal(ready.event, 'ready');
 
-    child.stdin.write(`${JSON.stringify({ id: 1, method: 'state', params: {} })}\n`);
+    socket.write(`${JSON.stringify({ id: 1, method: 'state', params: {} })}\n`);
     const reply = await readJson();
     assert.equal(reply.id, 1);
     assert.equal(reply.ok, true);
     assert.ok(reply.result.sessionId);
     assert.ok(Array.isArray(reply.result.warnings));
-    assert.ok(reply.result.warnings.some((w) => /stdio IPC/.test(w)));
+    assert.ok(reply.result.warnings.some((w) => /Node launcher/.test(w)));
+    assert.ok(reply.result.warnings.every((w) => !/stdio IPC/.test(w)));
 
-    child.stdin.write(`${JSON.stringify({ id: 2, method: 'policy', params: {} })}\n`);
+    socket.write(`${JSON.stringify({ id: 2, method: 'policy', params: {} })}\n`);
     const policy = await readJson();
     assert.equal(policy.id, 2);
     assert.equal(policy.ok, true);
     assert.match(policy.result.markdown, /Delivery Policy/i);
 
-    child.stdin.end();
-    await new Promise((resolve) => child.on('close', resolve));
+    socket.end();
+    rl.close();
+    await rpc.close();
   } finally {
+    if (prevDesktop === undefined) delete process.env['AIDP_DESKTOP'];
+    else process.env['AIDP_DESKTOP'] = prevDesktop;
     rmSync(runDir, { recursive: true, force: true });
   }
 });

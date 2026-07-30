@@ -1,10 +1,21 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createPrivateKey, createPublicKey, generateKeyPairSync, sign, verify } from 'node:crypto';
+import {
+  createCipheriv,
+  createDecipheriv,
+  createPrivateKey,
+  createPublicKey,
+  generateKeyPairSync,
+  hkdfSync,
+  scryptSync,
+  sign,
+  verify,
+} from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import {
   generateSealKeypair,
   MasterSecret,
+  StoreKey,
   signDocument,
   signSeal,
   verifyDocument,
@@ -27,6 +38,58 @@ test('derivation is deterministic for the same master secret', () => {
   const a = MasterSecret.fromBytes(bytes).deriveStoreKey('preference');
   const b = MasterSecret.fromBytes(bytes).deriveStoreKey('preference');
   assert.equal(b.open(a.seal('hello')), 'hello');
+});
+
+test('vendored custody crypto matches node:crypto scrypt and HKDF', () => {
+  const salt = Buffer.alloc(16, 1);
+  const fromPassphrase = MasterSecret.fromPassphrase('test-pass', salt);
+  const nodeMaster = MasterSecret.fromBytes(
+    Buffer.from(
+      scryptSync('test-pass', salt, 32, {
+        N: 2 ** 15,
+        r: 8,
+        p: 1,
+        maxmem: 128 * 1024 * 1024,
+      }),
+    ),
+  );
+  assert.equal(
+    fromPassphrase.deriveStoreKey('ledger').open(nodeMaster.deriveStoreKey('ledger').seal('scrypt')),
+    'scrypt',
+  );
+
+  // Same master bytes yield the same store key as node hkdfSync with empty salt.
+  const ikm = Buffer.alloc(32, 7);
+  const nodeDerived = Buffer.from(
+    hkdfSync('sha256', ikm, Buffer.alloc(0), 'aidp/advocate/store/transcript', 32),
+  );
+  const portable = MasterSecret.fromBytes(ikm).deriveStoreKey('transcript');
+  const probe = new StoreKey('transcript', nodeDerived);
+  assert.equal(portable.open(probe.seal('custody interop')), 'custody interop');
+  assert.equal(probe.open(portable.seal('custody interop')), 'custody interop');
+});
+
+test('StoreKey opens AES-GCM values sealed by node:crypto and vice versa', () => {
+  const keyBytes = Buffer.alloc(32, 7);
+  const key = new StoreKey('preference', keyBytes);
+  const plaintext = 'previously sealed material';
+
+  const iv = Buffer.alloc(12, 2);
+  const cipher = createCipheriv('aes-256-gcm', keyBytes, iv);
+  const ct = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  const nodeSealed = `v1.${iv.toString('base64url')}.${tag.toString('base64url')}.${ct.toString('base64url')}`;
+  assert.equal(key.open(nodeSealed), plaintext);
+
+  const portableSealed = key.seal(plaintext);
+  const parts = portableSealed.split('.');
+  assert.equal(parts[0], 'v1');
+  const piv = Buffer.from(parts[1]!, 'base64url');
+  const ptag = Buffer.from(parts[2]!, 'base64url');
+  const pct = Buffer.from(parts[3]!, 'base64url');
+  const decipher = createDecipheriv('aes-256-gcm', keyBytes, piv);
+  decipher.setAuthTag(ptag);
+  assert.equal(Buffer.concat([decipher.update(pct), decipher.final()]).toString('utf8'), plaintext);
 });
 
 test('a provenance seal verifies over the exact content and fails on a single changed character', () => {

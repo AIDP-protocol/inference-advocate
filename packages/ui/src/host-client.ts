@@ -3,7 +3,8 @@
 // Paper: steps 1 and 12.
 //
 // Browser-tab path: HTTP to the loopback daemon.
-// Desktop path: Tauri invoke into a stdio IPC host that calls HostSession (no HTTP listener).
+// Desktop path: Tauri invoke into a HostSession that the Node launcher constructed in-process
+// and exposed over loopback RPC (no HTTP listener, no Node stdio child).
 // Detection uses the global Tauri API injected when withGlobalTauri is enabled, so the browser
 // build does not need a Tauri dependency.
 

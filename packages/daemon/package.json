@@ -1,7 +1,7 @@
 {
   "name": "@aidp/daemon",
   "version": "0.1.0-pre",
-  "description": "Local HostSession host: HTTP daemon on 127.0.0.1 for the browser tab, and stdio IPC for desktop.",
+  "description": "Local HostSession host: HTTP daemon on 127.0.0.1 for the browser tab, and loopback RPC for desktop.",
   "license": "Apache-2.0",
   "type": "module",
   "scripts": {

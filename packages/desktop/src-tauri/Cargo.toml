@@ -1,7 +1,7 @@
 [package]
 name = "inference-advocate"
 version = "0.1.0"
-description = "AIDP inference advocate desktop shell (Tauri over HostSession stdio IPC)"
+description = "AIDP inference advocate desktop shell (Tauri over HostSession loopback RPC)"
 authors = ["Justin Philip Flores"]
 edition = "2021"
 license = "Apache-2.0"

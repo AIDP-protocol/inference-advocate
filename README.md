@@ -31,8 +31,9 @@ Not a gateway for developers. Not a moderation product for schools or employers.
 
 Requires Node 22.5 or later. Core has no npm runtime dependencies: Provenance Seal sign and
 verify are pure TypeScript (vendored Ed25519), ledger hashing is pure TypeScript SHA-256, and
-persistence is injected through `StoreBackend` (`@aidp/store-sqlite` uses `node:sqlite`). Store
-custody crypto in `crypto/keys.ts` (scrypt, HKDF, AES-GCM) is still Node-bound.
+store custody crypto in `crypto/keys.ts` (scrypt, HKDF, AES-GCM) is pure TypeScript (vendored
+`@noble/hashes` and `@noble/ciphers`). Persistence is injected through `StoreBackend`
+(`@aidp/store-sqlite` uses `node:sqlite`).
 
 ```bash
 npm install
@@ -67,7 +68,7 @@ Desktop shell (optional; needs Rust and Tauri 2 system libraries, see
 
 ```bash
 npm run mocks     # if using demo providers
-npm run desktop   # Tauri window; HostSession over stdio IPC (no HTTP for the core API)
+npm run desktop   # Tauri window; HostSession in the Node launcher over loopback RPC (no HTTP for the core API)
 ```
 
 ## The semantic evaluator
@@ -115,9 +116,9 @@ Two costs of a hosted evaluator, both surfaced by the advocate rather than burie
 ```
 packages/core          the advocate itself. Provider agnostic, no UI dependencies.
 packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped persistence implementation.
-packages/daemon        local HTTP server on 127.0.0.1 for the browser tab, and HostSession (also stdio IPC for desktop).
+packages/daemon        local HTTP server on 127.0.0.1 for the browser tab, and HostSession (also loopback RPC for desktop).
 packages/ui            React chat surface, monitor panel, policy view, export view.
-packages/desktop       Tauri shell (HostSession over stdio IPC; no HTTP listener for the core API).
+packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC; no HTTP listener for the core API).
 packages/demo          mock providers and the scripted scenario.
 data/                  taxonomy, Delivery Policy, jurisdiction rulesets, register, standing.
 ```

@@ -7,10 +7,16 @@
 // handed one store key cannot read another store. What is deferred: hardware backing, the
 // recovery spectrum, and the attestation wallet. Those are named in ARCHITECTURE.md as gaps.
 //
-// This module is still Node-bound (scrypt, HKDF, AES-256-GCM, randomBytes). Ed25519 seals
-// are not derived here; they live in seal.ts / ed25519.ts and are portable.
+// Custody crypto is pure TypeScript (vendored @noble/hashes and @noble/ciphers) so MasterSecret
+// / StoreKey stay synchronous and free of node:crypto. Random salts and IVs use
+// globalThis.crypto.getRandomValues (Web Crypto), matching Ed25519 seal key generation.
+// Web Crypto has no scrypt, so a SubtleCrypto-only path would still need a pure-TS KDF and
+// would force async seal/open; keeping sync matches the ledger SHA-256 decision.
 
-import { hkdfSync, scryptSync, randomBytes, createCipheriv, createDecipheriv } from 'node:crypto';
+import { aes256GcmOpen, aes256GcmSeal } from './aes-gcm.js';
+import { hkdf } from './vendor/noble-hashes/hkdf.js';
+import { scrypt } from './vendor/noble-hashes/scrypt.js';
+import { sha256 } from './vendor/noble-hashes/sha2.js';
 
 export type StoreName = 'transcript' | 'preference' | 'ledger' | 'attestation' | 'monitor';
 
@@ -18,6 +24,15 @@ const KEY_BYTES = 32;
 const SALT_BYTES = 16;
 const IV_BYTES = 12;
 const INFO_PREFIX = 'aidp/advocate/store/';
+
+/** CSPRNG bytes via Web Crypto. Available on Node 19+ without importing node:crypto. */
+function randomBytes(n: number): Buffer {
+  const c = globalThis.crypto;
+  if (!c?.getRandomValues) throw new Error('crypto.getRandomValues must be defined');
+  const out = new Uint8Array(n);
+  c.getRandomValues(out);
+  return Buffer.from(out);
+}
 
 /** The master secret. Held by the user, never by any operator. */
 export class MasterSecret {
@@ -35,8 +50,14 @@ export class MasterSecret {
    */
   static fromPassphrase(passphrase: string, salt: Buffer): MasterSecret {
     if (salt.length < SALT_BYTES) throw new Error('salt too short');
-    const bytes = scryptSync(passphrase, salt, KEY_BYTES, { N: 2 ** 15, r: 8, p: 1, maxmem: 128 * 1024 * 1024 });
-    return new MasterSecret(bytes);
+    const bytes = scrypt(passphrase, salt, {
+      N: 2 ** 15,
+      r: 8,
+      p: 1,
+      dkLen: KEY_BYTES,
+      maxmem: 128 * 1024 * 1024,
+    });
+    return new MasterSecret(Buffer.from(bytes));
   }
 
   /** For tests and for the demo, where no human is present to type a passphrase. */
@@ -58,7 +79,9 @@ export class MasterSecret {
    * requires, and holds no path back to the master secret.
    */
   deriveStoreKey(store: StoreName): StoreKey {
-    const derived = hkdfSync('sha256', this.#bytes, Buffer.alloc(0), INFO_PREFIX + store, KEY_BYTES);
+    // Empty salt matches the previous node:crypto hkdfSync call (Buffer.alloc(0)), not the
+    // RFC "salt omitted" case of HashLen zeros. Pass a zero-length array, not undefined.
+    const derived = hkdf(sha256, this.#bytes, new Uint8Array(0), INFO_PREFIX + store, KEY_BYTES);
     return new StoreKey(store, Buffer.from(derived));
   }
 }
@@ -80,10 +103,8 @@ export class StoreKey {
   /** AES-256-GCM. Output is salt-free because the key is already store-scoped. */
   seal(plaintext: string): string {
     const iv = randomBytes(IV_BYTES);
-    const cipher = createCipheriv('aes-256-gcm', this.#bytes, iv);
-    const ct = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
-    const tag = cipher.getAuthTag();
-    return `v1.${iv.toString('base64url')}.${tag.toString('base64url')}.${ct.toString('base64url')}`;
+    const { ct, tag } = aes256GcmSeal(this.#bytes, iv, new TextEncoder().encode(plaintext));
+    return `v1.${iv.toString('base64url')}.${Buffer.from(tag).toString('base64url')}.${Buffer.from(ct).toString('base64url')}`;
   }
 
   open(sealed: string): string {
@@ -92,8 +113,10 @@ export class StoreKey {
     const iv = Buffer.from(parts[1]!, 'base64url');
     const tag = Buffer.from(parts[2]!, 'base64url');
     const ct = Buffer.from(parts[3]!, 'base64url');
-    const decipher = createDecipheriv('aes-256-gcm', this.#bytes, iv);
-    decipher.setAuthTag(tag);
-    return Buffer.concat([decipher.update(ct), decipher.final()]).toString('utf8');
+    try {
+      return new TextDecoder().decode(aes256GcmOpen(this.#bytes, iv, ct, tag));
+    } catch {
+      throw new Error('unable to open sealed value');
+    }
   }
 }

@@ -1,6 +1,11 @@
-// Launches `tauri` after ensuring Node builds and the Rust toolchain are on PATH.
+// Launches HostSession in-process for `dev`, then starts the Tauri UI shell against its
+// loopback RPC. `build` only compiles the shell (no live HostSession required).
 //
-// Paper: steps 1 and 12. The shell sets AIDP_DESKTOP=1 so HostSession reports the Node IPC gap.
+// Paper: steps 1 and 12.
+//
+// Retires the Node stdio IPC child: HostSession is constructed here as a library, listenHostRpc
+// publishes it on 127.0.0.1, and Tauri dials AIDP_HOST_ADDR. AIDP_DESKTOP=1 still reports that
+// the advocate is not embedded inside the Rust binary.
 
 import { spawn, spawnSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
@@ -21,24 +26,80 @@ if (deps.status !== 0) process.exit(deps.status ?? 1);
 
 const cargoBin = join(process.env.CARGO_HOME ?? join(homedir(), '.cargo'), 'bin');
 const pathParts = [cargoBin, process.env.PATH ?? ''];
-const env = {
-  ...process.env,
-  PATH: pathParts.join(process.platform === 'win32' ? ';' : ':'),
-  AIDP_REPO_ROOT: repoRoot,
-  AIDP_DESKTOP: '1',
-  AIDP_NODE: process.env.AIDP_NODE ?? process.execPath,
-};
-
 const tauriCli = join(repoRoot, 'node_modules', '@tauri-apps', 'cli', 'tauri.js');
-const args = existsSync(tauriCli)
-  ? [tauriCli, mode]
-  : ['tauri', mode];
+const tauriArgs = existsSync(tauriCli) ? [tauriCli, mode] : ['tauri', mode];
+const tauriCmd = existsSync(tauriCli) ? process.execPath : 'npx';
+const tauriSpawnArgs = existsSync(tauriCli) ? tauriArgs : ['--yes', '@tauri-apps/cli', mode];
 
-const child = spawn(existsSync(tauriCli) ? process.execPath : 'npx', existsSync(tauriCli) ? args : ['--yes', '@tauri-apps/cli', mode], {
-  cwd: pkgRoot,
-  env,
-  stdio: 'inherit',
-  shell: process.platform === 'win32',
-});
+function spawnTauri(extraEnv) {
+  return spawn(tauriCmd, tauriSpawnArgs, {
+    cwd: pkgRoot,
+    env: {
+      ...process.env,
+      PATH: pathParts.join(process.platform === 'win32' ? ';' : ':'),
+      AIDP_REPO_ROOT: repoRoot,
+      AIDP_DESKTOP: '1',
+      ...extraEnv,
+    },
+    stdio: 'inherit',
+    shell: process.platform === 'win32',
+  });
+}
 
-child.on('exit', (code) => process.exit(code ?? 1));
+if (mode === 'build') {
+  // Compile only. A shipped binary still needs a Node launcher to construct HostSession;
+  // bundle.active stays off until that packaging claim is honest.
+  const child = spawnTauri({});
+  child.on('exit', (code) => process.exit(code ?? 1));
+} else {
+  const { HostSession } = await import('../../daemon/dist/host.js');
+  const { listenHostRpc } = await import('../../daemon/dist/host-rpc.js');
+
+  const runDir = process.env['AIDP_RUN_DIR'] ?? join(repoRoot, '.advocate');
+  const dataDir = process.env['AIDP_DATA_DIR'] ?? join(repoRoot, 'data');
+  process.env['AIDP_DESKTOP'] = '1';
+  process.env['AIDP_REPO_ROOT'] = repoRoot;
+
+  const host = new HostSession({
+    dataDir,
+    runDir,
+    providersPath: join(runDir, 'providers.json'),
+    storePath: join(runDir, 'advocate.sqlite'),
+    devKeyfile: join(runDir, 'dev.key'),
+    jurisdictionId: process.env['AIDP_JURISDICTION'] ?? 'us-ny',
+  });
+
+  const rpc = await listenHostRpc(host);
+  console.error('inference advocate desktop HostSession ready (in-process library, loopback RPC)');
+  console.error(`  rpc          ${rpc.endpoint}`);
+  console.error(`  store        ${join(runDir, 'advocate.sqlite')}`);
+  console.error(`  providers    ${join(runDir, 'providers.json')}`);
+  console.error(`  jurisdiction ${host.opened.jurisdiction.ruleset.id}`);
+  for (const w of host.warnings) console.error(`  warning      ${w}`);
+
+  const child = spawnTauri({
+    AIDP_HOST_ADDR: rpc.endpoint,
+    AIDP_RUN_DIR: runDir,
+    AIDP_DATA_DIR: dataDir,
+  });
+
+  async function shutdown(code) {
+    try {
+      await rpc.close();
+    } catch {
+      // Listener may already be closed.
+    }
+    process.exit(code ?? 1);
+  }
+
+  child.on('exit', (code) => {
+    void shutdown(code ?? 1);
+  });
+
+  process.on('SIGINT', () => {
+    child.kill('SIGINT');
+  });
+  process.on('SIGTERM', () => {
+    child.kill('SIGTERM');
+  });
+}

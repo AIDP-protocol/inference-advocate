@@ -1,9 +1,6 @@
-// The demo milestone from PLAN.md, executable.
-//
-//   "a user converses through the advocate with two providers, the monitor flags one of them
-//    at an accumulating rate, the rate crosses the warn line and then the exclusion line, the
-//    Delivery Policy responds visibly at each stage, and the telemetry export shows rates
-//    leaving and words staying."
+// The scripted end-to-end demo: two providers, accumulating flags, warn then exclusion,
+// Delivery Policy responses, and a telemetry export that shows rates leaving and words
+// staying.
 //
 // Paper: Section 4 end to end, plus Section 5 for the telemetry half.
 //

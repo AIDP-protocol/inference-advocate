@@ -1,8 +1,6 @@
 // The flag taxonomy, versioned in the repository as data rather than as code.
 //
 // Paper: step 8 and Definitions. Provisional: Definitions, "Flag".
-// PLAN: Phase 2, "flag taxonomy v0, versioned in the repo as data, not code".
-//
 // Keeping the taxonomy out of the code is not tidiness. Section 9 of the paper says the
 // value judgments inside the taxonomy are an argument to be held in public, and an argument
 // cannot be held over a compiled constant. A jurisdiction, a school, or a standards body

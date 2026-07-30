@@ -1,7 +1,7 @@
 // Mints the demo trust fabric: a registrar, a standing body, and sealing keys for the
 // mock providers, then writes and signs the Serving Register and the Standing document.
 //
-// Paper: steps 4, 5, 7, 13 and 14. PLAN: Phases 2 and 4.
+// Paper: steps 4, 5, 7, 13 and 14.
 //
 // These keys are demonstration fixtures. They are committed on purpose, because a signed
 // document nobody can verify teaches nothing, and they protect nothing of value. Do not

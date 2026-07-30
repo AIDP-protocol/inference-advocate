@@ -1,6 +1,6 @@
 // The local daemon. Binds to 127.0.0.1 and nothing else.
 //
-// Paper: steps 1 and 12. PLAN: Phase 5.
+// Paper: steps 1 and 12.
 //
 // Why this exists. The core needs a filesystem and a SQLite file, so it runs in a process
 // rather than in a browser tab, and the UI needs to talk to it. This daemon is that seam. It

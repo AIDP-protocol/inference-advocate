@@ -1,8 +1,6 @@
 // The deterministic pass. Decidable by arithmetic, so no model participates.
 //
 // Paper: step 7. Provisional: Section 3.2 (mandatory determinism where decidable).
-// PLAN: Phase 2.
-//
 // Honest labeling is the design rule here. No frontier lab currently signs text, so almost
 // every real response reaching this code will be unsealed. Unsealed is reported as unsealed
 // and the exchange continues, unless the provider's register entry declares that it seals

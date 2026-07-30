@@ -1,7 +1,7 @@
 // Shapes the daemon returns. Kept as a hand-written mirror rather than an import of the core
 // package, so that the UI has no build dependency on a Node-only module.
 //
-// Paper: steps 1 and 12. PLAN: Phase 5.
+// Paper: steps 1 and 12.
 
 export interface Notice {
   id: string;

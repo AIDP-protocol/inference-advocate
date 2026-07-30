@@ -1,7 +1,5 @@
 // Monitor state made visible: per-provider score, threshold proximity, and standing.
 //
-// PLAN: Phase 5, "Monitor state visible: per-provider rates, threshold proximity, standing".
-//
 // The bar is the point. A user should be able to see a provider walking toward a line before
 // it crosses one, because a gate that only speaks when it fires teaches nothing.
 

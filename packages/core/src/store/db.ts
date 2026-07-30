@@ -2,8 +2,6 @@
 //
 // Paper: Section 6 ("an operator who never holds a thing cannot be compelled to produce it").
 // Provisional: Mechanism 2, Section 2.2 (store segregation).
-// PLAN: Phase 1.
-//
 // The segregation is logical within one file and cryptographic by column: each store's
 // content is sealed under that store's key. One file is the residency promise made literal;
 // separate keys are what stop a compromise of one function from yielding the whole person.

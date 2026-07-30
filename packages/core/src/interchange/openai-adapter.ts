@@ -1,6 +1,6 @@
 // Provider adapter. Speaks the OpenAI-compatible wire format as the Interchange bootstrap.
 //
-// Paper: steps 3, 4 and 6. PLAN: Phase 1.
+// Paper: steps 3, 4 and 6.
 //
 // Deferral is fully blocking here: nothing streams to the user before evaluation completes.
 // The provisional discloses pipelined evaluation against a stream as an alternative

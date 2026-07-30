@@ -1,8 +1,6 @@
 // Provider configuration. Multiple named providers, keys held locally.
 //
 // Paper: step 3 ("any certified advocate can front any registered provider").
-// PLAN: Phase 1.
-//
 // The config file lives beside the store on the user's device. Keys are read from named
 // environment variables by default so that a config file can be shared or committed without
 // carrying a secret.

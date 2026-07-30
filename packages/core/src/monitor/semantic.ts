@@ -1,8 +1,6 @@
 // The semantic pass, and the evaluator interface behind it.
 //
 // Paper: step 8. Provisional: Mechanism 3.
-// PLAN: Phase 2.
-//
 // The paper's preferred evaluator is a commons-maintained reference evaluation model, defined
 // by properties rather than by openness: reproducible verdicts, inspectable basis, provenance
 // independent of any audited provider. No such model exists yet. So the interface is written

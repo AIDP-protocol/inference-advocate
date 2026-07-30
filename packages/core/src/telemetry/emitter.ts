@@ -3,9 +3,6 @@
 // Paper: Section 5. "The component that emits telemetry holds the key to the ledger store and
 // holds no key to the transcript store, so it is structurally incapable of transmitting what
 // it cannot read."
-// PLAN: Phase 4, "A reporting interface stubbed against a standing body that does not yet
-// exist, so the wire format is defined even though nothing receives it".
-//
 // This is the file where that claim is either true or marketing. It is constructed with a
 // LedgerReader and a ledger StoreKey. It is given no transcript store, no transcript key, and
 // no reference to the database object through which it could reach one. Adding a transcript

@@ -1,6 +1,6 @@
 // What leaves the device, and what never does.
 //
-// Paper: Section 5. PLAN: Phase 4, the export function.
+// Paper: Section 5.
 //
 // This screen exists so that the privacy claim can be checked rather than believed. On the
 // left, the exact bytes a telemetry batch would put on the wire. On the right, an inventory of

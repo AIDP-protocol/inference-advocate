@@ -1,7 +1,7 @@
 // A mock provider: an OpenAI-compatible endpoint that serves a scripted conversation and
 // seals its responses when given a key.
 //
-// Paper: steps 4 and 5. PLAN: demo milestone.
+// Paper: steps 4 and 5.
 //
 // The demo runs over a real socket rather than through an in-process shortcut, because the
 // claim being demonstrated is about a wire between two parties. A stubbed function call would

@@ -1,8 +1,6 @@
 // Windowed, severity weighted scoring over the per-provider ledger.
 //
 // Paper: step 10. Provisional: Sections 1.3 (windowing) and 1.4 (standing-seeded thresholds).
-// PLAN: Phase 3.
-//
 // The point of novelty in the paper is that the score is computed over the provider's recent
 // conduct rather than over the instant response. The instant response is the increment that
 // may cross a line. Everything in this file exists to keep that distinction literal.

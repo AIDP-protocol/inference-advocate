@@ -2,9 +2,6 @@
 //
 // Paper: step 12. "If there is a notice, it is pinned: not something the user can dismiss,
 // and no provider can remove it. It stays up for its window before it can wear off."
-// PLAN: Phase 5, "Pinned notices, non-dismissable, including the person-simulation notice,
-// with display windows".
-//
 // The notice belongs to the layer whose duty runs to the user, which is what makes it
 // credible. Nothing in the provider's response can suppress one, because the provider's
 // response never reaches the renderer without passing through here first.

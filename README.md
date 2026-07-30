@@ -35,7 +35,7 @@ built-in `node:sqlite`, and signing and verification use `node:crypto`.
 ```bash
 npm install
 npm test          # build the core and run the test suite
-npm run demo      # the scripted end-to-end scenario from PLAN.md
+npm run demo      # the scripted end-to-end scenario
 ```
 
 The demo starts three mock providers on the loopback interface, runs a conversation through the
@@ -130,13 +130,13 @@ in Section 9, and that argument cannot be held over a compiled constant.
 
 ## Status
 
-Pre-alpha. Phases 0 through 5 of PLAN.md are implemented and the demo milestone runs end to
-end. Thresholds in this repository are demo-scale and labeled as such; calibrating real ones is
-an open question, stated as such in the paper. ARCHITECTURE.md lists what is not built,
-including attribute attestation, hardware-backed keys, external ledger anchoring, monitor
-integrity attestation, the telemetry admission gate, and DNS deployment. The advocate reports
-several of those gaps about itself at startup, which is the intended posture: a reference
-implementation that overstates itself is worse than none.
+Pre-alpha. The fourteen-step client path and the scripted demo run end to end. Thresholds in
+this repository are demo-scale and labeled as such; calibrating real ones is an open question,
+stated as such in the paper. ARCHITECTURE.md lists what is not built, including attribute
+attestation, hardware-backed keys, external ledger anchoring, monitor integrity attestation,
+the telemetry admission gate, and DNS deployment. The advocate reports several of those gaps
+about itself at startup, which is the intended posture: a reference implementation that
+overstates itself is worse than none.
 
 ## Licensing and patent posture
 

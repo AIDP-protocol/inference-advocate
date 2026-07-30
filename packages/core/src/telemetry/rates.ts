@@ -1,8 +1,6 @@
 // Incident Telemetry: rates out, never content.
 //
 // Paper: steps 13 and 14, and Section 5 ("What leaves the client").
-// PLAN: Phase 4, "Rates, never content: aggregate incident rates derived from the ledger".
-//
 // Note the denominator. The paper insists that consumer-facing incidents be measured against
 // consumer-facing volume rather than a provider's total throughput, because otherwise a
 // thousand clean agentic calls drown one harmful consumer exchange. The traffic class is

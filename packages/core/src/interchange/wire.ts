@@ -2,8 +2,6 @@
 //
 // Paper: steps 3 and 6. "An open, standardized client-to-provider wire standard, so that any
 // certified advocate can front any registered provider."
-// PLAN: Phase 1.
-//
 // Bootstrap decision. A new wire format that nobody serves is not an existence proof, so the
 // reference advocate speaks the format every provider already speaks and carries the AIDP
 // additions in places an unmodified server ignores:

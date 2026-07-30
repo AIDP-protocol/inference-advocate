@@ -2,8 +2,6 @@
 //
 // Paper: step 9 ("one individual user's history with one provider, held locally, for them").
 // Provisional: Sections 1.7 (persistence and tamper resistance) and 1.8 (carryover).
-// PLAN: Phase 2.
-//
 // The ledger holds flag types, severities, outcomes and scores. It does not hold conversation
 // content. Evidence is referenced by an opaque ref into the transcript store, which is under a
 // different key. A component holding only the ledger key sees that a sycophancy flag of

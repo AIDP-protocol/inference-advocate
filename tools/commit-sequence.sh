@@ -1,10 +1,7 @@
 #!/usr/bin/env bash
-# Replays the build as a sequence of small commits.
-#
-# PLAN.md working agreement: "Commits are small and message-disciplined so the repo history is
-# legible as a build narrative." This script exists because the session that produced this work
-# lost its push path partway through, so the history is replayed in your clone instead of
-# arriving as commits.
+# Historical helper: replays an early build as a sequence of small commits.
+# Commits are meant to stay small and message-disciplined so the history reads as a build
+# narrative. Prefer ordinary git commits for new work.
 #
 # Usage, from inside a clone of the repository, after copying the files in:
 #   bash tools/commit-sequence.sh
@@ -117,8 +114,8 @@ There is no close button on a notice anywhere in this package, which is
 the entire implementation of non-dismissable." \
   packages/ui
 
-commit "docs: run instructions, plan status, and the open decisions list" \
-  README.md PLAN.md DECISIONS.md HANDOFF.md
+commit "docs: run instructions and status" \
+  README.md ARCHITECTURE.md
 
 echo "done."
 git --no-pager log --oneline | head -20

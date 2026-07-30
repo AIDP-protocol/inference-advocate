@@ -2,8 +2,6 @@
 //
 // Paper: steps 2 and 11. "The provider serves inference, the advocate applies law." This is
 // one of the two mechanisms the paper claims has no developed precedent.
-// PLAN: Phase 3, "Jurisdiction ruleset slot loaded at setup and applied at delivery, stubbed
-// with one or two example rulesets".
 //
 // A caution that belongs in the code and not only in the README. The rulesets shipped in
 // data/jurisdictions are illustrative encodings written by an engineer, not legal advice and
@@ -13,7 +11,7 @@
 //
 // Provisions carry a status. Only in_force rules change delivery. Pending provisions (a bill
 // that has passed but not been signed, for example) are surfaced as warnings and are not
-// applied as law. That is the resolution recorded in DECISIONS.md item 4.
+// applied as law.
 
 import { readFileSync } from 'node:fs';
 import type { Notice, OperatingMode, ProvisionStatus } from '../types.js';

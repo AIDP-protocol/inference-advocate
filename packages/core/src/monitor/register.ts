@@ -1,9 +1,6 @@
 // The Serving Register, as a local signed document.
 //
 // Paper: step 4 and step 7, and Section 4.1 (the DNS answer). Ancestry: SPF.
-// PLAN: Phase 2, "implemented against a local, signed register document whose format is
-// designed so a real register could replace it".
-//
 // The deployed register is a signed, database-backed service or transparency log, with a TXT
 // record binding a provider's domain to its register entry. None of that exists yet. What
 // exists here is the document that such a service would serve, signed by a registrar key that

@@ -2,7 +2,7 @@
 //
 // Paper: steps 1 and 12. "From the user's seat it looks almost exactly like the product they
 // already use. The whole apparatus is invisible when nothing is wrong, which is the design
-// goal." PLAN: Phase 5.
+// goal."
 //
 // So the default state of this screen is a prompt box and a conversation. The monitor panel
 // is there, at the side, quiet, until something crosses a line. Notices are pinned at the top

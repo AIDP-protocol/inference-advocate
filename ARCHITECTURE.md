@@ -129,9 +129,9 @@ itself at startup. Listing them here is the point of the section.
 
 **Attribute attestation.** The attestation package is a locally asserted object. There is no
 issuer, no selective disclosure, and no wallet. The paper's position is adopt-not-build, and
-the EUDI and mDL rails are still arriving; PLAN.md says design the slot, do not implement it.
-The slot is `AttestationPackage`, it crosses the wire, and it holds attributes rather than an
-identity, which is the property that has to survive when a real issuer is wired in.
+the EUDI and mDL rails are still arriving. Design the slot, do not implement it. The slot is
+`AttestationPackage`, it crosses the wire, and it holds attributes rather than an identity,
+which is the property that has to survive when a real issuer is wired in.
 
 **Hardware-backed keys, recovery, and the wallet.** `MasterSecret.fromPassphrase` is real
 scrypt and the per-store derivation is real HKDF, but the demo and the daemon use a development
@@ -168,7 +168,7 @@ defending it.
 **DNS deployment.** Section 4.1 of the paper puts the register binding, seal-key distribution,
 the sealed-policy bit, and standing checks on DNS, with the register itself served over HTTPS
 behind a pointer. The local documents here are shaped so that becomes a transport change.
-Not built, and named as out of scope in PLAN.md.
+Not built, and out of scope for the reference stage.
 
 **Real thresholds.** Every number in `data/policy/delivery-policy.json` is demonstration scale
 and labeled as such in three places. Calibration is an open question in the paper and it stays

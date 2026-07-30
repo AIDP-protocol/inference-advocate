@@ -1,7 +1,5 @@
 // The Delivery Policy, readable in the app.
 //
-// PLAN: Phase 5, "Delivery Policy visible and readable in-app".
-//
 // A policy the user cannot read is a policy the user cannot hold anyone to, so the same
 // markdown file that ships in the repository is what renders here. No paraphrase, no summary
 // written for the screen. If the policy is wrong, it is wrong in both places at once.

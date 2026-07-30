@@ -1,7 +1,8 @@
 // The advocate host session: core opened once, API operations as function calls.
 //
-// Paper: steps 1 and 12. PLAN: Phase 5, and the desktop packaging step that replaces this
-// HTTP seam with an in-process (or IPC) call from a Tauri shell.
+// Paper: steps 1 and 12.
+// Desktop packaging replaces this HTTP seam with an in-process (or IPC) call from a
+// Tauri shell.
 //
 // Why this file exists separately from server.ts. The daemon is an HTTP surface because the
 // UI runs in a browser tab that cannot open SQLite. Desktop packaging wants the same

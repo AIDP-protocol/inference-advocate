@@ -1,8 +1,6 @@
 // The Delivery Policy, as a document the advocate loads rather than logic it compiles in.
 //
 // Paper: steps 10 and 11. Provisional: Sections 1.3, 1.5, 1.8, 4.8.
-// PLAN: Phase 3, "Policy as a published, human-readable file in the repo, visible in the UI".
-//
 // The human-readable policy lives at data/policy/delivery-policy.md and is what the UI shows.
 // This file is the machine half of the same document. They are meant to be read together and
 // the repository keeps them adjacent so that drift between them is embarrassing.

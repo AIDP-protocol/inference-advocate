@@ -1,9 +1,6 @@
 // Global Standing, consumed as a local signed document.
 //
 // Paper: steps 13 and 14, and Section 5 ("What standing actually does").
-// PLAN: Phase 4, "Global standing consumed as a local document with the same design rule as
-// the register: the format is real, the body is stubbed".
-//
 // No standing body exists. The advocate is written as though one does, reading a document of
 // the shape such a body would publish, verified against a pinned key, so that replacing the
 // file with a periodic pull over the wire is a transport change.

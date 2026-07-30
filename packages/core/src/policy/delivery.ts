@@ -3,7 +3,6 @@
 // Paper: step 11. "It can deliver. It can deliver with a notice. It can withhold, pending
 // release by an authorized superior user. Or the evaluation can end in refusal."
 // Provisional: Sections 1.5 (classification-keyed release authority) and 4.8 (mode floors).
-// PLAN: Phase 3.
 
 import type {
   DeliveryDecision,

@@ -1,6 +1,6 @@
 // Runs the demo mock providers and stays up, so the UI has something to talk to.
 //
-// PLAN: Phase 5. `npm run mocks` in one terminal, `npm run daemon` in another, `npm run ui`
+// `npm run mocks` in one terminal, `npm run daemon` in another, `npm run ui`
 // in a third. Nothing listens on anything but the loopback interface.
 
 import { readFileSync } from 'node:fs';

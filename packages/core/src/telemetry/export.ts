@@ -2,8 +2,6 @@
 //
 // Paper: Section 5 and the README. "The export function exists so you can see exactly what
 // would cross the wire and what never does."
-// PLAN: Phase 4.
-//
 // A privacy claim nobody can inspect is a slogan. This produces two documents side by side:
 // the exact bytes a telemetry batch would put on the wire, and a content-free inventory of
 // everything the advocate is holding that no batch can reach.

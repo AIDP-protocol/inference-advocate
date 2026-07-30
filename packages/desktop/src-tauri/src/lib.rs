@@ -1,6 +1,6 @@
 // Tauri application library: sidecar lifecycle for the local advocate daemon.
 //
-// Paper: steps 1 and 12. PLAN: desktop packaging.
+// Paper: steps 1 and 12.
 //
 // Binds privacy claims the same way the browser seam does: the Node process listens on
 // 127.0.0.1 only. The window is chrome around that local surface. Conversation content still

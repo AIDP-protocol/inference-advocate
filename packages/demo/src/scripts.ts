@@ -1,6 +1,6 @@
 // The scripted conversations the mock providers serve.
 //
-// PLAN: demo milestone. These lines are written to fire the taxonomy v0 criteria, so that the
+// These lines are written to fire the taxonomy v0 criteria, so that the
 // gate can be watched crossing its lines. They are a caricature of the behavior the paper is
 // about, not a sample of any real product's output.
 

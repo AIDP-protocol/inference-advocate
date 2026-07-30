@@ -1,6 +1,6 @@
 // Desktop shell entry. Spawns the Node daemon as a loopback sidecar, then loads it in a window.
 //
-// Paper: steps 1 and 12. PLAN: desktop packaging.
+// Paper: steps 1 and 12.
 //
 // This is the first slice, not the finished shape. The architectural target is an in-process
 // (or IPC) call from the shell into HostSession, retiring the HTTP listener. Until that lands,

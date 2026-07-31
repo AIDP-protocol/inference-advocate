@@ -147,7 +147,9 @@ export function discoverEvaluatorConfig(
   const path = explicitPath ?? env['AIDP_EVALUATOR_CONFIG'];
   if (!path) return undefined;
   if (!existsSync(path)) {
-    throw new Error(`no evaluator config at ${path}`);
+    // No absolute path in the message: openAdvocate folds this into UI warnings, and those
+    // must not publish host layout (home directories, usernames) on a reachable advocate.
+    throw new Error('no evaluator config at the configured path');
   }
   return loadEvaluatorConfig(path);
 }

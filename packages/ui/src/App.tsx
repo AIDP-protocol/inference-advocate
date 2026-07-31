@@ -15,6 +15,7 @@ import { hostCall } from './host-client';
 import { MonitorPanel } from './MonitorPanel';
 import { PolicyView } from './PolicyView';
 import { ExportView } from './ExportView';
+import { WorkingIndicator } from './WorkingIndicator';
 
 interface Turn {
   role: 'user' | 'assistant';
@@ -169,7 +170,7 @@ export function App() {
                     )}
                   </div>
                 ))}
-                {busy && <p className="working">evaluating...</p>}
+                {busy && <WorkingIndicator />}
               </div>
 
               {error && <div className="error">{error}</div>}

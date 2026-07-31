@@ -9,7 +9,7 @@
 // arriving over a signed channel instead of from disk.
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { randomBytes } from 'node:crypto';
 import type { StoreBackend } from './store/port.js';
 import { MasterSecret } from './crypto/keys.js';
@@ -173,8 +173,10 @@ function loadOrCreateMaster(store: StoreBackend, devKeyfile: string | undefined,
     warnings.push('no key material configured; using an ephemeral master secret, so this store will not reopen');
     return MasterSecret.generate();
   }
+  // Basename only: the UI surfaces these warnings, and an absolute path would leak the host
+  // layout on any publicly reachable advocate (the demo site, for example).
   warnings.push(
-    `development key material at ${devKeyfile}. This is not custody. A deployed advocate derives the master secret from a user-held passphrase or secure hardware`,
+    `development key material (${basename(devKeyfile)}). This is not custody. A deployed advocate derives the master secret from a user-held passphrase or secure hardware`,
   );
   if (existsSync(devKeyfile)) {
     return MasterSecret.fromBytes(Buffer.from(readFileSync(devKeyfile, 'utf8').trim(), 'base64'));

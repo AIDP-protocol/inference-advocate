@@ -256,6 +256,14 @@ test('openAdvocate loads the shipped documents and reports its own gaps', () => 
     assert.equal(opened.standing.signatureValid, true);
     assert.equal(opened.jurisdiction.ruleset.id, 'us-ny');
     assert.ok(opened.warnings.some((w) => w.includes('not custody')));
+    assert.ok(
+      opened.warnings.some((w) => w.includes('dev.key') && !w.includes(dir)),
+      'development key warning names the file, not the absolute host path',
+    );
+    assert.ok(
+      !opened.warnings.some((w) => /(?:^|[\s`(])\/(?:home|Users)\//.test(w) || /[A-Za-z]:\\/.test(w)),
+      'startup warnings must not publish absolute home or drive paths',
+    );
     assert.ok(opened.warnings.some((w) => w.includes('attestations are locally asserted')));
     assert.ok(
       opened.warnings.some((w) => w.includes('pending') && w.includes('not applied as law')),

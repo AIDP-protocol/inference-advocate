@@ -15,11 +15,12 @@ coverage/
 tsconfig.tsbuildinfo
 *.tsbuildinfo
 
-# The advocate's own run directory: store, keys, provider configuration.
-# Nothing in here should ever reach a repository.
+# Run directories: store, keys, live provider configs, env files with real credentials.
+# Host-local and personal. Nothing here reaches the repository or the public tree.
 .advocate/
+.advocate-public/
 
-# Author-local notes, session handoffs, open decisions. Public tree stays public.
-# The tracked README in .private/ explains the convention; everything else stays local.
+# Author-local notes, session handoffs, personal/host-specific material.
+# Public tree stays public. The tracked README explains the convention.
 .private/*
 !.private/README.md

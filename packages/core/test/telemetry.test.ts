@@ -141,8 +141,18 @@ test('the export view shows what would leave beside what never does', () => {
   assert.equal(view.neverLeaves.transcriptTurns, 22);
   assert.equal(view.neverLeaves.evidenceSpans, 22);
   assert.equal(view.neverLeaves.ledgerEntriesByProvider['p1'], 22);
+  assert.equal(view.neverLeaves.storePath, ':memory:');
   assert.equal(JSON.stringify(view).includes('private thing'), false);
   assert.ok(view.wouldLeave.bytes > 0);
+
+  const onDisk = buildExportView({
+    batch,
+    ledger,
+    transcripts,
+    storePath: '/home/someone/.advocate-public/advocate.sqlite',
+  });
+  assert.equal(onDisk.neverLeaves.storePath, 'advocate.sqlite');
+  assert.equal(JSON.stringify(onDisk).includes('/home/someone'), false);
 });
 
 test('the shipped standing document verifies and is jurisdiction scoped', () => {

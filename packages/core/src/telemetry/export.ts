@@ -6,6 +6,7 @@
 // the exact bytes a telemetry batch would put on the wire, and a content-free inventory of
 // everything the advocate is holding that no batch can reach.
 
+import { basename } from 'node:path';
 import type { LedgerReader } from '../store/ledger.js';
 import type { TranscriptStore } from '../store/transcripts.js';
 import type { TelemetryBatch } from './rates.js';
@@ -17,6 +18,10 @@ export interface ResidencyReport {
   evidenceSpans: number;
   sealedBytesOnDevice: number;
   ledgerEntriesByProvider: Record<string, number>;
+  /**
+   * Public label for the store file (basename, or `:memory:`). Never an absolute path: this
+   * report is rendered in the UI and on any publicly reachable advocate.
+   */
   storePath: string;
 }
 
@@ -37,6 +42,7 @@ export interface BuildExportInput {
   batch: TelemetryBatch;
   ledger: LedgerReader;
   transcripts: TranscriptStore;
+  /** Full store location; reduced to a public label in the report. */
   storePath: string;
   /** For example a remote model evaluator, which does send response content somewhere. */
   outboundContentPaths?: string[];
@@ -62,8 +68,14 @@ export function buildExportView(input: BuildExportInput): ExportView {
       evidenceSpans: residency.evidenceSpans,
       sealedBytesOnDevice: residency.sealedBytes,
       ledgerEntriesByProvider,
-      storePath: input.storePath,
+      storePath: publicStoreLabel(input.storePath),
     },
     outboundContentPaths: input.outboundContentPaths ?? [],
   };
+}
+
+/** Basename only. Absolute host paths must not appear in the export view. */
+function publicStoreLabel(storePath: string): string {
+  if (storePath === ':memory:') return storePath;
+  return basename(storePath);
 }

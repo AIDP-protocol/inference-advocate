@@ -165,6 +165,13 @@ export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
     ...(opts.now ? { now: opts.now } : {}),
   });
 
+  // Reference convenience: restore a locally asserted adult/child choice from the preference
+  // store. An issued attestation would replace this path entirely.
+  const storedAdult = advocate.preferences.get<boolean>('attestations.isAdult');
+  if (storedAdult !== undefined && storedAdult !== attestations.isAdult) {
+    advocate.setIsAdult(storedAdult);
+  }
+
   return { advocate, store, register, standing, taxonomy, policy, jurisdiction, providers, warnings };
 }
 

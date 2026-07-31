@@ -110,6 +110,22 @@ export class Advocate {
     return this.#opts.standing.stateFor(provider.registerEntryId, this.#opts.jurisdiction.ruleset.id);
   }
 
+  /** Current attribute attestation package. Paper step 2; issuer is still a local assertion. */
+  get attestations(): AttestationPackage {
+    return this.#opts.attestations;
+  }
+
+  /**
+   * Flip the adult attribute for the reference client. Not verified. Persisted under the
+   * preference key so a demo restart keeps the last choice. A real advocate would take this
+   * from an issuer, not from a UI toggle.
+   */
+  setIsAdult(isAdult: boolean): AttestationPackage {
+    this.#opts.attestations = { ...this.#opts.attestations, isAdult };
+    this.preferences.set('attestations.isAdult', isAdult);
+    return this.#opts.attestations;
+  }
+
   /** Steps 1 through 12 for one exchange. */
   async ask(opts: AskOptions): Promise<ExchangeResult> {
     const provider = this.#opts.providers.require(opts.providerId);

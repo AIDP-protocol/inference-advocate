@@ -96,6 +96,12 @@ const server = createServer(async (req, res) => {
       return;
     }
 
+    if (url.pathname === '/api/attestations' && req.method === 'POST') {
+      const body = await readBody<{ isAdult?: boolean }>(req);
+      json(res, 200, await dispatchHostMethod(host, 'attestations.set', { ...body }));
+      return;
+    }
+
     if (url.pathname === '/api/export') {
       const floor = url.searchParams.get('floor');
       json(res, 200, await dispatchHostMethod(host, 'export', floor ? { floor } : {}));

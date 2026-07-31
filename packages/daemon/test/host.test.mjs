@@ -76,13 +76,21 @@ test('listenHostRpc answers state over loopback without HTTP or a stdio child', 
     assert.equal(reply.id, 1);
     assert.equal(reply.ok, true);
     assert.ok(reply.result.sessionId);
+    assert.ok(reply.result.attestations);
+    assert.equal(reply.result.attestations.isAdult, true);
     assert.ok(Array.isArray(reply.result.warnings));
     assert.ok(reply.result.warnings.some((w) => /Node launcher/.test(w)));
     assert.ok(reply.result.warnings.every((w) => !/stdio IPC/.test(w)));
 
-    socket.write(`${JSON.stringify({ id: 2, method: 'policy', params: {} })}\n`);
+    socket.write(`${JSON.stringify({ id: 2, method: 'attestations.set', params: { isAdult: false } })}\n`);
+    const child = await readJson();
+    assert.equal(child.id, 2);
+    assert.equal(child.ok, true);
+    assert.equal(child.result.attestations.isAdult, false);
+
+    socket.write(`${JSON.stringify({ id: 3, method: 'policy', params: {} })}\n`);
     const policy = await readJson();
-    assert.equal(policy.id, 2);
+    assert.equal(policy.id, 3);
     assert.equal(policy.ok, true);
     assert.match(policy.result.markdown, /Delivery Policy/i);
 

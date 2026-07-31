@@ -39,6 +39,14 @@ export function MonitorPanel({ state }: { state: AdvocateState | null }) {
         </dd>
         <dt>Jurisdiction</dt>
         <dd>{state.jurisdiction.name}</dd>
+        <dt>User attribute</dt>
+        <dd>
+          {state.attestations.isAdult ? 'adult' : 'child'} ({state.attestations.issuer})
+        </dd>
+        <dt>Thresholds</dt>
+        <dd>
+          warn {state.effectiveThresholds.warn}, block {state.effectiveThresholds.block}
+        </dd>
         <dt>Mode</dt>
         <dd>{state.policy.mode}</dd>
       </dl>

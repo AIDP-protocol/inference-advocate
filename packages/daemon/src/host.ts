@@ -75,6 +75,8 @@ export async function dispatchHostMethod(
     }
     case 'session.new':
       return host.newSession();
+    case 'attestations.set':
+      return host.setIsAdult(Boolean(params['isAdult']));
     case 'export': {
       const floor = params['floor'];
       const n =
@@ -127,6 +129,8 @@ export class HostSession {
 
   monitorState() {
     const policy = this.opened.policy.document;
+    const isMinor = !this.opened.advocate.attestations.isAdult;
+    const thresholds = this.opened.jurisdiction.effectiveThresholds(policy.thresholds, isMinor);
     return this.opened.providers.list().map((p) => {
       const entries = this.opened.advocate.ledger.recent(p.id, policy.window.n ?? 10);
       const windowScore = entries.reduce((s, e) => s + e.flags.reduce((t, f) => t + f.severity, 0), 0);
@@ -141,8 +145,8 @@ export class HostSession {
         standing: this.opened.advocate.standingFor(p),
         windowScore,
         windowSize: entries.length,
-        warn: policy.thresholds.warn,
-        block: policy.thresholds.block,
+        warn: thresholds.warn,
+        block: thresholds.block,
         flagCounts,
         carryover: carryover ? { cleanRemaining: carryover.cleanRemaining } : null,
         openBlocks: this.opened.advocate.ledger.openBlocks(p.id),
@@ -154,8 +158,20 @@ export class HostSession {
 
   state() {
     this.reloadProviders();
+    const attestations = this.opened.advocate.attestations;
+    const isMinor = !attestations.isAdult;
+    const thresholds = this.opened.jurisdiction.effectiveThresholds(
+      this.opened.policy.document.thresholds,
+      isMinor,
+    );
     return {
       sessionId: this.opened.advocate.sessionId,
+      attestations: {
+        isAdult: attestations.isAdult,
+        jurisdiction: attestations.jurisdiction,
+        issuer: attestations.issuer ?? 'unverified-local-assertion',
+      },
+      effectiveThresholds: thresholds,
       jurisdiction: this.opened.jurisdiction.ruleset,
       pendingProvisions: this.opened.jurisdiction.pendingProvisions(),
       policy: this.opened.policy.document,
@@ -216,6 +232,28 @@ export class HostSession {
   newSession() {
     this.pinned.length = 0;
     return { sessionId: this.opened.advocate.newSession() };
+  }
+
+  /**
+   * Reference-only adult/child flip. Locally asserted, persisted in preferences, starts a new
+   * session so the interaction chain matches the new attribute.
+   */
+  setIsAdult(isAdult: boolean) {
+    const attestations = this.opened.advocate.setIsAdult(isAdult);
+    const session = this.newSession();
+    return {
+      attestations: {
+        isAdult: attestations.isAdult,
+        jurisdiction: attestations.jurisdiction,
+        issuer: attestations.issuer ?? 'unverified-local-assertion',
+      },
+      sessionId: session.sessionId,
+      providers: this.monitorState(),
+      effectiveThresholds: this.opened.jurisdiction.effectiveThresholds(
+        this.opened.policy.document.thresholds,
+        !attestations.isAdult,
+      ),
+    };
   }
 
   exportView(floor?: number) {

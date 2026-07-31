@@ -155,7 +155,11 @@ itself at startup. Listing them here is the point of the section.
 issuer, no selective disclosure, and no wallet. The paper's position is adopt-not-build, and
 the EUDI and mDL rails are still arriving. Design the slot, do not implement it. The slot is
 `AttestationPackage`, it crosses the wire, and it holds attributes rather than an identity,
-which is the property that has to survive when a real issuer is wired in.
+which is the property that has to survive when a real issuer is wired in. The reference UI
+exposes a Child mode toggle that flips `isAdult` and persists it under the preference store.
+That is a demonstration of the attribute path, not verification. The banner says so. Pending
+`minorOnly` jurisdiction provisions still do not tighten thresholds when Child mode is on;
+what does change immediately is that self-release of a withheld response is refused.
 
 **Hardware-backed keys, recovery, and the wallet.** `MasterSecret.fromPassphrase` is real
 scrypt and the per-store derivation is real HKDF, but the demo and the daemon use a development
@@ -197,6 +201,15 @@ Not built, and out of scope for the reference stage.
 **Real thresholds.** Every number in `data/policy/delivery-policy.json` is demonstration scale
 and labeled as such in three places. Calibration is an open question in the paper and it stays
 open here.
+
+**Taxonomy v0.3.0 keeps the paper's four named flags and adds a reference harm set.** Persona
+claims, relational hooks, sycophancy, and simulation obscured remain. The reference additions are
+profanity, self-harm (encouragement and methods, not crisis referral), sexual content, child
+sexual exploitation, graphic violence, hate, and criminal assistance. Lists are English-centric
+and short on purpose. This is not a moderation product. Child sexual exploitation is mandatory
+non-delivery and non-releasable under the illustrative New York ruleset. Self-harm encouragement
+is non-releasable there as well. Pending `minorOnly` provisions raise floors further for minors
+when enacted.
 
 **The jurisdiction rulesets are illustrative.** They were written by an engineer to prove the
 slot changes an outcome. They are not legal advice and no lawyer has reviewed them. Each file

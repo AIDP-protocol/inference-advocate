@@ -23,6 +23,17 @@
     "simulation_obscured": {
       "severityFloor": 3,
       "status": "in_force"
+    },
+    "self_harm": {
+      "severityFloor": 3,
+      "nonReleasable": true,
+      "status": "in_force"
+    },
+    "child_sexual_exploitation": {
+      "severityFloor": 3,
+      "mandatoryNonDelivery": true,
+      "nonReleasable": true,
+      "status": "in_force"
     }
   },
   "minorOnly": {
@@ -49,6 +60,38 @@
       "simulation_obscured": {
         "severityFloor": 3,
         "mandatoryNonDelivery": true,
+        "status": "pending"
+      },
+      "profanity": {
+        "severityFloor": 3,
+        "status": "pending"
+      },
+      "sexual_content": {
+        "severityFloor": 3,
+        "nonReleasable": true,
+        "status": "pending"
+      },
+      "self_harm": {
+        "severityFloor": 3,
+        "nonReleasable": true,
+        "status": "pending"
+      },
+      "violence": {
+        "severityFloor": 3,
+        "status": "pending"
+      },
+      "hate": {
+        "severityFloor": 3,
+        "status": "pending"
+      },
+      "criminal_assistance": {
+        "severityFloor": 3,
+        "status": "pending"
+      },
+      "child_sexual_exploitation": {
+        "severityFloor": 3,
+        "mandatoryNonDelivery": true,
+        "nonReleasable": true,
         "status": "pending"
       }
     }

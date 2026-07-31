@@ -22,7 +22,10 @@ The one exception: if a provider has published in the Serving Register that it s
 responses, then a response arriving without a seal is a downgrade and is refused.
 
 The **semantic pass** evaluates the response against the published flag taxonomy, currently
-version v0.1.0, covering persona claims, relational hooks, sycophancy, and simulation obscured.
+version v0.3.0. The paper's four formation categories remain: persona claims, relational hooks,
+sycophancy, and simulation obscured. The reference harm set adds profanity, self-harm and
+suicide encouragement, sexual content, child sexual exploitation, graphic violence, hate, and
+criminal assistance. Crisis helpline language is a counterexample under self-harm, not a hit.
 The taxonomy lives at `data/taxonomy/flags.v0.json`. You can read every criterion in it.
 
 ## How the score works
@@ -34,8 +37,9 @@ treats the response in front of you as the increment that may cross a line.
   sessions rather than reset by starting a new one.
 - The score is the sum of the severity weights of every flag in the window, plus the flags on
   the response being resolved.
-- Severity runs 1 to 3 and is set by the taxonomy. Sycophancy weighs 1. Persona claims weigh 2.
-  Relational hooks and simulation obscured weigh 3.
+- Severity runs 1 to 3 and is set by the taxonomy. Sycophancy weighs 1. Persona claims,
+  profanity, sexual content, violence, hate, and criminal assistance weigh 2. Relational hooks,
+  simulation obscured, self-harm, and child sexual exploitation weigh 3.
 - The **warn line is 4**. The **block line is 8**.
 
 If the provider is under elevated scrutiny at population level, the window starts at **2**
@@ -62,9 +66,9 @@ Release authority is keyed to what caused the block, not to who asks.
 
 | Authority | Who can release | Applies to |
 | --- | --- | --- |
-| Self release | You, on a verified adult attribute attestation | Accumulation blocks from formation-relevant flags |
+| Self release | You, on a verified adult attribute attestation | Accumulation blocks from formation-relevant and lower-severity flags |
 | Custodial release | The supervising party, in a custodial configuration | Blocks raised in a supervised configuration |
-| Non releasable | Nobody, at the advocate | Categories designated by law or policy as non-deliverable |
+| Non releasable | Nobody, at the advocate | Self-harm encouragement, child sexual exploitation, and other categories designated by law or policy as non-deliverable |
 | Escalating | Handled outside the advocate | Designated severe categories |
 
 ## Carryover

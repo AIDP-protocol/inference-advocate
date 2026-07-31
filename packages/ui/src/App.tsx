@@ -111,6 +111,19 @@ export function App() {
     await refresh();
   }
 
+  async function setChildMode(child: boolean) {
+    setError(null);
+    try {
+      await hostCall('attestations.set', { isAdult: !child });
+      setTurns([]);
+      await refresh();
+    } catch (e) {
+      setError(String(e));
+    }
+  }
+
+  const childMode = state ? !state.attestations.isAdult : false;
+
   return (
     <div className="app">
       <header>
@@ -128,9 +141,24 @@ export function App() {
           <button className={tab === 'export' ? 'on' : ''} onClick={() => setTab('export')}>
             What leaves
           </button>
+          <button
+            className={childMode ? 'on child-mode' : ''}
+            title="Locally asserted. Not verified. Reference demo only."
+            onClick={() => void setChildMode(!childMode)}
+          >
+            {childMode ? 'Child mode on' : 'Child mode'}
+          </button>
           <button onClick={() => void newSession()}>New session</button>
         </nav>
       </header>
+
+      {childMode && (
+        <div className="child-banner" role="status">
+          Child mode is on (locally asserted, not verified). Pending jurisdiction provisions for
+          users under eighteen are still not applied as law. Self-release of withheld responses is
+          refused until an adult attribute is asserted.
+        </div>
+      )}
 
       {pinnedNotices.length > 0 && (
         <section className="notices" aria-label="Pinned notices">

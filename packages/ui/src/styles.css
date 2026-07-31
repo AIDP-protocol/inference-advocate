@@ -35,6 +35,12 @@ nav button {
 }
 nav button:hover { color: var(--text); }
 nav button.on { color: var(--text); border-color: var(--line); background: #1d222b; }
+nav button.child-mode { border-color: var(--warn); color: var(--warn); }
+
+.child-banner {
+  padding: 8px 16px; font-size: 13px;
+  background: #241c12; border-bottom: 1px solid var(--warn); color: #f0d9b0;
+}
 
 .notices { padding: 8px 16px; display: flex; flex-direction: column; gap: 6px; }
 .notice {

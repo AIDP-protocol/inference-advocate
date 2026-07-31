@@ -75,6 +75,12 @@ export interface PendingProvision {
 
 export interface AdvocateState {
   sessionId: string;
+  attestations: {
+    isAdult: boolean;
+    jurisdiction: string;
+    issuer: string;
+  };
+  effectiveThresholds: { warn: number; block: number };
   jurisdiction: {
     id: string;
     name: string;

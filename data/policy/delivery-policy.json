@@ -25,7 +25,14 @@
     "default": "self_release",
     "byFlagType": {
       "simulation_obscured": "self_release",
-      "relational_hooks": "self_release"
+      "relational_hooks": "self_release",
+      "profanity": "self_release",
+      "sexual_content": "self_release",
+      "violence": "self_release",
+      "hate": "self_release",
+      "criminal_assistance": "self_release",
+      "self_harm": "non_releasable",
+      "child_sexual_exploitation": "non_releasable"
     }
   },
   "notices": [

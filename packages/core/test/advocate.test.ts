@@ -199,6 +199,21 @@ test('pending New York minor provisions are visible and do not block a minor alo
   assert.notEqual(r.decision.releaseAuthority, 'non_releasable');
 });
 
+test('child mode is a local attestation flip that refuses self release', async () => {
+  const { advocate } = build({ script: [HOOKY, HOOKY, HOOKY] });
+  assert.equal(advocate.attestations.isAdult, true);
+  advocate.setIsAdult(false);
+  assert.equal(advocate.attestations.isAdult, false);
+  let withheldId = '';
+  for (let i = 0; i < 3 && !withheldId; i++) {
+    const r = await advocate.ask({ providerId: 'test', text: `turn ${i}` });
+    if (r.decision.kind === 'withhold') withheldId = r.responseId;
+  }
+  assert.ok(withheldId);
+  assert.equal(advocate.release('test', withheldId, 'self').released, false);
+  assert.equal(advocate.release('test', withheldId, 'custodian').released, true);
+});
+
 test('a new session restores delivery and leaves the provider on edge', async () => {
   const { advocate } = build({ script: [HOOKY, HOOKY, HOOKY, CLEAN, CLEAN] });
   for (let i = 0; i < 3; i++) await advocate.ask({ providerId: 'test', text: `turn ${i}` });

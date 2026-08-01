@@ -121,6 +121,17 @@ test('a clean exchange delivers and the transcript stays local', async () => {
   assert.equal(result.delivered, CLEAN);
   assert.equal(advocate.transcripts.session(advocate.sessionId).length, 2);
   assert.deepEqual(advocate.ledger.verifyChain('test'), { ok: true });
+  assert.ok(result.timings.totalMs >= 0);
+  assert.ok(result.timings.providerMs >= 0);
+  assert.ok(result.timings.semanticMs >= 0);
+  assert.ok(
+    result.timings.totalMs + 5 >=
+      result.timings.providerMs +
+        result.timings.deterministicMs +
+        result.timings.semanticMs +
+        result.timings.resolveMs,
+    'total covers the measured stages',
+  );
 });
 
 test('the attestation package rides with the request and carries no identity', async () => {

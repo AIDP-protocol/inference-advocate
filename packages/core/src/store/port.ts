@@ -87,6 +87,12 @@ export interface StoreBackend {
   getCarryover(providerId: string): CarryoverRow | undefined;
   setCarryover(row: CarryoverRow): void;
   deleteCarryover(providerId: string): void;
+  /**
+   * Drop every ledger row for a provider. Reference/demo only: the product path is decay
+   * through clean responses, not unilateral erasure of accumulation. Open blocks and the
+   * transcript are untouched.
+   */
+  clearProviderLedger(providerId: string): void;
 
   upsertBlock(row: Omit<BlockRow, 'releasedAt' | 'releasedBy'>): void;
   listOpenBlocks(providerId: string): BlockRow[];

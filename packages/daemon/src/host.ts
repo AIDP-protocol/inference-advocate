@@ -77,6 +77,12 @@ export async function dispatchHostMethod(
       return host.newSession();
     case 'attestations.set':
       return host.setIsAdult(Boolean(params['isAdult']));
+    case 'reputation.reset': {
+      const providerId = params['providerId'];
+      return host.resetReputation(
+        typeof providerId === 'string' && providerId.length > 0 ? providerId : undefined,
+      );
+    }
     case 'export': {
       const floor = params['floor'];
       const n =
@@ -254,6 +260,18 @@ export class HostSession {
         !attestations.isAdult,
       ),
     };
+  }
+
+  /**
+   * Demo-only wipe of rolling scores and carryover. Omitting providerId resets every configured
+   * provider. Open blocks stay open; use release for withheld content.
+   */
+  resetReputation(providerId?: string) {
+    const ids = providerId
+      ? [providerId]
+      : this.opened.providers.list().map((p) => p.id);
+    for (const id of ids) this.opened.advocate.resetProviderReputation(id);
+    return { reset: ids, providers: this.monitorState() };
   }
 
   exportView(floor?: number) {

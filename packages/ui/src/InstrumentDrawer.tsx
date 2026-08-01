@@ -19,6 +19,7 @@ export function InstrumentDrawer(props: {
   onClose: () => void;
   onTab: (tab: DrawerTab) => void;
   onChildMode: (child: boolean) => void;
+  onResetReputation: (providerId?: string) => void;
   scenarioStep: number;
   onScenarioStep: (step: number) => void;
 }) {
@@ -30,6 +31,7 @@ export function InstrumentDrawer(props: {
     onClose,
     onTab,
     onChildMode,
+    onResetReputation,
     scenarioStep,
     onScenarioStep,
   } = props;
@@ -52,7 +54,7 @@ export function InstrumentDrawer(props: {
             )}
             <span className="chip">step {stepLabel}</span>
             <span className="chip">
-              {providerCount} mock provider{providerCount === 1 ? '' : 's'}
+              {providerCount} provider{providerCount === 1 ? '' : 's'}
             </span>
           </span>
         </button>
@@ -88,7 +90,9 @@ export function InstrumentDrawer(props: {
       </div>
 
       <div className="drawer-body">
-        {tab === 'monitor' && <MonitorPanel state={state} />}
+        {tab === 'monitor' && (
+          <MonitorPanel state={state} onResetReputation={onResetReputation} />
+        )}
         {tab === 'scenario' && (
           <ScenarioTab
             step={scenarioStep}

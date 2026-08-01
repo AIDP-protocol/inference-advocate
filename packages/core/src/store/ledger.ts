@@ -146,6 +146,16 @@ export class LedgerStore implements LedgerReader {
     this.setCarryover({ ...c, cleanRemaining: c.cleanRemaining - 1 });
   }
 
+  /**
+   * Wipe rolling-window accumulation and carryover for a provider. Reference/demo only: the
+   * paper's path is decay through clean responses (Section 1.8). Does not release open blocks
+   * and does not touch the transcript.
+   */
+  resetReputation(providerId: string): void {
+    this.#store.clearProviderLedger(providerId);
+    this.#store.deleteCarryover(providerId);
+  }
+
   // Blocks, provisional Sections 1.5 and 1.8.
 
   raiseBlock(rec: Omit<BlockRecord, 'releasedAt' | 'releasedBy'>): void {

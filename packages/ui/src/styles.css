@@ -172,6 +172,15 @@ a:hover {
   border-radius: 6px;
   color: var(--text-secondary);
   cursor: default;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  font: inherit;
+}
+
+button.session-item {
+  cursor: pointer;
 }
 
 .session-item.active {
@@ -179,8 +188,13 @@ a:hover {
   color: oklch(0.26 0.008 70);
 }
 
-.session-item:not(.active):hover {
+button.session-item:not(.active):hover {
   background: oklch(0.94 0.004 70);
+}
+
+.session-item.muted {
+  color: oklch(0.60 0.008 70);
+  cursor: default;
 }
 
 .sidebar-footer {
@@ -775,11 +789,115 @@ a:hover {
   border: none;
   background: transparent;
   color: oklch(0.46 0.008 70);
-  max-width: 180px;
+  max-width: 220px;
 }
 
 .composer-provider:hover {
   background: oklch(0.96 0.003 70);
+}
+
+.provider-picker {
+  position: relative;
+  flex: none;
+}
+
+.provider-picker-trigger {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: oklch(0.46 0.008 70);
+  max-width: 200px;
+}
+
+.provider-picker-trigger:hover,
+.provider-picker.open .provider-picker-trigger {
+  background: oklch(0.96 0.003 70);
+}
+
+.provider-picker-primary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.provider-picker-chevron {
+  color: oklch(0.68 0.006 70);
+  flex: none;
+}
+
+.provider-picker-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 20;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  min-width: 240px;
+  max-width: min(360px, 80vw);
+  border: 1px solid oklch(0.90 0.004 70);
+  border-radius: 10px;
+  background: oklch(1 0 0);
+  box-shadow: 0 8px 24px oklch(0.2 0 0 / 0.10);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.provider-picker-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: oklch(0.34 0.008 70);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.provider-picker-option:hover,
+.provider-picker-option.on {
+  background: oklch(0.96 0.003 70);
+}
+
+.provider-model-pill {
+  flex: none;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: oklch(0.955 0.003 70);
+  border: 1px solid oklch(0.90 0.004 70);
+  color: oklch(0.52 0.008 70);
+}
+
+.provider-name {
+  display: inline;
+}
+
+.provider-name .provider-model {
+  font-size: 0.82em;
+  font-weight: 400;
+  color: oklch(0.62 0.008 70);
+}
+
+.monitor-card .provider-model {
+  font-size: 10.5px;
+  font-weight: 400;
+  color: oklch(0.66 0.010 255);
 }
 
 .composer-send {
@@ -1314,6 +1432,58 @@ a:hover {
 
 .monitor-status.muted {
   color: oklch(0.68 0.010 255);
+}
+
+.monitor-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.monitor-demo-reset {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--drawer-hairline);
+  background: var(--drawer);
+}
+
+.demo-reset-btn {
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid oklch(0.48 0.08 210);
+  background: oklch(0.26 0.03 210);
+  color: oklch(0.82 0.06 210);
+  cursor: pointer;
+}
+
+.demo-reset-btn:hover:not(:disabled) {
+  background: oklch(0.30 0.04 210);
+  border-color: oklch(0.55 0.09 210);
+}
+
+.demo-reset-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.demo-reset-btn.per-provider {
+  align-self: flex-start;
+  margin-top: 2px;
+  font-size: 10.5px;
+  padding: 4px 8px;
+}
+
+.demo-reset-caveat {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: oklch(0.58 0.04 210);
+  line-height: 1.4;
 }
 
 .fabric-card {

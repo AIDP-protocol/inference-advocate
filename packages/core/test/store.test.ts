@@ -106,6 +106,49 @@ test('carryover decays one clean response at a time', () => {
   assert.equal(ledger.getCarryover('p1'), undefined);
 });
 
+test('resetReputation clears ledger and carryover but leaves open blocks', () => {
+  const { ledger, store } = fixture();
+  ledger.append({
+    providerId: 'p1',
+    responseId: 'r1',
+    at: '2026-07-28T00:00:00.000Z',
+    flags: [{ type: 'sycophancy', severity: 3, evidenceRef: 'e1' }],
+    outcome: 'withhold',
+    score: 3,
+    evaluatorVersion: 'test@1',
+    taxonomyVersion: 'v0.1.0',
+  });
+  ledger.setCarryover({
+    providerId: 'p1',
+    multiplier: 1,
+    cleanRemaining: 5,
+    setAt: '2026-07-28T00:00:00.000Z',
+  });
+  ledger.raiseBlock({
+    providerId: 'p1',
+    responseId: 'r1',
+    authority: 'self_release',
+    raisedAt: '2026-07-28T00:00:00.000Z',
+  });
+
+  ledger.resetReputation('p1');
+
+  assert.equal(ledger.recent('p1', 10).length, 0);
+  assert.equal(ledger.getCarryover('p1'), undefined);
+  assert.equal(ledger.openBlocks('p1').length, 1);
+  assert.deepEqual(ledger.verifyChain('p1'), { ok: true });
+
+  // Raw rows: ledger gone, carryover gone, block still open.
+  const ledgerRows = (store as SqliteStore).raw
+    .prepare('SELECT * FROM ledger WHERE provider_id = ?')
+    .all('p1');
+  assert.equal(ledgerRows.length, 0);
+  const carryRows = (store as SqliteStore).raw
+    .prepare('SELECT * FROM carryover WHERE provider_id = ?')
+    .all('p1');
+  assert.equal(carryRows.length, 0);
+});
+
 test('a pre-refactor ledger fixture verifies with identical hashes', () => {
   const fixturePath = join(repoRoot, 'packages', 'core', 'test', 'fixtures', 'ledger-chain-prerefactor.json');
   const captured = JSON.parse(readFileSync(fixturePath, 'utf8')) as {

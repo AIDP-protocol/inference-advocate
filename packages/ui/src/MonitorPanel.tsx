@@ -6,8 +6,15 @@
 // Lives in the instrument drawer (demonstration), not the client shell.
 
 import type { AdvocateState, ProviderState } from './types';
+import { splitProviderLabel } from './provider-label';
 
-export function MonitorPanel({ state }: { state: AdvocateState | null }) {
+export function MonitorPanel({
+  state,
+  onResetReputation,
+}: {
+  state: AdvocateState | null;
+  onResetReputation: (providerId?: string) => void;
+}) {
   if (!state) {
     return <div className="monitor-empty">connecting to the local daemon...</div>;
   }
@@ -21,17 +28,38 @@ export function MonitorPanel({ state }: { state: AdvocateState | null }) {
     );
   }
 
+  const anyReputation = state.providers.some(
+    (p) => p.carryover || p.windowScore > 0 || p.evaluatedTotal > 0,
+  );
+
   return (
-    <div className="monitor-grid">
-      {state.providers.map((p) => (
-        <ProviderCard key={p.id} p={p} />
-      ))}
-      <TrustFabric state={state} />
+    <div className="monitor-pane">
+      <div className="monitor-grid">
+        {state.providers.map((p) => (
+          <ProviderCard key={p.id} p={p} onReset={() => onResetReputation(p.id)} />
+        ))}
+        <TrustFabric state={state} />
+      </div>
+
+      <div className="monitor-demo-reset">
+        <button
+          type="button"
+          className="demo-reset-btn"
+          disabled={!anyReputation}
+          onClick={() => onResetReputation()}
+          title="Clears rolling scores and carryover for every provider. Does not release withheld content. Reference demo only."
+        >
+          Reset all provider reputations
+        </button>
+        <span className="demo-reset-caveat">
+          demo only · clears scores and carryover, not withheld content · will not ship
+        </span>
+      </div>
     </div>
   );
 }
 
-function ProviderCard({ p }: { p: ProviderState }) {
+function ProviderCard({ p, onReset }: { p: ProviderState; onReset: () => void }) {
   const excluded = p.standing === 'excluded';
   const band = excluded
     ? 'excluded'
@@ -42,13 +70,17 @@ function ProviderCard({ p }: { p: ProviderState }) {
         : 'clear';
   const scale = Math.max(p.block, p.windowScore, 1);
   const pct = (v: number) => `${Math.min(100, (v / scale) * 100)}%`;
-  const displayName = stripMockParen(p.label);
+  const { primary, secondary } = splitProviderLabel(p.label);
   const subtitle = providerSubtitle(p);
+  const canReset = !excluded && (Boolean(p.carryover) || p.windowScore > 0 || p.evaluatedTotal > 0);
 
   return (
     <div className="monitor-card">
       <div className="head">
-        <span className="name">{displayName}</span>
+        <span className="name">
+          {primary}
+          {secondary && <span className="provider-model"> ({secondary})</span>}
+        </span>
         <span className={`band-pill ${band}`}>{band}</span>
       </div>
       <span className="monitor-sub">{subtitle}</span>
@@ -96,6 +128,16 @@ function ProviderCard({ p }: { p: ProviderState }) {
             ledger chain {p.chain.ok ? 'intact' : `broken at ${p.chain.brokenAtSeq}`},{' '}
             {p.evaluatedTotal} evaluated
           </div>
+          {canReset && (
+            <button
+              type="button"
+              className="demo-reset-btn per-provider"
+              onClick={onReset}
+              title="Clears this provider's rolling score and carryover. Does not release withheld content. Reference demo only."
+            >
+              Reset reputation · demo only
+            </button>
+          )}
         </>
       )}
     </div>
@@ -155,18 +197,10 @@ function TrustFabric({ state }: { state: AdvocateState }) {
   );
 }
 
-function stripMockParen(label: string): string {
-  return label.replace(/\s*\([^)]*\)\s*$/, '').trim() || label;
-}
-
 function providerSubtitle(p: ProviderState): string {
-  const paren = p.label.match(/\(([^)]*)\)/);
-  let nature = 'mock';
-  if (paren?.[1]) {
-    const inner = paren[1].trim();
-    // Prefer the parenthetical as authored (e.g. "mock, drifts"), else "mock".
-    nature = /^mock\b/i.test(inner) ? inner : `mock, ${inner}`;
-  }
+  const { secondary } = splitProviderLabel(p.label);
+  // Demo mocks annotate themselves in the label paren ("mock", "mock, drifts", ...).
+  const mockNote = secondary && /^mock\b/i.test(secondary) ? secondary : null;
 
   let standingBit: string;
   if (p.standing === 'elevated_scrutiny') standingBit = 'elevated, window seeded at 2';
@@ -174,9 +208,11 @@ function providerSubtitle(p: ProviderState): string {
   else if (p.standing === 'good') standingBit = 'good standing';
   else standingBit = p.standing.replace(/_/g, ' ');
 
-  // Avoid "mock · excluded at population level" when the paren already said that.
-  if (nature.toLowerCase().includes(standingBit.toLowerCase())) return nature;
-  return `${nature} · ${standingBit}`;
+  if (mockNote) {
+    if (mockNote.toLowerCase().includes(standingBit.toLowerCase())) return mockNote;
+    return `${mockNote} · ${standingBit}`;
+  }
+  return standingBit;
 }
 
 function shortIssuer(issuer: string): string {

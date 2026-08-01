@@ -102,6 +102,12 @@ const server = createServer(async (req, res) => {
       return;
     }
 
+    if (url.pathname === '/api/reputation/reset' && req.method === 'POST') {
+      const body = await readBody<{ providerId?: string }>(req);
+      json(res, 200, await dispatchHostMethod(host, 'reputation.reset', { ...body }));
+      return;
+    }
+
     if (url.pathname === '/api/export') {
       const floor = url.searchParams.get('floor');
       json(res, 200, await dispatchHostMethod(host, 'export', floor ? { floor } : {}));

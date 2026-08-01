@@ -16,6 +16,7 @@ import { hostCall } from './host-client';
 import { PolicyView } from './PolicyView';
 import { WorkingIndicator } from './WorkingIndicator';
 import { InstrumentDrawer, type DrawerTab } from './InstrumentDrawer';
+import { ProviderPicker } from './ProviderPicker';
 
 interface Turn {
   role: 'user' | 'assistant';
@@ -138,6 +139,16 @@ export function App() {
     }
   }
 
+  async function resetReputation(providerId?: string) {
+    setError(null);
+    try {
+      await hostCall('reputation.reset', providerId ? { providerId } : {});
+      await refresh();
+    } catch (e) {
+      setError(String(e));
+    }
+  }
+
   const sessionTitle = 'Chat';
 
   return (
@@ -154,11 +165,17 @@ export function App() {
                 <span className="session-group-label">Today</span>
                 <span className="not-built">not built</span>
               </div>
-              <div className="session-item active">Current session</div>
+              <button
+                type="button"
+                className={`session-item ${view === 'chat' ? 'active' : ''}`}
+                onClick={() => setView('chat')}
+              >
+                Current session
+              </button>
               <div className="session-group later">
                 <span className="session-group-label">Earlier</span>
               </div>
-              <div className="session-item">Session history</div>
+              <div className="session-item muted">Session history</div>
             </div>
 
             <nav className="sidebar-footer">
@@ -290,18 +307,11 @@ export function App() {
                         }
                       }}
                     />
-                    <select
-                      className="composer-provider"
+                    <ProviderPicker
+                      providers={state?.providers ?? []}
                       value={provider}
-                      onChange={(e) => setProvider(e.target.value)}
-                      aria-label="Provider"
-                    >
-                      {(state?.providers ?? []).map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {stripMockParen(p.label)}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={setProvider}
+                    />
                     <button
                       type="button"
                       className="composer-send"
@@ -332,6 +342,7 @@ export function App() {
         onClose={() => setDrawerOpen(false)}
         onTab={setDrawerTab}
         onChildMode={(child) => void setChildMode(child)}
+        onResetReputation={(providerId) => void resetReputation(providerId)}
         scenarioStep={scenarioStep}
         onScenarioStep={setScenarioStep}
       />
@@ -510,6 +521,3 @@ function provenanceLine(result: ExchangeResult): string {
   return `${seal}, ${endpoint}`;
 }
 
-function stripMockParen(label: string): string {
-  return label.replace(/\s*\([^)]*\)\s*$/, '').trim() || label;
-}

@@ -49,6 +49,13 @@ export interface ExchangeResult {
   delivered: string | null;
   withheldContent?: string;
   ledgerSeq: number;
+  timings: {
+    totalMs: number;
+    providerMs: number;
+    deterministicMs: number;
+    semanticMs: number;
+    resolveMs: number;
+  };
 }
 
 export interface ProviderState {
@@ -87,6 +94,10 @@ export interface AdvocateState {
     version: string;
     disclaimer: string;
     citations?: string[];
+    minorOnly?: {
+      status?: string;
+      thresholdOverrides?: { warn: number; block: number };
+    };
   };
   pendingProvisions: PendingProvision[];
   policy: {
@@ -95,6 +106,10 @@ export interface AdvocateState {
     mode: string;
     window: { kind: string; n?: number; hours?: number; scope: string };
     thresholds: { warn: number; block: number };
+    releaseAuthority?: {
+      default: string;
+      byFlagType?: Record<string, string>;
+    };
     telemetry: { granularityFloor: number; trafficClass: string; endpoint: string | null };
   };
   taxonomy: {

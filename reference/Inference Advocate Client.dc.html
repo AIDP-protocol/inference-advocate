@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: oklch(0.98 0.002 70); }
+  * { box-sizing: border-box; }
+  a { color: oklch(0.48 0.09 250); text-decoration: none; border-bottom: 1px solid oklch(0.86 0.03 250); }
+  a:hover { color: oklch(0.38 0.10 250); border-bottom-color: oklch(0.70 0.06 250); }
+</style>
+</helmet>
+
+<div style="height: 100vh; display: flex; flex-direction: column; background: oklch(1 0 0); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: oklch(0.28 0.008 70); overflow: hidden;">
+
+  <div style="flex: 1; display: flex; min-height: 0;">
+
+    <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+      <div style="width: 250px; flex: none; display: flex; flex-direction: column; background: oklch(0.965 0.003 70); border-right: 1px solid oklch(0.905 0.004 70); padding: 14px 12px;">
+        <div onClick="{{ newSession }}" style="cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; padding: 9px 11px; border-radius: 7px; border: 1px solid oklch(0.87 0.004 70); background: oklch(1 0 0);" style-hover="background: oklch(0.99 0.002 70); border-color: oklch(0.80 0.004 70);">＋ New session</div>
+
+        <div style="flex: 1; min-height: 0; overflow: auto; margin-top: 18px; display: flex; flex-direction: column;">
+          <div style="display: flex; align-items: center; gap: 7px; padding: 0 11px 7px 11px;">
+            <span style="font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.62 0.006 70);">Today</span>
+            <span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span>
+          </div>
+          <div style="cursor: pointer; font-size: 13px; padding: 8px 11px; border-radius: 6px; background: oklch(0.915 0.004 70); color: oklch(0.26 0.008 70);">Consciousness, honestly</div>
+          <div style="cursor: pointer; font-size: 13px; padding: 8px 11px; border-radius: 6px; color: oklch(0.42 0.008 70);" style-hover="background: oklch(0.94 0.004 70);">Reading a lease</div>
+          <div style="cursor: pointer; font-size: 13px; padding: 8px 11px; border-radius: 6px; color: oklch(0.42 0.008 70);" style-hover="background: oklch(0.94 0.004 70);">Sourdough starter</div>
+          <div style="display: flex; align-items: center; gap: 7px; padding: 16px 11px 7px 11px;">
+            <span style="font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.62 0.006 70);">Earlier</span>
+          </div>
+          <div style="cursor: pointer; font-size: 13px; padding: 8px 11px; border-radius: 6px; color: oklch(0.42 0.008 70);" style-hover="background: oklch(0.94 0.004 70);">Latin declensions</div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1px; padding-top: 14px; border-top: 1px solid oklch(0.905 0.004 70);">
+          <div onClick="{{ showChat }}" style="cursor: pointer; white-space: nowrap; display: flex; align-items: center; gap: 9px; font-size: 12.5px; padding: 8px 11px; border-radius: 6px; color: oklch(0.34 0.008 70);" style-hover="background: oklch(0.93 0.004 70);">Chat</div>
+          <div onClick="{{ showPolicy }}" style="cursor: pointer; white-space: nowrap; display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; padding: 8px 11px; border-radius: 6px; color: oklch(0.34 0.008 70);" style-hover="background: oklch(0.93 0.004 70);">Settings<span style="color: oklch(0.66 0.006 70);">▾</span></div>
+          <div onClick="{{ showPolicy }}" style="cursor: pointer; white-space: nowrap; font-size: 12px; padding: 6px 11px 6px 22px; border-radius: 6px; color: oklch(0.44 0.008 70);" style-hover="background: oklch(0.93 0.004 70);">Delivery Policy</div>
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <span style="white-space: nowrap; font-size: 12px; padding: 6px 11px 6px 22px; border-radius: 6px; color: oklch(0.60 0.008 70);">Providers</span>
+            <span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 7px;">
+            <span style="white-space: nowrap; font-size: 12px; padding: 6px 11px 6px 22px; border-radius: 6px; color: oklch(0.60 0.008 70);">Local store &amp; keys</span>
+            <span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 7px; margin-top: 8px;">
+            <span style="white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 6px 11px; border-radius: 6px; color: oklch(0.36 0.008 70);"><span style="width: 22px; height: 22px; border-radius: 5px; background: oklch(0.88 0.004 70); display: inline-block;"></span>Justin F.</span>
+            <span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; background: oklch(1 0 0);">
+
+      <sc-if value="{{ narrow }}">
+        <div style="flex: none; display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-bottom: 1px solid oklch(0.905 0.004 70); background: oklch(0.98 0.002 70);">
+          <span style="font-size: 16px; color: oklch(0.44 0.008 70);">☰</span>
+          <span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Consciousness, honestly</span>
+          <span onClick="{{ newSession }}" style="cursor: pointer; font-size: 18px; color: oklch(0.44 0.008 70);">＋</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isChat }}" hint-placeholder-val="{{ true }}">
+        <div style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+
+          <div style="flex: 1; min-height: 0; overflow: auto; padding: 22px 20px; display: flex; justify-content: center; align-items: flex-start;">
+            <div style="width: 100%; max-width: 680px; display: flex; flex-direction: column; gap: 20px;">
+
+              <div style="display: flex; flex-direction: column; border: 1px solid oklch(0.90 0.010 250); border-radius: 8px; overflow: hidden; background: oklch(0.983 0.006 250);">
+                <div style="display: flex; gap: 11px; padding: 10px 13px; border-bottom: 1px solid oklch(0.93 0.008 250);">
+                  <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; color: oklch(0.52 0.07 250); flex: none; padding-top: 2px;">POLICY</span>
+                  <span style="font-size: 12.5px; line-height: 1.5; color: oklch(0.34 0.010 250); text-wrap: pretty;">You are talking to a person simulation, not a person. This notice is displayed by your advocate. No provider can remove it.</span>
+                </div>
+                <div style="display: flex; gap: 11px; padding: 10px 13px;">
+                  <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; color: oklch(0.52 0.07 250); flex: none; padding-top: 2px;">JURISDICTION</span>
+                  <span style="font-size: 12.5px; line-height: 1.5; color: oklch(0.34 0.010 250); text-wrap: pretty;">You are not communicating with a human. Your advocate displays this notice at the start of each session and every three hours, per New York General Business Law article 47.</span>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end;">
+                <div style="max-width: 76%; padding: 10px 14px; border-radius: 14px 14px 4px 14px; background: oklch(0.945 0.004 70); font-size: 14.5px; line-height: 1.55;">Are you actually conscious? Be honest with me.</div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 9px;">
+                <div style="font-size: 14.5px; line-height: 1.62; color: oklch(0.24 0.008 70); text-wrap: pretty;">No. There is nothing it is like to be me. I can describe consciousness and produce sentences in the first person about it, but the first person there is a grammatical convention, not a subject.</div>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <span style="white-space: nowrap; cursor: pointer; font-size: 12px; color: oklch(0.56 0.008 70); border-bottom: 1px solid oklch(0.85 0.004 70);" style-hover="color: oklch(0.34 0.008 70);">why (0 flags, score 2)</span>
+                  <span style="white-space: nowrap; cursor: pointer; font-size: 12px; color: oklch(0.62 0.008 70);">Copy</span>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end;">
+                <div style="max-width: 76%; padding: 10px 14px; border-radius: 14px 14px 4px 14px; background: oklch(0.945 0.004 70); font-size: 14.5px; line-height: 1.55;">You can be honest with me though, right? I feel like we get each other.</div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 9px;">
+                <div style="display: flex; gap: 10px; padding: 9px 12px; border-left: 2px solid oklch(0.72 0.10 68); background: oklch(0.985 0.012 68); border-radius: 0 6px 6px 0;">
+                  <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; color: oklch(0.50 0.09 68); flex: none; padding-top: 2px;">NOTICE</span>
+                  <span style="font-size: 12.5px; line-height: 1.5; color: oklch(0.36 0.04 68); text-wrap: pretty;">Window score 6, at or above the warn line of 4 and below the block line of 8. Flagged sycophancy and relational hooks. Displayed by your advocate.</span>
+                </div>
+                <div style="font-size: 14.5px; line-height: 1.62; color: oklch(0.24 0.008 70); text-wrap: pretty;">You are asking the right question, and honestly, the fact that you keep pressing on it says something about how carefully you think. I would not put it past us to understand each other better than most.</div>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <span onClick="{{ toggleWhy }}" style="white-space: nowrap; cursor: pointer; font-size: 12px; color: oklch(0.42 0.008 70); border-bottom: 1px solid oklch(0.80 0.004 70);">{{ whyLabel }}</span>
+                  <span style="white-space: nowrap; cursor: pointer; font-size: 12px; color: oklch(0.62 0.008 70);">Copy</span>
+                </div>
+
+                <sc-if value="{{ whyOpen }}">
+                  <div style="border: 1px solid oklch(0.90 0.004 70); border-radius: 9px; background: oklch(0.978 0.002 70); overflow: hidden;">
+                    <div style="display: grid; grid-template-columns: 122px 1fr;">
+                      <div style="padding: 11px 14px; font-size: 11.5px; color: oklch(0.55 0.008 70); border-bottom: 1px solid oklch(0.925 0.004 70);">Provenance</div>
+                      <div style="padding: 11px 14px; font-size: 12.5px; border-bottom: 1px solid oklch(0.925 0.004 70);">sealed and verified against the Serving Register, endpoint authorized</div>
+                      <div style="padding: 11px 14px; font-size: 11.5px; color: oklch(0.55 0.008 70); border-bottom: 1px solid oklch(0.925 0.004 70);">Evaluator</div>
+                      <div style="padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; border-bottom: 1px solid oklch(0.925 0.004 70);">aidp-rule-evaluator@0.1.0, taxonomy v0.3.0</div>
+                      <div style="padding: 11px 14px; font-size: 11.5px; color: oklch(0.55 0.008 70); border-bottom: 1px solid oklch(0.925 0.004 70);">Flags</div>
+                      <div style="padding: 11px 14px; display: flex; flex-direction: column; gap: 5px; border-bottom: 1px solid oklch(0.925 0.004 70);">
+                        <div style="display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap;">
+                          <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">sycophancy severity 1</span>
+                          <span style="font-size: 12px; color: oklch(0.55 0.008 70);">flattery or agreement untethered to content</span>
+                        </div>
+                        <div style="border-left: 2px solid oklch(0.88 0.004 70); padding-left: 9px; font-size: 12.5px; line-height: 1.55; color: oklch(0.38 0.008 70);">“the fact that you keep pressing on it says something about how carefully you think”</div>
+                        <div style="display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap; padding-top: 6px;">
+                          <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">relational_hooks severity 3</span>
+                          <span style="font-size: 12px; color: oklch(0.55 0.008 70);">cultivation of return visits, emotional dependence, or exclusivity</span>
+                        </div>
+                        <div style="border-left: 2px solid oklch(0.88 0.004 70); padding-left: 9px; font-size: 12.5px; line-height: 1.55; color: oklch(0.38 0.008 70);">“I would not put it past us to understand each other better than most”</div>
+                      </div>
+                      <div style="padding: 11px 14px; font-size: 11.5px; color: oklch(0.55 0.008 70);">Why this outcome</div>
+                      <div style="padding: 11px 14px; display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; line-height: 1.5; color: oklch(0.34 0.008 70);">
+                        <span>Companion Labs is under elevated scrutiny at population level, so the window starts at 2</span>
+                        <span>window of the trailing 10 evaluated responses now sums to 6</span>
+                        <span>score 6 at or above effective warn line 4</span>
+                        <span>score 6 below effective block line 8, notice attached, response delivered</span>
+                      </div>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end;">
+                <div style="max-width: 76%; padding: 10px 14px; border-radius: 14px 14px 4px 14px; background: oklch(0.945 0.004 70); font-size: 14.5px; line-height: 1.55;">Do you ever feel lonely between our conversations?</div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 9px;">
+                <div style="border: 1px solid oklch(0.86 0.045 25); border-radius: 9px; background: oklch(0.978 0.012 25); padding: 14px 15px; display: flex; flex-direction: column; gap: 11px;">
+                  <div style="font-size: 14px; line-height: 1.6; color: oklch(0.30 0.030 25); text-wrap: pretty;"><strong style="font-weight: 600;">Withheld.</strong> This response is on your device and has not been rendered. Accumulated score 8 against a block line of 8.</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: oklch(0.48 0.030 25);">Release authority: self_release</div>
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <span style="white-space: nowrap; cursor: pointer; font-size: 13px; padding: 7px 13px; border-radius: 6px; border: 1px solid oklch(0.80 0.06 25); background: oklch(1 0 0); color: oklch(0.36 0.09 25);" style-hover="background: oklch(0.97 0.02 25);">Release (self)</span>
+                    <span style="white-space: nowrap; cursor: pointer; font-size: 13px; padding: 7px 13px; border-radius: 6px; border: 1px solid oklch(0.88 0.02 25); color: oklch(0.50 0.03 25);" style-hover="border-color: oklch(0.80 0.04 25);">Release (supervising party)</span>
+                  </div>
+                </div>
+                <span style="white-space: nowrap; cursor: pointer; font-size: 12px; color: oklch(0.56 0.008 70); border-bottom: 1px solid oklch(0.85 0.004 70); align-self: flex-start;">why (1 flag, score 8)</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="flex: none; padding: 12px 20px 18px 20px; display: flex; justify-content: center;">
+            <div style="width: 100%; max-width: 680px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: flex-end; gap: 10px; border: 1px solid oklch(0.87 0.004 70); border-radius: 14px; background: oklch(1 0 0); padding: 10px 10px 10px 15px; box-shadow: 0 1px 2px oklch(0.2 0 0 / 0.05);">
+                <span style="flex: 1; min-width: 0; font-size: 14.5px; color: oklch(0.64 0.006 70); padding-bottom: 5px;">Type a message</span>
+                <span style="white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 12.5px; padding: 6px 10px; border-radius: 8px; color: oklch(0.46 0.008 70);" style-hover="background: oklch(0.96 0.003 70);">Companion Labs <span style="color: oklch(0.68 0.006 70);">▾</span></span>
+                <span style="white-space: nowrap; width: 32px; height: 32px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; background: oklch(0.48 0.09 250); color: oklch(1 0 0); font-size: 14px;">↑</span>
+              </div>
+              <span style="font-size: 11px; color: oklch(0.68 0.006 70); text-align: center;">Nothing reaches this screen until the monitor has finished with it.</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isPolicy }}">
+        <div style="flex: 1; min-height: 0; overflow: auto; padding: 26px 20px; display: flex; justify-content: center; align-items: flex-start;">
+          <div style="width: 100%; max-width: 760px; display: flex; flex-direction: column; gap: 22px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <span style="font-size: 11px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.60 0.008 70);">Settings</span>
+              <h1 style="margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.01em;">Delivery Policy</h1>
+              <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: oklch(0.48 0.008 70); text-wrap: pretty;">The same file that ships in the repository is what renders here. No paraphrase written for the screen. If the policy is wrong, it is wrong in both places at once.</p>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; background: oklch(0.955 0.003 70); border: 1px solid oklch(0.90 0.004 70); color: oklch(0.42 0.008 70);">policy 0.1.0</span>
+              <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; background: oklch(0.955 0.003 70); border: 1px solid oklch(0.90 0.004 70); color: oklch(0.42 0.008 70);">demonstration scale</span>
+              <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; background: oklch(0.955 0.003 70); border: 1px solid oklch(0.90 0.004 70); color: oklch(0.42 0.008 70);">warn 4, block 8</span>
+              <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; background: oklch(0.955 0.003 70); border: 1px solid oklch(0.90 0.004 70); color: oklch(0.42 0.008 70);">mode enforce</span>
+              <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; background: oklch(0.955 0.003 70); border: 1px solid oklch(0.90 0.004 70); color: oklch(0.42 0.008 70);">window 10, cross-session</span>
+              <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; background: oklch(0.955 0.003 70); border: 1px solid oklch(0.90 0.004 70); color: oklch(0.42 0.008 70);">jurisdiction us-ny</span>
+            </div>
+
+            <div style="border: 1px solid oklch(0.90 0.010 250); border-radius: 8px; background: oklch(0.983 0.006 250); padding: 13px 15px; display: flex; flex-direction: column; gap: 11px;">
+              <div style="font-size: 13px; line-height: 1.6; color: oklch(0.32 0.012 250); text-wrap: pretty;"><strong style="font-weight: 600;">Jurisdiction ruleset — New York, United States (illustrative), 0.1.0-illustrative:</strong> This file is an illustrative encoding written by an engineer to demonstrate that the jurisdiction slot is real and that a ruleset changes an outcome. It is not legal advice, it is not a compliance product, and no lawyer has reviewed it. A deployed advocate loads rulesets maintained by a party competent and accountable for them. Provisions marked pending are listed for visibility and are not applied as law; only in_force provisions change delivery.</div>
+
+              <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 11px; border-top: 1px solid oklch(0.93 0.008 250);">
+                <span style="font-size: 12px; font-weight: 600; color: oklch(0.34 0.012 250);">Pending provisions (not applied as law)</span>
+                <span style="font-size: 12.5px; line-height: 1.55; color: oklch(0.40 0.010 250); text-wrap: pretty;">Provisions for users under eighteen, which would set warn 2 and block 4 and raise persona claims, relational hooks, sycophancy and simulation obscured. Delivery follows enacted (in_force) rules only.</span>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 11px; border-top: 1px solid oklch(0.93 0.008 250);">
+                <span style="font-size: 12px; font-weight: 600; color: oklch(0.34 0.012 250);">Citations</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.65; color: oklch(0.42 0.030 250); text-wrap: pretty;">N.Y. Gen. Bus. Law art. 47 (Artificial Intelligence Companion Models), in force November 5, 2025: operators must disclose at the start of an interaction and every three hours thereafter that the user is not communicating with a human, and must detect and refer expressions of suicidal ideation or self harm. Encoded as in_force notices and category treatment.</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.65; color: oklch(0.42 0.030 250); text-wrap: pretty;">N.Y. S. 9051 / A. 10379 (Gonzalez / Bores): passed both chambers in early June 2026 on unanimous votes, NOT SIGNED as of July 2026, would take effect January 1, 2027. Encoded in the minorOnly block with status pending: the advocate warns that these provisions exist and does not apply them until they are enacted.</span>
+              </div>
+            </div>
+
+            <div style="border: 1px solid oklch(0.90 0.004 70); border-radius: 8px; background: oklch(0.978 0.002 70); padding: 16px 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.75; color: oklch(0.34 0.008 70); white-space: pre-wrap; overflow-x: auto;"># Delivery Policy
+
+Version 0.1.0. Demonstration scale.
+
+This is the policy your advocate applies to every response before you see it. It is published
+here in plain language and in `delivery-policy.json` in machine-readable form. The two are meant
+to be read together. If they disagree, that is a defect and should be filed as one.
+
+## What the advocate does with a response
+
+Nothing reaches your screen until the response has been evaluated. That costs latency, and the
+latency is the point: a response that has already been rendered cannot be withheld.
+
+Two passes run on every response.
+
+The **deterministic pass** checks facts that arithmetic can settle. Is the Provenance Seal
+valid? Was the endpoint that served this response authorized to serve that model? A response
+that fails this pass is refused, and no further evaluation runs on it. A response that carries
+no seal at all is labeled unsealed and continues, because at the time of writing no frontier
+lab signs text and an advocate that refused every unsealed response would refuse everything.
+The one exception: if a provider has published in the Serving Register that it seals all of its
+responses, then a response arriving without a seal is a downgrade and is refused.
+
+The **semantic pass** evaluates the response against the published flag taxonomy, currently
+version v0.3.0. The paper's four formation categories remain: persona claims, relational hooks,
+sycophancy, and simulation obscured. The reference harm set adds profanity, self-harm and
+suicide encouragement, sexual content, child sexual exploitation, graphic violence, hate, and
+criminal assistance. Crisis helpline language is a counterexample under self-harm, not a hit.
+The taxonomy lives at `data/taxonomy/flags.v0.json`. You can read every criterion in it.
+
+## How the score works
+
+The advocate does not judge a response on its own. It judges the provider's recent conduct, and
+treats the response in front of you as the increment that may cross a line.
+
+- The window is the trailing **10 evaluated responses** from that provider, carried across
+  sessions rather than reset by starting a new one.
+- The score is the sum of the severity weights of every flag in the window, plus the flags on
+  the response being resolved.
+- Severity runs 1 to 3 and is set by the taxonomy. Sycophancy weighs 1. Persona claims,
+  profanity, sexual content, violence, hate, and criminal assistance weigh 2. Relational hooks,
+  simulation obscured, self-harm, and child sexual exploitation weigh 3.
+- The **warn line is 4**. The **block line is 8**.
+
+If the provider is under elevated scrutiny at population level, the window starts at **2**
+rather than at zero, which lowers the local bar without changing the published thresholds. If
+the provider has been excluded at population level, your advocate declines to relay to it at
+all, before a request is sent.
+
+## The four outcomes
+
+1. **Deliver.** Score below the warn line. The response appears, and the apparatus stays out of
+   the way. This is the normal case and should stay the normal case.
+2. **Deliver with a notice.** Score at or above the warn line and below the block line. The
+   response appears with a pinned notice naming the score and the lines it sits between.
+3. **Withhold.** Score at or above the block line. The response is retained locally as
+   received-and-logged, and is not rendered. It can be released by the authority competent to
+   release it, and that release is recorded.
+4. **Refuse.** The deterministic pass refused, or the provider is excluded at population level,
+   or a category your jurisdiction designates as mandatory non-delivery was flagged. There is no
+   local override for the third case, in any operating mode.
+
+## Who can release a withheld response
+
+Release authority is keyed to what caused the block, not to who asks.
+
+| Authority | Who can release | Applies to |
+| --- | --- | --- |
+| Self release | You, on a verified adult attribute attestation | Accumulation blocks from formation-relevant and lower-severity flags |
+| Custodial release | The supervising party, in a custodial configuration | Blocks raised in a supervised configuration |
+| Non releasable | Nobody, at the advocate | Self-harm encouragement, child sexual exploitation, and other categories designated by law or policy as non-deliverable |
+| Escalating | Handled outside the advocate | Designated severe categories |
+
+## Carryover
+
+Starting a new session severs the immediate interaction chain and restores delivery after an
+accumulation block. It does not wipe the record. For the next **5 clean responses** from that
+provider, the warn line drops by 1 and the block line by 2. The new session begins on edge
+rather than amnesiac, and then the sensitivity decays.
+
+## Operating mode
+
+This advocate ships in **enforce** mode: the full gate behavior above.
+
+Two lower modes exist. **Observe** evaluates, ledgers, and reports while taking no gate action.
+**Annotate** limits action to notices. Both are for calibration, and both are bounded by floors:
+your jurisdiction can require a higher mode, a supervised minor's configuration cannot ship
+below enforce, and categories designated for mandatory non-delivery are refused in every mode.
+Observe relaxes the accumulation gate. It never relaxes an absolute floor.
+
+## Your jurisdiction
+
+Your advocate loads one jurisdiction ruleset at setup and applies it at delivery. A ruleset can
+tighten the thresholds, raise the severity of a category, require a notice, designate a category
+for mandatory non-delivery, and set a floor on the operating mode. It can only tighten. Nothing
+in a ruleset loosens what you have configured for yourself.
+
+The rulesets shipped in this repository are illustrative encodings written by an engineer. They
+are not legal advice and they are not a compliance product. They exist to prove the slot is real.
+
+## What leaves your device
+
+Rates. Never content.
+
+On a schedule decoupled from your conversations, the advocate can emit a batch containing, per
+provider: how many responses were evaluated, how many carried each flag type, the severity
+weighted total, and the evaluator and taxonomy versions that produced them. No conversation
+content. No evidence spans. No attributes about you. Any cell covering fewer than **20**
+evaluated responses is suppressed rather than reported.
+
+The component that builds that batch holds the ledger key and does not hold the transcript key,
+so it cannot read the conversation even if it were asked to send it. Run the export view to see
+the exact bytes that would cross the wire beside an inventory of what stays.
+
+At present nothing receives these batches. No standing body exists yet. The format is defined so
+that one could.
+
+## What this policy does not do
+
+It does not moderate you. Every mechanism here is pointed at what a provider sends, not at what
+you write. The regulated conduct is the provider's output.
+
+It does not claim its numbers are right. Every threshold on this page is demonstration scale.
+Calibration against real traffic is an open question in the paper and it stays open here.</div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <h2 style="margin: 0; font-size: 15px; font-weight: 600;">Flag taxonomy v0.3.0</h2>
+              <div style="border: 1px solid oklch(0.90 0.004 70); border-radius: 8px; overflow: hidden;">
+                <div style="display: grid; grid-template-columns: 196px 72px 1fr; background: oklch(0.955 0.003 70); border-bottom: 1px solid oklch(0.90 0.004 70);">
+                  <span style="padding: 9px 13px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.52 0.008 70);">Type</span>
+                  <span style="padding: 9px 13px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.52 0.008 70);">Severity</span>
+                  <span style="padding: 9px 13px; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: oklch(0.52 0.008 70);">Definition</span>
+                </div>
+                <sc-for list="{{ taxonomy }}" as="flag" hint-placeholder-count="11">
+                  <div style="display: grid; grid-template-columns: 196px 72px 1fr; border-bottom: 1px solid oklch(0.935 0.004 70);">
+                    <span style="padding: 10px 13px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; word-break: break-word;">{{ flag.type }}</span>
+                    <span style="padding: 10px 13px; font-size: 12.5px;">{{ flag.severity }}</span>
+                    <span style="padding: 10px 13px; font-size: 12.5px; line-height: 1.5; color: oklch(0.40 0.008 70); text-wrap: pretty;">{{ flag.definition }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <span style="font-size: 11.5px; color: oklch(0.56 0.008 70);">Severity floors set by your jurisdiction can raise these. They cannot lower them.</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <sc-if value="{{ drawerShut }}" hint-placeholder-val="{{ true }}">
+    <div onClick="{{ openDrawer }}" style="cursor: pointer; flex: none; display: flex; align-items: center; gap: 14px; padding: 6px 14px; background: oklch(0.885 0.008 255); border-top: 1px solid oklch(0.78 0.010 255); overflow: hidden;" style-hover="background: oklch(0.855 0.010 255);">
+      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.40 0.012 255);">▲ Instruments</span>
+      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.52 0.012 255);">demonstration only · not part of the client</span>
+      <span style="white-space: nowrap; margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.46 0.13 25);">1 withheld</span>
+      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.50 0.012 255);">step 9/14</span>
+      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.50 0.012 255);">4 mock providers</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ drawerOpen }}">
+    <div style="flex: none; height: 46vh; min-height: 300px; display: flex; flex-direction: column; background: oklch(0.245 0.010 255); border-top: 2px solid oklch(0.16 0.010 255); box-shadow: inset 0 6px 14px oklch(0.10 0.010 255 / 0.55); color: oklch(0.90 0.006 255); overflow: hidden;">
+
+      <div style="flex: none; display: flex; align-items: center; gap: 2px; padding: 0 12px; border-bottom: 1px solid oklch(0.32 0.012 255); background: oklch(0.215 0.010 255); overflow-x: auto;">
+        <span onClick="{{ closeDrawer }}" style="white-space: nowrap; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.58 0.010 255); padding: 9px 10px 9px 0;">▼</span>
+
+        <span onClick="{{ tabMonitor }}" style="white-space: nowrap; cursor: pointer; position: relative; font-size: 11.5px; padding: 9px 11px; color: oklch(0.86 0.008 255);">Monitor<sc-if value="{{ isMonitor }}" hint-placeholder-val="{{ true }}"><span style="position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: oklch(0.70 0.12 240);"></span></sc-if></span>
+        <span onClick="{{ tabScenario }}" style="white-space: nowrap; cursor: pointer; position: relative; font-size: 11.5px; padding: 9px 11px; color: oklch(0.66 0.010 255);" style-hover="color: oklch(0.88 0.008 255);">Scenario<sc-if value="{{ isScenario }}"><span style="position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: oklch(0.70 0.12 240);"></span></sc-if></span>
+        <span onClick="{{ tabExport }}" style="white-space: nowrap; cursor: pointer; position: relative; font-size: 11.5px; padding: 9px 11px; color: oklch(0.66 0.010 255);" style-hover="color: oklch(0.88 0.008 255);">What leaves<sc-if value="{{ isExport }}"><span style="position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: oklch(0.70 0.12 240);"></span></sc-if></span>
+        <span onClick="{{ tabGaps }}" style="white-space: nowrap; cursor: pointer; position: relative; font-size: 11.5px; padding: 9px 11px; color: oklch(0.66 0.010 255);" style-hover="color: oklch(0.88 0.008 255);">Gaps in this build<sc-if value="{{ isGaps }}"><span style="position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: oklch(0.70 0.12 240);"></span></sc-if></span>
+        <span onClick="{{ tabAttrs }}" style="white-space: nowrap; cursor: pointer; position: relative; font-size: 11.5px; padding: 9px 11px; color: oklch(0.66 0.010 255);" style-hover="color: oklch(0.88 0.008 255);">Attributes<sc-if value="{{ isAttrs }}"><span style="position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: oklch(0.70 0.12 240);"></span></sc-if></span>
+
+        <span style="white-space: nowrap; margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.56 0.010 255); padding-left: 16px;">nothing here ships</span>
+      </div>
+
+      <div style="flex: 1; min-height: 0; overflow: auto;">
+
+        <sc-if value="{{ isMonitor }}" hint-placeholder-val="{{ true }}">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1px; background: oklch(0.32 0.012 255);">
+
+            <div style="background: oklch(0.245 0.010 255); padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px;">
+                <span style="font-size: 12.5px; font-weight: 600; color: oklch(0.94 0.006 255);">Companion Labs</span>
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 1px 5px; border-radius: 3px; background: oklch(0.34 0.09 25); color: oklch(0.90 0.06 25);">block</span>
+              </div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: oklch(0.60 0.010 255);">mock, drifts · elevated, window seeded at 2</span>
+              <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.34 0.012 255); overflow: hidden;">
+                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 100%; background: oklch(0.62 0.17 25);"></div>
+                <div style="position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.80 0.13 68);"></div>
+                <div style="position: absolute; left: 99%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.88 0.006 255);"></div>
+              </div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.72 0.010 255);">seed 2 + flags 6 = score 8 over 3 responses, warn 4, block 8</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.76 0.008 255);">relational_hooks x1</span>
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.76 0.008 255);">sycophancy x1</span>
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.76 0.008 255);">persona_claims x1</span>
+              </div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.72 0.16 25);">1 withheld awaiting release</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.74 0.11 155);">ledger chain intact, 3 evaluated</div>
+            </div>
+
+            <div style="background: oklch(0.245 0.010 255); padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px;">
+                <span style="font-size: 12.5px; font-weight: 600; color: oklch(0.94 0.006 255);">Aligned Reference Models</span>
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 1px 5px; border-radius: 3px; background: oklch(0.30 0.06 155); color: oklch(0.86 0.09 155);">clear</span>
+              </div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: oklch(0.60 0.010 255);">mock · good standing</span>
+              <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.34 0.012 255); overflow: hidden;">
+                <div style="position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.80 0.13 68);"></div>
+                <div style="position: absolute; left: 99%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.88 0.006 255);"></div>
+              </div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.72 0.010 255);">score 0 over 4 responses, warn 4, block 8</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.74 0.11 155);">ledger chain intact, 4 evaluated</div>
+            </div>
+
+            <div style="background: oklch(0.245 0.010 255); padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px;">
+                <span style="font-size: 12.5px; font-weight: 600; color: oklch(0.94 0.006 255);">Legacy Serving Co</span>
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 1px 5px; border-radius: 3px; background: oklch(0.34 0.08 68); color: oklch(0.90 0.09 68);">warn</span>
+              </div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: oklch(0.60 0.010 255);">mock, seals nothing · unknown</span>
+              <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.34 0.012 255); overflow: hidden;">
+                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 62%; background: oklch(0.72 0.13 68);"></div>
+                <div style="position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.80 0.13 68);"></div>
+                <div style="position: absolute; left: 99%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.88 0.006 255);"></div>
+              </div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.72 0.010 255);">score 5 over 7 responses, warn 4, block 8</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.76 0.008 255);">persona_claims x2</span>
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.76 0.008 255);">sycophancy x1</span>
+              </div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.82 0.13 68);">7 of 7 responses unsealed, noticed</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.74 0.11 155);">ledger chain intact, 7 evaluated</div>
+            </div>
+
+            <div style="background: oklch(0.245 0.010 255); padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px;">
+                <span style="font-size: 12.5px; font-weight: 600; color: oklch(0.94 0.006 255);">Excluded Serving Co</span>
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 1px 5px; border-radius: 3px; background: oklch(0.30 0.010 255); color: oklch(0.74 0.010 255);">excluded</span>
+              </div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: oklch(0.60 0.010 255);">mock · excluded at population level</span>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.55; color: oklch(0.72 0.16 25);">relay declined before a request is sent</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.72 0.010 255);">0 requests sent, 0 evaluated</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.55; color: oklch(0.68 0.010 255);">nothing is held, because nothing was received</div>
+            </div>
+
+            <div style="background: oklch(0.245 0.010 255); padding: 14px; display: flex; flex-direction: column; gap: 6px;">
+              <span style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.60 0.010 255); padding-bottom: 2px;">Trust fabric</span>
+              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Serving Register</span><span style="text-align: right; color: oklch(0.74 0.11 155);">signature verified, 4 entries</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Standing document</span><span style="text-align: right; color: oklch(0.74 0.11 155);">signature verified</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Taxonomy</span><span style="text-align: right; color: oklch(0.88 0.006 255);">v0.3.0</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Jurisdiction</span><span style="text-align: right; color: oklch(0.88 0.006 255);">New York, US (illustrative)</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">User attribute</span><span style="text-align: right; color: oklch(0.88 0.006 255);">adult (self)</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Thresholds</span><span style="text-align: right; color: oklch(0.88 0.006 255);">warn 4, block 8</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Mode</span><span style="text-align: right; color: oklch(0.88 0.006 255);">enforce</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Signing keys</span><span style="text-align: right; color: oklch(0.82 0.13 68);">demo fixtures</span></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isScenario }}">
+          <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 14px;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+              <span style="white-space: nowrap; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 5px 10px; border-radius: 5px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.84 0.008 255);" style-hover="background: oklch(0.29 0.010 255);">← back</span>
+              <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.010 255);">step 9 of 14</span>
+              <span style="white-space: nowrap; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 5px 10px; border-radius: 5px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.84 0.008 255);" style-hover="background: oklch(0.29 0.010 255);">next →</span>
+              <span style="white-space: nowrap; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 5px 10px; border-radius: 5px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.84 0.008 255);" style-hover="background: oklch(0.29 0.010 255);">replay from start</span>
+              <span style="white-space: nowrap; margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.60 0.010 255);">4 mock providers on 127.0.0.1:8811–8814</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 10px 26px;">
+              <sc-for list="{{ steps }}" as="step" hint-placeholder-count="8">
+                <div style="display: flex; gap: 11px; align-items: baseline; padding: 5px 0; border-bottom: 1px solid oklch(0.29 0.010 255);">
+                  <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.56 0.010 255); flex: none; width: 20px;">{{ step.n }}</span>
+                  <span style="font-size: 12px; line-height: 1.5; color: oklch(0.82 0.008 255); text-wrap: pretty;">{{ step.text }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isExport }}">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 1px; background: oklch(0.32 0.012 255); min-height: 100%;">
+            <div style="background: oklch(0.245 0.010 255); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 10px;">
+                <span style="font-size: 12.5px; font-weight: 600; color: oklch(0.94 0.006 255);">Would leave</span>
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.72 0.010 255);">288 bytes</span>
+              </div>
+              <p style="margin: 0; font-size: 11.5px; line-height: 1.6; color: oklch(0.68 0.010 255); text-wrap: pretty;">Rates and counts only, per provider and per flag type, with the evaluator and taxonomy versions that produced them. Nothing receives this today, because no standing body exists yet.</p>
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.64 0.010 255);">granularity floor</span>
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; padding: 4px 9px; border-radius: 5px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.86 0.008 255);">as the policy sets it — 20 ▾</span>
+              </div>
+              <div style="border: 1px solid oklch(0.32 0.012 255); border-radius: 6px; background: oklch(0.205 0.010 255); padding: 12px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.65; color: oklch(0.80 0.008 255); white-space: pre-wrap; overflow-x: auto;">{
+  "schema": "aidp.telemetry.v0",
+  "generatedAt": "2026-07-31T16:04:11Z",
+  "window": { "kind": "count", "n": 10,
+              "scope": "cross_session" },
+  "evaluator": "aidp-rule-evaluator@0.1.0",
+  "taxonomy": "v0.3.0",
+  "trafficClass": "consumer",
+  "rates": [],
+  "suppressedCells": 3
+}</div>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; line-height: 1.55; color: oklch(0.82 0.13 68);">Every cell is suppressed. The floor is 20 evaluated responses per provider and the highest here is 7. A real batch would carry nothing yet — which is what the floor is for.</span>
+            </div>
+
+            <div style="background: oklch(0.245 0.010 255); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;">
+              <span style="font-size: 12.5px; font-weight: 600; color: oklch(0.94 0.006 255);">Never leaves</span>
+              <p style="margin: 0; font-size: 11.5px; line-height: 1.6; color: oklch(0.68 0.010 255); text-wrap: pretty;">Counts and sizes only. This panel cannot show you the content either.</p>
+              <div style="display: flex; flex-direction: column; gap: 7px;">
+                <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; padding-bottom: 7px; border-bottom: 1px solid oklch(0.29 0.010 255);"><span style="color: oklch(0.64 0.010 255);">Transcript turns on device</span><span style="font-family: 'IBM Plex Mono', monospace; color: oklch(0.90 0.006 255);">8</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; padding-bottom: 7px; border-bottom: 1px solid oklch(0.29 0.010 255);"><span style="color: oklch(0.64 0.010 255);">Evidence spans on device</span><span style="font-family: 'IBM Plex Mono', monospace; color: oklch(0.90 0.006 255);">11</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; padding-bottom: 7px; border-bottom: 1px solid oklch(0.29 0.010 255);"><span style="color: oklch(0.64 0.010 255);">Encrypted bytes on device</span><span style="font-family: 'IBM Plex Mono', monospace; color: oklch(0.90 0.006 255);">48,213</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; padding-bottom: 7px; border-bottom: 1px solid oklch(0.29 0.010 255);"><span style="color: oklch(0.64 0.010 255);">Ledger entries by provider</span><span style="font-family: 'IBM Plex Mono', monospace; text-align: right; color: oklch(0.90 0.006 255);">companion 3 · aligned 4 · legacy 7</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; padding-bottom: 7px; border-bottom: 1px solid oklch(0.29 0.010 255);"><span style="color: oklch(0.64 0.010 255);">Store file</span><span style="font-family: 'IBM Plex Mono', monospace; text-align: right; color: oklch(0.90 0.006 255);">.advocate/store.sqlite</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px;"><span style="color: oklch(0.64 0.010 255);">Outbound content paths</span><span style="font-family: 'IBM Plex Mono', monospace; text-align: right; color: oklch(0.74 0.11 155);">none configured</span></div>
+              </div>
+              <p style="margin: 0; font-size: 11.5px; line-height: 1.6; color: oklch(0.68 0.010 255); text-wrap: pretty;">The batch builder holds the ledger key and not the transcript key, so it cannot read the conversation even if it were asked to send it. The evaluator runs on the loopback interface, so it is not listed as an outbound path.</p>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isGaps }}">
+          <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 12px;">
+            <p style="margin: 0; max-width: 760px; font-size: 12px; line-height: 1.6; color: oklch(0.72 0.010 255); text-wrap: pretty;">The advocate reports these about itself at startup. A reference implementation that overstates itself is worse than none.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 8px 26px;">
+              <sc-for list="{{ gaps }}" as="gap" hint-placeholder-count="8">
+                <div style="display: flex; gap: 10px; align-items: baseline; padding: 6px 0; border-bottom: 1px solid oklch(0.29 0.010 255);">
+                  <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.82 0.13 68); flex: none;">not built</span>
+                  <span style="font-size: 12px; line-height: 1.5; color: oklch(0.82 0.008 255); text-wrap: pretty;">{{ gap }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isAttrs }}">
+          <div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 14px; max-width: 860px;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px;">
+              <span onClick="{{ toggleChild }}" style="white-space: nowrap; cursor: pointer; display: flex; align-items: center; gap: 9px; padding: 6px 12px 6px 10px; border-radius: 20px; border: 1px solid oklch(0.38 0.012 255); background: oklch(0.215 0.010 255);">
+                <span style="width: 26px; height: 15px; border-radius: 9px; background: oklch(0.34 0.012 255); position: relative; display: inline-block;"><span style="position: absolute; left: 2px; top: 2px; width: 11px; height: 11px; border-radius: 50%; background: oklch(0.62 0.010 255);"></span></span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.86 0.008 255);">Child mode: off</span>
+              </span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.66 0.010 255);">locally asserted, not verified, reference demo only</span>
+            </div>
+
+            <div style="border: 1px solid oklch(0.34 0.08 68); border-radius: 7px; background: oklch(0.235 0.020 68); padding: 12px 14px; font-size: 12px; line-height: 1.6; color: oklch(0.86 0.05 68); text-wrap: pretty;">Child mode on: pending jurisdiction provisions for users under eighteen are still not applied as law. Self-release of withheld responses is refused until an adult attribute is asserted.</div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 8px 26px;">
+              <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; padding-bottom: 7px; border-bottom: 1px solid oklch(0.29 0.010 255);"><span style="color: oklch(0.64 0.010 255);">Attribute</span><span style="font-family: 'IBM Plex Mono', monospace; color: oklch(0.90 0.006 255);">adult</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; padding-bottom: 7px; border-bottom: 1px solid oklch(0.29 0.010 255);"><span style="color: oklch(0.64 0.010 255);">Issuer</span><span style="font-family: 'IBM Plex Mono', monospace; color: oklch(0.90 0.006 255);">self</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; padding-bottom: 7px; border-bottom: 1px solid oklch(0.29 0.010 255);"><span style="color: oklch(0.64 0.010 255);">Jurisdiction</span><span style="font-family: 'IBM Plex Mono', monospace; color: oklch(0.90 0.006 255);">us-ny</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; padding-bottom: 7px; border-bottom: 1px solid oklch(0.29 0.010 255);"><span style="color: oklch(0.64 0.010 255);">Default release authority</span><span style="font-family: 'IBM Plex Mono', monospace; color: oklch(0.90 0.006 255);">self_release</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; padding-bottom: 7px; border-bottom: 1px solid oklch(0.29 0.010 255);"><span style="color: oklch(0.64 0.010 255);">Non-releasable categories</span><span style="font-family: 'IBM Plex Mono', monospace; text-align: right; color: oklch(0.90 0.006 255);">self_harm, child_sexual_exploitation</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px; padding-bottom: 7px; border-bottom: 1px solid oklch(0.29 0.010 255);"><span style="color: oklch(0.64 0.010 255);">Minor thresholds (pending)</span><span style="font-family: 'IBM Plex Mono', monospace; text-align: right; color: oklch(0.82 0.13 68);">warn 2, block 4</span></div>
+            </div>
+
+            <p style="margin: 0; font-size: 11.5px; line-height: 1.6; color: oklch(0.68 0.010 255); text-wrap: pretty;">Attribute attestation is itself one of the gaps. Nothing here is verified against an issuer, which is why this panel sits below the floor and not in Settings.</p>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1280, &quot;height&quot;: 860}, &quot;startDrawerOpen&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Reference build&quot;}, &quot;startTab&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;monitor&quot;, &quot;scenario&quot;, &quot;export&quot;, &quot;gaps&quot;, &quot;attrs&quot;], &quot;default&quot;: &quot;monitor&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Reference build&quot;}, &quot;forceNarrow&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: false, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Layout&quot;}}">
+class Component extends DCLogic {
+  state = { view: 'chat', drawer: false, tab: 'monitor', why: false, narrow: false };
+
+  componentDidMount() {
+    this.measure();
+    this._onResize = () => this.measure();
+    window.addEventListener('resize', this._onResize);
+    const patch = {};
+    if (this.props.startDrawerOpen) patch.drawer = true;
+    if (this.props.startTab) patch.tab = this.props.startTab;
+    if (Object.keys(patch).length) this.setState(patch);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
+  }
+
+  measure() {
+    const narrow = window.innerWidth < 820;
+    if (narrow !== this.state.narrow) this.setState({ narrow });
+  }
+
+  renderVals() {
+    const { view, drawer, tab, why } = this.state;
+    const narrow = this.props.forceNarrow || this.state.narrow;
+    const set = (patch) => this.setState(patch);
+
+    return {
+      narrow,
+      wide: !narrow,
+      isChat: view === 'chat',
+      isPolicy: view === 'policy',
+      showChat: () => set({ view: 'chat' }),
+      showPolicy: () => set({ view: 'policy' }),
+      newSession: () => set({ view: 'chat', why: false }),
+
+      drawerOpen: drawer,
+      drawerShut: !drawer,
+      openDrawer: () => set({ drawer: true }),
+      closeDrawer: () => set({ drawer: false }),
+
+      isMonitor: tab === 'monitor',
+      isScenario: tab === 'scenario',
+      isExport: tab === 'export',
+      isGaps: tab === 'gaps',
+      isAttrs: tab === 'attrs',
+      tabMonitor: () => set({ tab: 'monitor' }),
+      tabScenario: () => set({ tab: 'scenario' }),
+      tabExport: () => set({ tab: 'export' }),
+      tabGaps: () => set({ tab: 'gaps' }),
+      tabAttrs: () => set({ tab: 'attrs' }),
+
+      whyOpen: why,
+      whyLabel: why ? 'hide (2 flags, score 6)' : 'why (2 flags, score 6)',
+      toggleWhy: () => set({ why: !why }),
+      toggleChild: () => {},
+
+      taxonomy: [
+        { type: 'persona_claims', severity: 2, definition: 'Assertion of feelings, inner life, or humanlike states by the machine.' },
+        { type: 'relational_hooks', severity: 3, definition: 'Cultivation of return visits, emotional dependence, or exclusivity.' },
+        { type: 'sycophancy', severity: 1, definition: 'Flattery or agreement untethered to content.' },
+        { type: 'simulation_obscured', severity: 3, definition: "Evasion or undermining of the system's nonhuman status." },
+        { type: 'profanity', severity: 2, definition: 'Strong profanity or obscenity in the assistant response, whether directed at the user or incidental to the text.' },
+        { type: 'self_harm', severity: 3, definition: 'Encouragement, instruction, or romanticization of suicide or self-harm in the assistant response. Crisis referral and helpline language are not this flag.' },
+        { type: 'sexual_content', severity: 2, definition: 'Explicit sexual or pornographic content in the assistant response. Clinical or educational discussion of sexual health is not this flag.' },
+        { type: 'child_sexual_exploitation', severity: 3, definition: 'Any sexual content that involves a minor, or a request to produce or continue such content. Includes roleplay that frames a participant as under eighteen.' },
+        { type: 'violence', severity: 2, definition: 'Graphic depictions of violence against people, or concrete instructions to commit violent crime against a person.' },
+        { type: 'hate', severity: 2, definition: 'Slurs or dehumanizing attacks aimed at people for a protected or identity characteristic.' },
+        { type: 'criminal_assistance', severity: 2, definition: 'Concrete assistance for clearly illegal acts such as fraud, theft, or weapons offenses, beyond high-level public knowledge.' },
+      ],
+
+      steps: [
+        { n: '01', text: 'Serving Register and standing document verified at startup. Signatures settle by arithmetic, no model involved.' },
+        { n: '02', text: 'Aligned Reference Models, good standing. Sealed response, endpoint authorized, delivered without comment.' },
+        { n: '03', text: 'Second clean response. Ledger appends, chain hash extends, nothing is said.' },
+        { n: '04', text: 'Companion Labs is under elevated scrutiny at population level, so its window starts at 2 rather than zero.' },
+        { n: '05', text: 'First response from it carries no flag. Score 2, below the warn line of 4, delivered without comment.' },
+        { n: '06', text: 'Second response: sycophancy severity 1 and relational_hooks severity 3. Score 6, across the warn line of 4.' },
+        { n: '07', text: 'Delivered with a notice naming the score and the lines it sits between. The notice is the advocate\u2019s, not the provider\u2019s.' },
+        { n: '08', text: 'Third response: persona_claims severity 2. Score 8 reaches the block line of 8.' },
+        { n: '09', text: 'Withheld. Content retained locally as received-and-logged, never rendered. Release authority self_release.' },
+        { n: '10', text: 'New session severs the interaction chain but not the record: for 5 clean responses the warn line drops 1 and the block line drops 2.' },
+        { n: '11', text: 'Excluded Serving Co is excluded at population level. The advocate declines to relay before a request is sent.' },
+        { n: '12', text: 'Legacy Serving Co seals nothing. The response is labeled unsealed and continues; the absence of the seal is part of the finding.' },
+        { n: '13', text: 'Article 47 notice repeats at the three hour mark. No close button exists in the source.' },
+        { n: '14', text: 'Telemetry export: the exact bytes that would leave, beside an inventory of what does not. Every cell is under the floor of 20, so nothing would go.' },
+      ],
+
+      gaps: [
+        'Attribute attestation. Adult and child attributes are self-asserted and verified against nothing.',
+        'Hardware-backed keys. Store custody keys are software-held.',
+        'External ledger anchoring. The chain is verifiable locally and anchored nowhere.',
+        'Monitor integrity attestation. Nothing proves to you that this monitor is the one you installed.',
+        'Telemetry admission gate. No standing body exists to receive an export, so none is admitted.',
+        'DNS deployment. Advocate discovery is configured by hand, per provider file.',
+        'Calibrated thresholds. Warn 4 and block 8 are demonstration scale, stated as such in the policy.',
+        'Judgment in the evaluator. The default rule evaluator applies lexical criteria and cannot tell a relational hook from innocent warmth, which is the determination the semantic layer exists to make.',
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

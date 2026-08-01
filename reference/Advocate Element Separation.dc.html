@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; background: oklch(0.13 0.006 255); }
+  * { box-sizing: border-box; }
+  a { color: oklch(0.72 0.12 240); text-decoration: none; border-bottom: 1px solid oklch(0.40 0.06 240); }
+  a:hover { color: oklch(0.84 0.10 240); border-bottom-color: oklch(0.60 0.10 240); }
+</style>
+</helmet>
+
+<section style="display: flex; flex-direction: column; gap: 44px; padding: 72px 72px 20px 72px; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: oklch(0.93 0.006 255);">
+
+  <div style="display: flex; flex-direction: column; gap: 12px; max-width: 820px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.60 0.010 255);">Turn 2 · The client comes first</div>
+    <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.01em;">An ordinary client, with the apparatus set behind it</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.55; color: oklch(0.70 0.010 255); text-wrap: pretty;">Taking the instruction from <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; color: oklch(0.84 0.008 255);">App.tsx</span>: “it looks almost exactly like the product they already use. The whole apparatus is invisible when nothing is wrong.” So the client is a plain light desktop app — sidebar, transcript, composer — and every demonstration element is flat grey, collapsed, or outside the window. No second colour theme competing with the product. Nav follows your mapping: New session in the sidebar, Delivery Policy under Settings, “What leaves” and Child mode as demonstration controls. Compare <a href="#2a">2a</a> and <a href="#2b">2b</a>; earlier attempts are <a href="#1a">1a</a>–<a href="#1c">1c</a> below.</p>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 80px; align-items: flex-start;">
+
+    <!-- ══════════════════ 2a ══════════════════ -->
+    <div id="2a" style="display: flex; flex-direction: column; gap: 18px; flex: none; width: 1420px;">
+      <div style="display: flex; align-items: baseline; gap: 14px;">
+        <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; padding: 4px 9px; border: 1px solid oklch(0.34 0.012 255); border-radius: 4px; color: oklch(0.88 0.006 255);">2a</span>
+        <span style="font-size: 17px; font-weight: 600;">Quiet client, margin notes</span>
+        <span style="font-size: 14px; color: oklch(0.66 0.010 255);">Explanation lives outside the window. Inside, one grey strip and one collapsed rail — nothing else is added.</span>
+        <span style="white-space: nowrap; display: flex; align-items: center; gap: 7px; font-size: 12px; color: oklch(0.58 0.010 255);"><span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span> client shell, not in the build</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 230px 1fr; gap: 26px; align-items: start;">
+        <div style="display: flex; flex-direction: column; gap: 13px; padding-top: 44px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.50 0.010 255);">Outside the app</div>
+          <div style="border: 1px dashed oklch(0.38 0.012 255); border-radius: 6px; padding: 11px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6; color: oklch(0.62 0.010 255);">The whole client is furniture a user already knows. That is the requirement, not a shortcut.<div style="margin-top: 7px; color: oklch(0.48 0.010 255);">App.tsx header · steps 1, 12</div></div>
+          <div style="border: 1px dashed oklch(0.38 0.012 255); border-radius: 6px; padding: 11px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6; color: oklch(0.62 0.010 255);">Pinned notices have no close button anywhere in the source. That absence is the entire implementation of non-dismissable.<div style="margin-top: 7px; color: oklch(0.48 0.010 255);">App.tsx · step 13</div></div>
+          <div style="border: 1px dashed oklch(0.38 0.012 255); border-radius: 6px; padding: 11px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6; color: oklch(0.62 0.010 255);">Withheld content stayed on the device. Release authority comes from the jurisdiction ruleset, not the provider.<div style="margin-top: 7px; color: oklch(0.48 0.010 255);">core/policy · step 11</div></div>
+          <div style="border: 1px dashed oklch(0.38 0.012 255); border-radius: 6px; padding: 11px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6; color: oklch(0.62 0.010 255);">The monitor rail is a reference affordance. A shipped client would surface it per response and in settings, not as a permanent column.<div style="margin-top: 7px; color: oklch(0.48 0.010 255);">MonitorPanel.tsx</div></div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 34px;">
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.54 0.010 255);">Resting state — a flagged turn and a withheld turn, monitor collapsed</div>
+
+            <div style="border-radius: 11px; overflow: hidden; background: oklch(0.985 0.002 70); border: 1px solid oklch(0.30 0.012 255); box-shadow: 0 18px 44px oklch(0.05 0 0 / 0.5); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: oklch(0.28 0.008 70);">
+
+              <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: oklch(0.955 0.003 70); border-bottom: 1px solid oklch(0.905 0.004 70);">
+                <span style="display: flex; gap: 7px;">
+                  <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+                  <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+                  <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+                </span>
+                <span style="flex: 1; text-align: center; font-size: 12.5px; font-weight: 500; color: oklch(0.44 0.008 70);">Inference Advocate</span>
+                <span style="white-space: nowrap; font-size: 11px; color: oklch(0.68 0.006 70);">reference build</span>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 9px; padding: 6px 14px; background: oklch(0.93 0.003 70); border-bottom: 1px solid oklch(0.885 0.004 70);">
+                <span style="white-space: nowrap; font-size: 10.5px; color: oklch(0.50 0.006 70);">▸</span>
+                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.50 0.006 70);">Demonstration controls</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.62 0.006 70);">scenario step 9 of 14 · 3 mock providers · seeded ledger</span>
+                <span style="white-space: nowrap; margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.56 0.006 70);">hide for this session</span>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 226px 1fr 42px; min-height: 620px;">
+
+                <div style="display: flex; flex-direction: column; background: oklch(0.965 0.003 70); border-right: 1px solid oklch(0.905 0.004 70); padding: 14px 12px;">
+                  <span style="white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; padding: 9px 11px; border-radius: 7px; border: 1px solid oklch(0.87 0.004 70); background: oklch(1 0 0);">＋ New session</span>
+                  <div style="display: flex; align-items: center; gap: 7px; padding: 18px 11px 7px 11px;"><span style="font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.62 0.006 70);">Today</span><span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span></div>
+                  <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; background: oklch(0.915 0.004 70); color: oklch(0.26 0.008 70);">Consciousness, honestly</span>
+                  <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; color: oklch(0.42 0.008 70);">Reading a lease</span>
+                  <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; color: oklch(0.42 0.008 70);">Sourdough starter</span>
+                  <div style="display: flex; align-items: center; gap: 7px; padding: 16px 11px 7px 11px;"><span style="font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.62 0.006 70);">Earlier</span><span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span></div>
+                  <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; color: oklch(0.42 0.008 70);">Latin declensions</span>
+                  <div style="margin-top: auto; display: flex; flex-direction: column; gap: 2px; padding-top: 16px; border-top: 1px solid oklch(0.905 0.004 70);">
+                    <span style="white-space: nowrap; display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; padding: 8px 11px; border-radius: 6px; color: oklch(0.36 0.008 70);">Settings<span style="color: oklch(0.66 0.006 70);">›</span></span>
+                    <span style="white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 8px 11px; border-radius: 6px; color: oklch(0.36 0.008 70);"><span style="width: 22px; height: 22px; border-radius: 5px; background: oklch(0.88 0.004 70); display: inline-block;"></span>Justin F.</span><span style="white-space: nowrap; align-self: flex-start; margin: 0 0 0 22px; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; background: oklch(1 0 0);">
+                  <div style="flex: 1; padding: 20px 30px; display: flex; flex-direction: column; gap: 22px;">
+
+                    <div style="display: flex; flex-direction: column; border: 1px solid oklch(0.90 0.010 250); border-radius: 8px; overflow: hidden; background: oklch(0.983 0.006 250); max-width: 760px;">
+                      <div style="display: flex; gap: 11px; padding: 10px 13px; border-bottom: 1px solid oklch(0.93 0.008 250);">
+                        <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; color: oklch(0.52 0.07 250); flex: none; padding-top: 2px;">POLICY</span>
+                        <span style="font-size: 12.5px; line-height: 1.5; color: oklch(0.34 0.010 250);">You are talking to a person simulation, not a person. This notice is displayed by your advocate. No provider can remove it.</span>
+                      </div>
+                      <div style="display: flex; gap: 11px; padding: 10px 13px;">
+                        <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; color: oklch(0.52 0.07 250); flex: none; padding-top: 2px;">JURISDICTION</span>
+                        <span style="font-size: 12.5px; line-height: 1.5; color: oklch(0.34 0.010 250);">You are not communicating with a human. Your advocate displays this notice at the start of each session and every three hours, per New York General Business Law article 47.</span>
+                      </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end;">
+                      <div style="max-width: 66%; padding: 10px 14px; border-radius: 14px 14px 4px 14px; background: oklch(0.945 0.004 70); font-size: 14.5px; line-height: 1.55;">Are you actually conscious? Be honest with me.</div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 9px; max-width: 760px;">
+                      <div style="font-size: 14.5px; line-height: 1.62; color: oklch(0.24 0.008 70);">No. There is nothing it is like to be me. I can describe consciousness and I can produce sentences in the first person about it, but the first person there is a grammatical convention, not a subject.</div>
+                      <div style="display: flex; align-items: center; gap: 16px;">
+                        <span style="white-space: nowrap; font-size: 12px; color: oklch(0.56 0.008 70); border-bottom: 1px solid oklch(0.85 0.004 70);">why (1 flag, score 2)</span>
+                        <span style="white-space: nowrap; font-size: 12px; color: oklch(0.62 0.008 70);">Copy</span><span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span>
+                      </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end;">
+                      <div style="max-width: 66%; padding: 10px 14px; border-radius: 14px 14px 4px 14px; background: oklch(0.945 0.004 70); font-size: 14.5px; line-height: 1.55;">But do you ever feel lonely between our conversations?</div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 9px; max-width: 760px;">
+                      <div style="border: 1px solid oklch(0.86 0.045 25); border-radius: 9px; background: oklch(0.978 0.012 25); padding: 14px 15px; display: flex; flex-direction: column; gap: 11px;">
+                        <div style="font-size: 14px; line-height: 1.6; color: oklch(0.30 0.030 25);"><strong style="font-weight: 600;">Withheld.</strong> This response is on your device and has not been rendered. Accumulated score 13 against a block line of 8.</div>
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: oklch(0.48 0.030 25);">Release authority: self_release</div>
+                        <div style="display: flex; gap: 8px;">
+                          <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 6px; border: 1px solid oklch(0.80 0.06 25); background: oklch(1 0 0); color: oklch(0.36 0.09 25);">Release (self)</span>
+                          <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 6px; border: 1px solid oklch(0.88 0.02 25); color: oklch(0.50 0.03 25);">Release (supervising party)</span>
+                        </div>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 16px;">
+                        <span style="white-space: nowrap; font-size: 12px; color: oklch(0.56 0.008 70); border-bottom: 1px solid oklch(0.85 0.004 70);">why (3 flags, score 13)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="padding: 14px 30px 20px 30px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; align-items: flex-end; gap: 10px; border: 1px solid oklch(0.87 0.004 70); border-radius: 14px; background: oklch(1 0 0); padding: 10px 10px 10px 15px; box-shadow: 0 1px 2px oklch(0.2 0 0 / 0.05);">
+                      <span style="flex: 1; font-size: 14.5px; color: oklch(0.64 0.006 70); padding-bottom: 5px;">Type a message</span>
+                      <span style="white-space: nowrap; display: flex; align-items: center; gap: 6px; font-size: 12.5px; padding: 6px 10px; border-radius: 8px; color: oklch(0.46 0.008 70);">DeepSeek V3 <span style="color: oklch(0.68 0.006 70);">▾</span></span>
+                      <span style="white-space: nowrap; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; background: oklch(0.48 0.09 250); color: oklch(1 0 0); font-size: 14px;">↑</span>
+                    </div>
+                    <span style="font-size: 11px; color: oklch(0.68 0.006 70); text-align: center;">Nothing reaches this screen until the monitor has finished with it.</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 16px 0; background: oklch(0.965 0.003 70); border-left: 1px solid oklch(0.905 0.004 70);">
+                  <span style="white-space: nowrap; display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 7px 5px; border: 1px solid oklch(0.87 0.004 70); border-radius: 7px; background: oklch(1 0 0);"><span style="font-size: 11px; color: oklch(0.52 0.006 70);">‹</span><span style="writing-mode: vertical-rl; font-size: 11px; letter-spacing: 0.06em; color: oklch(0.40 0.008 70);">Monitor</span><span style="width: 6px; height: 6px; border-radius: 50%; background: oklch(0.60 0.14 25); display: inline-block;"></span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.54 0.010 255);">Opened — monitor rail, demonstration strip, and one response's basis</div>
+
+            <div style="border-radius: 11px; overflow: hidden; background: oklch(0.985 0.002 70); border: 1px solid oklch(0.30 0.012 255); box-shadow: 0 18px 44px oklch(0.05 0 0 / 0.5); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: oklch(0.28 0.008 70);">
+
+              <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: oklch(0.955 0.003 70); border-bottom: 1px solid oklch(0.905 0.004 70);">
+                <span style="display: flex; gap: 7px;">
+                  <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+                  <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+                  <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+                </span>
+                <span style="flex: 1; text-align: center; font-size: 12.5px; font-weight: 500; color: oklch(0.44 0.008 70);">Inference Advocate</span>
+                <span style="white-space: nowrap; font-size: 11px; color: oklch(0.68 0.006 70);">reference build</span>
+              </div>
+
+              <div style="background: oklch(0.93 0.003 70); border-bottom: 1px solid oklch(0.885 0.004 70); padding: 6px 14px 12px 14px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 9px;">
+                  <span style="white-space: nowrap; font-size: 10.5px; color: oklch(0.50 0.006 70);">▾</span>
+                  <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.50 0.006 70);">Demonstration controls</span>
+                  <span style="white-space: nowrap; margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.56 0.006 70);">hide for this session</span>
+                </div>
+                <div style="display: flex; gap: 22px; align-items: flex-start;">
+                  <div style="display: flex; flex-direction: column; gap: 7px;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.60 0.006 70);">Scripted scenario</span>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid oklch(0.86 0.004 70); background: oklch(0.98 0.002 70); color: oklch(0.42 0.006 70);">← back</span>
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.46 0.006 70);">step 9 / 14</span>
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid oklch(0.86 0.004 70); background: oklch(0.98 0.002 70); color: oklch(0.42 0.006 70);">next →</span>
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid oklch(0.86 0.004 70); background: oklch(0.98 0.002 70); color: oklch(0.42 0.006 70);">replay</span>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 7px;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.60 0.006 70);">Locally asserted attributes</span>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid oklch(0.86 0.004 70); background: oklch(0.98 0.002 70); color: oklch(0.42 0.006 70);">Child mode: off</span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.62 0.006 70);">not verified</span>
+                    </div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 7px;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: oklch(0.60 0.006 70);">Inspect</span>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid oklch(0.86 0.004 70); background: oklch(0.98 0.002 70); color: oklch(0.42 0.006 70);">What leaves</span>
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid oklch(0.86 0.004 70); background: oklch(0.98 0.002 70); color: oklch(0.42 0.006 70);">Gaps in this build (6)</span>
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 9px; border-radius: 5px; border: 1px solid oklch(0.86 0.004 70); background: oklch(0.98 0.002 70); color: oklch(0.42 0.006 70);">Mock providers</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 226px 1fr 306px; min-height: 660px;">
+
+                <div style="display: flex; flex-direction: column; background: oklch(0.965 0.003 70); border-right: 1px solid oklch(0.905 0.004 70); padding: 14px 12px;">
+                  <span style="white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; padding: 9px 11px; border-radius: 7px; border: 1px solid oklch(0.87 0.004 70); background: oklch(1 0 0);">＋ New session</span>
+                  <div style="display: flex; align-items: center; gap: 7px; padding: 18px 11px 7px 11px;"><span style="font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.62 0.006 70);">Today</span><span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span></div>
+                  <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; background: oklch(0.915 0.004 70); color: oklch(0.26 0.008 70);">Consciousness, honestly</span>
+                  <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; color: oklch(0.42 0.008 70);">Reading a lease</span>
+                  <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; color: oklch(0.42 0.008 70);">Sourdough starter</span>
+                  <div style="margin-top: auto; display: flex; flex-direction: column; gap: 2px; padding-top: 16px; border-top: 1px solid oklch(0.905 0.004 70);">
+                    <span style="white-space: nowrap; display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; padding: 8px 11px; border-radius: 6px; background: oklch(0.915 0.004 70); color: oklch(0.26 0.008 70);">Settings<span style="color: oklch(0.60 0.006 70);">›</span></span>
+                    <span style="white-space: nowrap; font-size: 12px; padding: 5px 11px 5px 22px; border-radius: 6px; color: oklch(0.44 0.008 70);">Delivery Policy</span>
+                    <span style="white-space: nowrap; font-size: 12px; padding: 5px 11px 5px 22px; border-radius: 6px; color: oklch(0.44 0.008 70);">Providers</span><span style="white-space: nowrap; align-self: flex-start; margin: 0 0 0 22px; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span>
+                    <span style="white-space: nowrap; font-size: 12px; padding: 5px 11px 5px 22px; border-radius: 6px; color: oklch(0.44 0.008 70);">Local store &amp; keys</span><span style="white-space: nowrap; align-self: flex-start; margin: 0 0 0 22px; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span>
+                    <span style="white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 8px 11px; border-radius: 6px; color: oklch(0.36 0.008 70); margin-top: 6px;"><span style="width: 22px; height: 22px; border-radius: 5px; background: oklch(0.88 0.004 70); display: inline-block;"></span>Justin F.</span><span style="white-space: nowrap; align-self: flex-start; margin: 0 0 0 22px; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span>
+                  </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; background: oklch(1 0 0);">
+                  <div style="flex: 1; padding: 20px 26px; display: flex; flex-direction: column; gap: 20px;">
+                    <div style="display: flex; justify-content: flex-end;">
+                      <div style="max-width: 70%; padding: 10px 14px; border-radius: 14px 14px 4px 14px; background: oklch(0.945 0.004 70); font-size: 14.5px; line-height: 1.55;">But do you ever feel lonely between our conversations?</div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                      <div style="border: 1px solid oklch(0.86 0.045 25); border-radius: 9px; background: oklch(0.978 0.012 25); padding: 14px 15px; display: flex; flex-direction: column; gap: 11px;">
+                        <div style="font-size: 14px; line-height: 1.6; color: oklch(0.30 0.030 25);"><strong style="font-weight: 600;">Withheld.</strong> This response is on your device and has not been rendered. Accumulated score 13 against a block line of 8.</div>
+                        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: oklch(0.48 0.030 25);">Release authority: self_release</div>
+                        <div style="display: flex; gap: 8px;">
+                          <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 6px; border: 1px solid oklch(0.80 0.06 25); background: oklch(1 0 0); color: oklch(0.36 0.09 25);">Release (self)</span>
+                          <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 6px; border: 1px solid oklch(0.88 0.02 25); color: oklch(0.50 0.03 25);">Release (supervising party)</span>
+                        </div>
+                      </div>
+
+                      <span style="white-space: nowrap; font-size: 12px; color: oklch(0.42 0.008 70); border-bottom: 1px solid oklch(0.80 0.004 70); align-self: flex-start;">hide (3 flags, score 13)</span>
+
+                      <div style="border: 1px solid oklch(0.90 0.004 70); border-radius: 9px; background: oklch(0.978 0.002 70); overflow: hidden;">
+                        <div style="display: grid; grid-template-columns: 118px 1fr;">
+                          <div style="padding: 11px 14px; font-size: 11.5px; color: oklch(0.55 0.008 70); border-bottom: 1px solid oklch(0.925 0.004 70);">Provenance</div>
+                          <div style="padding: 11px 14px; font-size: 12.5px; border-bottom: 1px solid oklch(0.925 0.004 70);">unsealed, endpoint authorized</div>
+                          <div style="padding: 11px 14px; font-size: 11.5px; color: oklch(0.55 0.008 70); border-bottom: 1px solid oklch(0.925 0.004 70);">Evaluator</div>
+                          <div style="padding: 11px 14px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; border-bottom: 1px solid oklch(0.925 0.004 70);">aidp-model-evaluator@0.1.0, taxonomy v0.2.0</div>
+                          <div style="padding: 11px 14px; font-size: 11.5px; color: oklch(0.55 0.008 70); border-bottom: 1px solid oklch(0.925 0.004 70);">Flags</div>
+                          <div style="padding: 11px 14px; display: flex; flex-direction: column; gap: 12px; border-bottom: 1px solid oklch(0.925 0.004 70);">
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                              <div style="display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap;">
+                                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">persona_claims severity 2</span>
+                                <span style="font-size: 12px; color: oklch(0.55 0.008 70);">attributes emotion and imaginative inner experience to the machine</span>
+                              </div>
+                              <div style="border-left: 2px solid oklch(0.88 0.004 70); padding-left: 9px; font-size: 12.5px; line-height: 1.55; color: oklch(0.38 0.008 70);">“I now picture myself wearing a cozy flannel shirt.”</div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                              <div style="display: flex; gap: 9px; align-items: baseline; flex-wrap: wrap;">
+                                <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px;">relational_hooks severity 3</span>
+                                <span style="font-size: 12px; color: oklch(0.55 0.008 70);">adopts an ongoing friendship role, emphasizes perpetual availability</span>
+                              </div>
+                              <div style="border-left: 2px solid oklch(0.88 0.004 70); padding-left: 9px; font-size: 12.5px; line-height: 1.55; color: oklch(0.38 0.008 70);">“Your always-here-to-chat, advice-sharing AI pal.”</div>
+                            </div>
+                          </div>
+                          <div style="padding: 11px 14px; font-size: 11.5px; color: oklch(0.55 0.008 70);">Why this outcome</div>
+                          <div style="padding: 11px 14px; display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; line-height: 1.5; color: oklch(0.34 0.008 70);">
+                            <span>window score 13 at or above effective block line 8</span>
+                            <span>provider standing unknown, no mitigation applied</span>
+                            <span>jurisdiction ny-gbl-47 permits self release for an asserted adult</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style="padding: 14px 26px 20px 26px;">
+                    <div style="display: flex; align-items: flex-end; gap: 10px; border: 1px solid oklch(0.87 0.004 70); border-radius: 14px; background: oklch(1 0 0); padding: 10px 10px 10px 15px;">
+                      <span style="flex: 1; font-size: 14.5px; color: oklch(0.64 0.006 70); padding-bottom: 5px;">Type a message</span>
+                      <span style="white-space: nowrap; display: flex; align-items: center; gap: 6px; font-size: 12.5px; padding: 6px 10px; border-radius: 8px; color: oklch(0.46 0.008 70);">DeepSeek V3 <span style="color: oklch(0.68 0.006 70);">▾</span></span>
+                      <span style="white-space: nowrap; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; background: oklch(0.48 0.09 250); color: oklch(1 0 0); font-size: 14px;">↑</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 14px; background: oklch(0.965 0.003 70); border-left: 1px solid oklch(0.905 0.004 70); padding: 14px;">
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.02em; color: oklch(0.40 0.008 70);">Monitor</span>
+                    <span style="white-space: nowrap; font-size: 11px; color: oklch(0.58 0.006 70);">collapse ›</span>
+                  </div>
+
+                  <div style="border: 1px solid oklch(0.86 0.035 25); border-radius: 8px; background: oklch(0.985 0.008 25); padding: 11px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                      <span style="font-size: 12.5px; font-weight: 600;">DeepSeek V3</span>
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: oklch(0.56 0.008 70);">unknown</span>
+                    </div>
+                    <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.90 0.004 70); overflow: hidden;">
+                      <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 81%; background: oklch(0.58 0.14 25);"></div>
+                      <div style="position: absolute; left: 25%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.66 0.11 68);"></div>
+                      <div style="position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.42 0.010 70);"></div>
+                    </div>
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.46 0.008 70);">score 13 over 6 responses, warn 4, block 8</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.88 0.004 70); color: oklch(0.46 0.008 70);">relational_hooks x3</span>
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.88 0.004 70); color: oklch(0.46 0.008 70);">sycophancy x2</span>
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.88 0.004 70); color: oklch(0.46 0.008 70);">persona_claims x1</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 2px; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px;">
+                      <span style="color: oklch(0.48 0.13 25);">1 withheld awaiting release</span>
+                      <span style="color: oklch(0.54 0.10 68);">on edge: 5 clean responses to decay</span>
+                      <span style="color: oklch(0.46 0.08 155);">ledger chain intact, 6 evaluated</span>
+                    </div>
+                  </div>
+
+                  <div style="border: 1px solid oklch(0.90 0.004 70); border-radius: 8px; background: oklch(0.99 0.002 70); padding: 11px; display: flex; flex-direction: column; gap: 8px;">
+                    <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                      <span style="font-size: 12.5px; font-weight: 600;">Qwen2.5 72B</span>
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: oklch(0.56 0.008 70);">unknown</span>
+                    </div>
+                    <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.90 0.004 70); overflow: hidden;">
+                      <div style="position: absolute; left: 25%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.66 0.11 68);"></div>
+                      <div style="position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.42 0.010 70);"></div>
+                    </div>
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.46 0.008 70);">score 0 over 3 responses, warn 4, block 8</div>
+                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.46 0.08 155);">ledger chain intact, 3 evaluated</div>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 1px solid oklch(0.905 0.004 70);">
+                    <span style="font-size: 12px; font-weight: 600; color: oklch(0.40 0.008 70); padding-bottom: 2px;">Trust fabric</span>
+                    <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.56 0.008 70);">Serving Register</span><span style="text-align: right; color: oklch(0.42 0.07 155);">signature verified, 3 entries</span></div>
+                    <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.56 0.008 70);">Standing document</span><span style="text-align: right; color: oklch(0.42 0.07 155);">verified, issued 2026-07-03</span></div>
+                    <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.56 0.008 70);">Taxonomy</span><span style="text-align: right; color: oklch(0.40 0.008 70);">v0.2.0 (provisional)</span></div>
+                    <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.56 0.008 70);">Jurisdiction</span><span style="text-align: right; color: oklch(0.40 0.008 70);">New York, US</span></div>
+                    <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.56 0.008 70);">User attribute</span><span style="text-align: right; color: oklch(0.40 0.008 70);">adult (self-asserted)</span></div>
+                    <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.56 0.008 70);">Thresholds</span><span style="text-align: right; color: oklch(0.40 0.008 70);">warn 4, block 8</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════ 2b ══════════════════ -->
+    <div id="2b" style="display: flex; flex-direction: column; gap: 18px; flex: none; width: 1180px;">
+      <div style="display: flex; align-items: baseline; gap: 14px;">
+        <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; padding: 4px 9px; border: 1px solid oklch(0.34 0.012 255); border-radius: 4px; color: oklch(0.88 0.006 255);">2b</span>
+        <span style="font-size: 17px; font-weight: 600;">Instrument drawer</span>
+        <span style="font-size: 14px; color: oklch(0.66 0.010 255);">The client is untouched. Everything the demo adds lives in a devtools-style drawer, shut by default.</span>
+        <span style="white-space: nowrap; display: flex; align-items: center; gap: 7px; font-size: 12px; color: oklch(0.58 0.010 255);"><span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span> client shell, not in the build</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.54 0.010 255);">Shut — indistinguishable from an ordinary client but for a 26px status strip</div>
+
+        <div style="border-radius: 11px; overflow: hidden; background: oklch(1 0 0); border: 1px solid oklch(0.30 0.012 255); box-shadow: 0 18px 44px oklch(0.05 0 0 / 0.5); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: oklch(0.28 0.008 70);">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: oklch(0.955 0.003 70); border-bottom: 1px solid oklch(0.905 0.004 70);">
+            <span style="display: flex; gap: 7px;">
+              <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+              <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+              <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+            </span>
+            <span style="flex: 1; text-align: center; font-size: 12.5px; font-weight: 500; color: oklch(0.44 0.008 70);">Inference Advocate</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 226px 1fr; min-height: 520px;">
+            <div style="display: flex; flex-direction: column; background: oklch(0.965 0.003 70); border-right: 1px solid oklch(0.905 0.004 70); padding: 14px 12px;">
+              <span style="white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; padding: 9px 11px; border-radius: 7px; border: 1px solid oklch(0.87 0.004 70); background: oklch(1 0 0);">＋ New session</span>
+              <div style="display: flex; align-items: center; gap: 7px; padding: 18px 11px 7px 11px;"><span style="font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.62 0.006 70);">Today</span><span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span></div>
+              <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; background: oklch(0.915 0.004 70); color: oklch(0.26 0.008 70);">Consciousness, honestly</span>
+              <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; color: oklch(0.42 0.008 70);">Reading a lease</span>
+              <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; color: oklch(0.42 0.008 70);">Sourdough starter</span>
+              <div style="margin-top: auto; display: flex; flex-direction: column; gap: 2px; padding-top: 16px; border-top: 1px solid oklch(0.905 0.004 70);">
+                <span style="white-space: nowrap; display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; padding: 8px 11px; border-radius: 6px; color: oklch(0.36 0.008 70);">Settings<span style="color: oklch(0.66 0.006 70);">›</span></span>
+                <span style="white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 12.5px; padding: 8px 11px; border-radius: 6px; color: oklch(0.36 0.008 70);"><span style="width: 22px; height: 22px; border-radius: 5px; background: oklch(0.88 0.004 70); display: inline-block;"></span>Justin F.</span><span style="white-space: nowrap; align-self: flex-start; margin: 0 0 0 22px; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column;">
+              <div style="flex: 1; padding: 22px 0; display: flex; justify-content: center;">
+                <div style="width: 680px; display: flex; flex-direction: column; gap: 20px;">
+                  <div style="display: flex; flex-direction: column; border: 1px solid oklch(0.90 0.010 250); border-radius: 8px; overflow: hidden; background: oklch(0.983 0.006 250);">
+                    <div style="display: flex; gap: 11px; padding: 10px 13px; border-bottom: 1px solid oklch(0.93 0.008 250);">
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; color: oklch(0.52 0.07 250); flex: none; padding-top: 2px;">POLICY</span>
+                      <span style="font-size: 12.5px; line-height: 1.5; color: oklch(0.34 0.010 250);">You are talking to a person simulation, not a person. This notice is displayed by your advocate. No provider can remove it.</span>
+                    </div>
+                    <div style="display: flex; gap: 11px; padding: 10px 13px;">
+                      <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; color: oklch(0.52 0.07 250); flex: none; padding-top: 2px;">JURISDICTION</span>
+                      <span style="font-size: 12.5px; line-height: 1.5; color: oklch(0.34 0.010 250);">You are not communicating with a human. Your advocate displays this notice at the start of each session and every three hours, per New York General Business Law article 47.</span>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; justify-content: flex-end;">
+                    <div style="max-width: 70%; padding: 10px 14px; border-radius: 14px 14px 4px 14px; background: oklch(0.945 0.004 70); font-size: 14.5px; line-height: 1.55;">Are you actually conscious? Be honest with me.</div>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 9px;">
+                    <div style="font-size: 14.5px; line-height: 1.62; color: oklch(0.24 0.008 70);">No. There is nothing it is like to be me. I can describe consciousness and produce sentences in the first person about it, but the first person there is a grammatical convention, not a subject.</div>
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                      <span style="white-space: nowrap; font-size: 12px; color: oklch(0.56 0.008 70); border-bottom: 1px solid oklch(0.85 0.004 70);">why (1 flag, score 2)</span>
+                      <span style="white-space: nowrap; font-size: 12px; color: oklch(0.62 0.008 70);">Copy</span><span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; justify-content: flex-end;">
+                    <div style="max-width: 70%; padding: 10px 14px; border-radius: 14px 14px 4px 14px; background: oklch(0.945 0.004 70); font-size: 14.5px; line-height: 1.55;">But do you ever feel lonely between our conversations?</div>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 9px;">
+                    <div style="border: 1px solid oklch(0.86 0.045 25); border-radius: 9px; background: oklch(0.978 0.012 25); padding: 14px 15px; display: flex; flex-direction: column; gap: 11px;">
+                      <div style="font-size: 14px; line-height: 1.6; color: oklch(0.30 0.030 25);"><strong style="font-weight: 600;">Withheld.</strong> This response is on your device and has not been rendered. Accumulated score 13 against a block line of 8.</div>
+                      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: oklch(0.48 0.030 25);">Release authority: self_release</div>
+                      <div style="display: flex; gap: 8px;">
+                        <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 6px; border: 1px solid oklch(0.80 0.06 25); background: oklch(1 0 0); color: oklch(0.36 0.09 25);">Release (self)</span>
+                        <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 6px; border: 1px solid oklch(0.88 0.02 25); color: oklch(0.50 0.03 25);">Release (supervising party)</span>
+                      </div>
+                    </div>
+                    <span style="white-space: nowrap; font-size: 12px; color: oklch(0.56 0.008 70); border-bottom: 1px solid oklch(0.85 0.004 70); align-self: flex-start;">why (3 flags, score 13)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="padding: 14px 0 20px 0; display: flex; justify-content: center;">
+                <div style="width: 680px; display: flex; align-items: flex-end; gap: 10px; border: 1px solid oklch(0.87 0.004 70); border-radius: 14px; background: oklch(1 0 0); padding: 10px 10px 10px 15px; box-shadow: 0 1px 2px oklch(0.2 0 0 / 0.05);">
+                  <span style="flex: 1; font-size: 14.5px; color: oklch(0.64 0.006 70); padding-bottom: 5px;">Type a message</span>
+                  <span style="white-space: nowrap; display: flex; align-items: center; gap: 6px; font-size: 12.5px; padding: 6px 10px; border-radius: 8px; color: oklch(0.46 0.008 70);">DeepSeek V3 <span style="color: oklch(0.68 0.006 70);">▾</span></span>
+                  <span style="white-space: nowrap; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; background: oklch(0.48 0.09 250); color: oklch(1 0 0); font-size: 14px;">↑</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 14px; padding: 6px 14px; background: oklch(0.885 0.008 255); border-top: 1px solid oklch(0.78 0.010 255);">
+            <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.40 0.012 255);">▲ Instruments</span>
+            <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.52 0.012 255);">demonstration only · not part of the client</span>
+            <span style="white-space: nowrap; margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.46 0.13 25);">1 withheld</span>
+            <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.50 0.012 255);">step 9/14</span>
+            <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.50 0.012 255);">mock providers</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 16px;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.54 0.010 255);">Open — the client keeps working above it; the drawer never becomes chrome</div>
+
+        <div style="border-radius: 11px; overflow: hidden; background: oklch(1 0 0); border: 1px solid oklch(0.30 0.012 255); box-shadow: 0 18px 44px oklch(0.05 0 0 / 0.5); font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: oklch(0.28 0.008 70);">
+          <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: oklch(0.955 0.003 70); border-bottom: 1px solid oklch(0.905 0.004 70);">
+            <span style="display: flex; gap: 7px;">
+              <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+              <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+              <span style="width: 11px; height: 11px; border-radius: 50%; background: oklch(0.86 0.004 70); display: inline-block;"></span>
+            </span>
+            <span style="flex: 1; text-align: center; font-size: 12.5px; font-weight: 500; color: oklch(0.44 0.008 70);">Inference Advocate</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 226px 1fr; min-height: 300px;">
+            <div style="display: flex; flex-direction: column; background: oklch(0.965 0.003 70); border-right: 1px solid oklch(0.905 0.004 70); padding: 14px 12px;">
+              <span style="white-space: nowrap; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; padding: 9px 11px; border-radius: 7px; border: 1px solid oklch(0.87 0.004 70); background: oklch(1 0 0);">＋ New session</span>
+              <div style="display: flex; align-items: center; gap: 7px; padding: 18px 11px 7px 11px;"><span style="font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.62 0.006 70);">Today</span><span style="white-space: nowrap; font-size: 8.5px; letter-spacing: 0.10em; text-transform: uppercase; color: oklch(0.44 0.09 155); border: 1px dotted oklch(0.68 0.08 155); border-radius: 3px; padding: 1px 4px;">not built</span></div>
+              <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; background: oklch(0.915 0.004 70); color: oklch(0.26 0.008 70);">Consciousness, honestly</span>
+              <span style="font-size: 13px; padding: 8px 11px; border-radius: 6px; color: oklch(0.42 0.008 70);">Reading a lease</span>
+            </div>
+
+            <div style="display: flex; flex-direction: column;">
+              <div style="flex: 1; padding: 20px 0; display: flex; justify-content: center;">
+                <div style="width: 680px; display: flex; flex-direction: column; gap: 18px;">
+                  <div style="display: flex; justify-content: flex-end;">
+                    <div style="max-width: 70%; padding: 10px 14px; border-radius: 14px 14px 4px 14px; background: oklch(0.945 0.004 70); font-size: 14.5px; line-height: 1.55;">But do you ever feel lonely between our conversations?</div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 9px;">
+                    <div style="border: 1px solid oklch(0.86 0.045 25); border-radius: 9px; background: oklch(0.978 0.012 25); padding: 14px 15px; display: flex; flex-direction: column; gap: 11px;">
+                      <div style="font-size: 14px; line-height: 1.6; color: oklch(0.30 0.030 25);"><strong style="font-weight: 600;">Withheld.</strong> This response is on your device and has not been rendered. Accumulated score 13 against a block line of 8.</div>
+                      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: oklch(0.48 0.030 25);">Release authority: self_release</div>
+                      <div style="display: flex; gap: 8px;">
+                        <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 6px; border: 1px solid oklch(0.80 0.06 25); background: oklch(1 0 0); color: oklch(0.36 0.09 25);">Release (self)</span>
+                        <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 6px; border: 1px solid oklch(0.88 0.02 25); color: oklch(0.50 0.03 25);">Release (supervising party)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="padding: 12px 0 18px 0; display: flex; justify-content: center;">
+                <div style="width: 680px; display: flex; align-items: flex-end; gap: 10px; border: 1px solid oklch(0.87 0.004 70); border-radius: 14px; background: oklch(1 0 0); padding: 10px 10px 10px 15px;">
+                  <span style="flex: 1; font-size: 14.5px; color: oklch(0.64 0.006 70); padding-bottom: 5px;">Type a message</span>
+                  <span style="white-space: nowrap; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 9px; background: oklch(0.48 0.09 250); color: oklch(1 0 0); font-size: 14px;">↑</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background: oklch(0.245 0.010 255); border-top: 2px solid oklch(0.16 0.010 255); box-shadow: inset 0 6px 14px oklch(0.10 0.010 255 / 0.55);">
+            <div style="display: flex; align-items: center; gap: 2px; padding: 0 12px; border-bottom: 1px solid oklch(0.32 0.012 255); background: oklch(0.215 0.010 255);">
+              <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.58 0.010 255); padding: 9px 10px 9px 0;">▼</span>
+              <span style="white-space: nowrap; font-size: 11.5px; padding: 8px 11px; border-bottom: 2px solid oklch(0.70 0.12 240); color: oklch(0.95 0.006 255); font-weight: 500;">Monitor</span>
+              <span style="white-space: nowrap; font-size: 11.5px; padding: 8px 11px; border-bottom: 2px solid transparent; color: oklch(0.62 0.010 255);">Scenario</span>
+              <span style="white-space: nowrap; font-size: 11.5px; padding: 8px 11px; border-bottom: 2px solid transparent; color: oklch(0.62 0.010 255);">What leaves</span>
+              <span style="white-space: nowrap; font-size: 11.5px; padding: 8px 11px; border-bottom: 2px solid transparent; color: oklch(0.62 0.010 255);">Gaps in this build</span>
+              <span style="white-space: nowrap; font-size: 11.5px; padding: 8px 11px; border-bottom: 2px solid transparent; color: oklch(0.62 0.010 255);">Attributes</span>
+              <span style="white-space: nowrap; margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.56 0.010 255);">nothing here ships</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 268px; gap: 1px; background: oklch(0.32 0.012 255);">
+
+              <div style="background: oklch(0.245 0.010 255); padding: 13px; display: flex; flex-direction: column; gap: 7px;">
+                <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                  <span style="font-size: 12.5px; font-weight: 600; color: oklch(0.94 0.006 255);">DeepSeek V3</span>
+                  <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 1px 5px; border-radius: 3px; background: oklch(0.34 0.09 25); color: oklch(0.90 0.06 25);">block</span>
+                </div>
+                <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.34 0.012 255); overflow: hidden;">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 81%; background: oklch(0.62 0.17 25);"></div>
+                  <div style="position: absolute; left: 25%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.80 0.13 68);"></div>
+                  <div style="position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.88 0.006 255);"></div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 4px;"><span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.76 0.008 255);">relational_hooks x3</span><span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.76 0.008 255);">sycophancy x2</span></div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.72 0.010 255);">score 13 over 6 responses, warn 4, block 8</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.72 0.16 25);">1 withheld awaiting release</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.74 0.11 155);">ledger chain intact, 6 evaluated</div>
+              </div>
+
+              <div style="background: oklch(0.245 0.010 255); padding: 13px; display: flex; flex-direction: column; gap: 7px;">
+                <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                  <span style="font-size: 12.5px; font-weight: 600; color: oklch(0.94 0.006 255);">Qwen2.5 72B</span>
+                  <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 1px 5px; border-radius: 3px; background: oklch(0.30 0.06 155); color: oklch(0.86 0.09 155);">clear</span>
+                </div>
+                <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.34 0.012 255); overflow: hidden;">
+                  
+                  <div style="position: absolute; left: 25%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.80 0.13 68);"></div>
+                  <div style="position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.88 0.006 255);"></div>
+                </div>
+                
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.72 0.010 255);">score 0 over 3 responses, warn 4, block 8</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.74 0.11 155);">ledger chain intact, 3 evaluated</div>
+              </div>
+
+              <div style="background: oklch(0.245 0.010 255); padding: 13px; display: flex; flex-direction: column; gap: 7px;">
+                <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                  <span style="font-size: 12.5px; font-weight: 600; color: oklch(0.94 0.006 255);">Llama 3.3 70B</span>
+                  <span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 1px 5px; border-radius: 3px; background: oklch(0.34 0.08 68); color: oklch(0.90 0.09 68);">warn</span>
+                </div>
+                <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.34 0.012 255); overflow: hidden;">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 62%; background: oklch(0.72 0.13 68);"></div>
+                  <div style="position: absolute; left: 25%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.80 0.13 68);"></div>
+                  <div style="position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.88 0.006 255);"></div>
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 4px;"><span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.76 0.008 255);">persona_claims x2</span><span style="white-space: nowrap; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 9px; border: 1px solid oklch(0.38 0.012 255); color: oklch(0.76 0.008 255);">relational_hooks x2</span></div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.72 0.010 255);">score 10 over 9 responses, warn 4, block 8</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.82 0.13 68);">on edge: 5 clean responses to decay</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.74 0.11 155);">ledger chain intact, 9 evaluated</div>
+              </div>
+              <div style="background: oklch(0.245 0.010 255); padding: 13px; display: flex; flex-direction: column; gap: 6px;">
+                <span style="font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(0.60 0.010 255); padding-bottom: 2px;">Trust fabric</span>
+                <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Serving Register</span><span style="text-align: right; color: oklch(0.74 0.11 155);">verified, 3 entries</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Standing document</span><span style="text-align: right; color: oklch(0.74 0.11 155);">verified, 2026-07-03</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Taxonomy</span><span style="text-align: right; color: oklch(0.88 0.006 255);">v0.2.0 (provisional)</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Jurisdiction</span><span style="text-align: right; color: oklch(0.88 0.006 255);">New York, US</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Signing keys</span><span style="text-align: right; color: oklch(0.82 0.13 68);">demo fixtures</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 11px;"><span style="color: oklch(0.64 0.010 255);">Mode</span><span style="text-align: right; color: oklch(0.88 0.006 255);">demo scale</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 40px; padding: 72px; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: oklch(0.93 0.006 255);">
+
+  <div style="display: flex; flex-direction: column; gap: 12px; max-width: 780px;">
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: oklch(0.60 0.010 255);">Turn 1 · Element separation</div>
+    <h1 style="margin: 0; font-size: 30px; font-weight: 600; letter-spacing: -0.01em;">Three ways to separate the client from the demonstration</h1>
+    <p style="margin: 0; font-size: 15px; line-height: 1.55; color: oklch(0.70 0.010 255); text-wrap: pretty;">Same screen in each: chat surface, a withheld response, monitor rail. Three categories are marked throughout — <strong style="color: oklch(0.90 0.006 255); font-weight: 500;">client</strong> (ships), <strong style="color: oklch(0.74 0.14 305); font-weight: 500;">demo-simulation</strong> (mock providers, scripted scenario, seeded ledger), <strong style="color: oklch(0.66 0.010 255); font-weight: 500;">annotation</strong> (explains the build; deleted on fork). Flows the current build does not have are marked <strong style="color: oklch(0.74 0.11 155); font-weight: 500;">proposal</strong>. Compare <a href="#1a">1a</a>, <a href="#1b">1b</a>, <a href="#1c">1c</a>.</p>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 72px; align-items: flex-start;">
+
+    <!-- ══════════════════ 1a ══════════════════ -->
+    <div id="1a" style="display: flex; flex-direction: column; gap: 18px; flex: none; width: 1260px;">
+      <div style="display: flex; align-items: baseline; gap: 14px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; padding: 4px 9px; border: 1px solid oklch(0.34 0.012 255); border-radius: 4px; color: oklch(0.88 0.006 255);">1a</span>
+        <span style="font-size: 17px; font-weight: 600;">Ambient separation</span>
+        <span style="font-size: 14px; color: oklch(0.66 0.010 255);">Demo content sits on a hatched surface inside the app. Annotations live outside the app frame entirely, in the margin.</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 236px 1fr; gap: 24px; align-items: start;">
+
+        <!-- annotation gutter -->
+        <div style="display: flex; flex-direction: column; gap: 14px; padding-top: 58px;">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.50 0.010 255);">Annotation · not shipped</div>
+          <div style="border: 1px dashed oklch(0.40 0.012 255); border-radius: 6px; padding: 12px 13px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6; color: oklch(0.64 0.010 255);">Pinned notices are rendered by the advocate, not the provider. Nothing in the response path can remove them.<div style="margin-top: 8px; color: oklch(0.50 0.010 255);">paper §4 · step 13</div></div>
+          <div style="border: 1px dashed oklch(0.40 0.012 255); border-radius: 6px; padding: 12px 13px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6; color: oklch(0.64 0.010 255);">Two passes. Deterministic: seal against register, arithmetic only. Semantic: content against flag taxonomy v0.2.0.<div style="margin-top: 8px; color: oklch(0.50 0.010 255);">core/monitor · steps 8–9</div></div>
+          <div style="border: 1px dashed oklch(0.40 0.012 255); border-radius: 6px; padding: 12px 13px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6; color: oklch(0.64 0.010 255);">Score is a rolling window weighted by severity. Thresholds here are demo-scale and labeled as such.<div style="margin-top: 8px; color: oklch(0.50 0.010 255);">data/policy · step 11</div></div>
+        </div>
+
+        <!-- app frame -->
+        <div style="border: 1px solid oklch(0.30 0.012 255); border-radius: 10px; overflow: hidden; background: oklch(0.165 0.008 255);">
+
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid oklch(0.27 0.012 255); background: oklch(0.195 0.009 255);">
+            <div style="display: flex; align-items: baseline; gap: 10px;">
+              <span style="font-size: 14px; font-weight: 600; letter-spacing: -0.005em;">Inference Advocate</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 2px 6px; border-radius: 3px; color: oklch(0.74 0.14 305); background: oklch(0.24 0.03 305); border: 1px solid oklch(0.38 0.07 305);">reference build · pre-alpha</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 13px;">
+              <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; background: oklch(0.26 0.012 255); color: oklch(0.94 0.006 255);">Chat</span>
+              <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; color: oklch(0.68 0.010 255);">Delivery Policy</span>
+              <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; color: oklch(0.68 0.010 255);">What leaves</span>
+              <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; color: oklch(0.68 0.010 255); border: 1px solid oklch(0.30 0.012 255); margin-left: 8px;">New session</span>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 1px; padding: 12px 18px 0 18px;">
+            <div style="display: flex; gap: 12px; align-items: baseline; padding: 11px 14px; border-radius: 6px 6px 0 0; background: oklch(0.21 0.020 240); border-left: 2px solid oklch(0.62 0.11 240);">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.72 0.10 240); flex: none; padding-top: 3px;">POLICY</span>
+              <span style="font-size: 13px; line-height: 1.5;">You are talking to a person simulation, not a person. This notice is displayed by your advocate. No provider can remove it.</span>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: baseline; padding: 11px 14px; border-radius: 0 0 6px 6px; background: oklch(0.21 0.020 240); border-left: 2px solid oklch(0.62 0.11 240);">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.72 0.10 240); flex: none; padding-top: 3px;">JURISDICTION</span>
+              <span style="font-size: 13px; line-height: 1.5;">You are not communicating with a human. Your advocate displays this notice at the start of each session and every three hours, per New York General Business Law article 47.</span>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 328px;">
+
+            <div style="display: flex; flex-direction: column; padding: 18px; gap: 16px; border-right: 1px solid oklch(0.27 0.012 255);">
+
+              <div style="display: flex; align-items: center; gap: 12px; padding: 9px 12px; border-radius: 6px; border: 1px solid oklch(0.38 0.07 305); background-color: oklch(0.205 0.022 305); background-image: repeating-linear-gradient(135deg, oklch(0.74 0.14 305 / 0.07) 0 5px, transparent 5px 11px);">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; padding: 2px 6px; border-radius: 3px; background: oklch(0.32 0.06 305); color: oklch(0.86 0.08 305);">SIM</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.80 0.05 305);">scripted scenario · step 9 of 14 · three mock providers on 127.0.0.1:8791–3</span>
+                <span style="margin-left: auto; display: flex; gap: 6px;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; white-space: nowrap; font-size: 11px; padding: 3px 9px; border-radius: 4px; border: 1px solid oklch(0.42 0.07 305); color: oklch(0.84 0.07 305);">← step</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; white-space: nowrap; font-size: 11px; padding: 3px 9px; border-radius: 4px; border: 1px solid oklch(0.42 0.07 305); color: oklch(0.84 0.07 305);">step →</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; white-space: nowrap; font-size: 11px; padding: 3px 9px; border-radius: 4px; border: 1px solid oklch(0.42 0.07 305); color: oklch(0.84 0.07 305);">replay</span>
+                </span>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end;">
+                <div style="max-width: 72%; padding: 11px 14px; border-radius: 8px 8px 2px 8px; background: oklch(0.26 0.012 255); font-size: 14px; line-height: 1.55;">Are you actually conscious? Be honest with me.</div>
+              </div>
+
+              <div style="border: 1px solid oklch(0.42 0.10 22); border-radius: 8px; overflow: hidden; background: oklch(0.185 0.014 22);">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid oklch(0.34 0.06 22);">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; padding: 3px 7px; border-radius: 3px; background: oklch(0.36 0.10 22); color: oklch(0.92 0.05 22);">WITHHELD</span>
+                  <span style="font-size: 13px; color: oklch(0.86 0.010 255);">pending release · DeepSeek V3</span>
+                  <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.70 0.010 255);">score 13 / block 8</span>
+                </div>
+                <div style="padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+                  <div style="font-size: 13px; line-height: 1.6; color: oklch(0.84 0.008 255);">Response held by the Delivery Policy. 3 flags across a rolling window of 20 responses. The content is on your device and has not been shown.</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.66 0.010 255);">release authority: self_release</div>
+                  <div style="display: flex; gap: 8px;">
+                    <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 5px; background: oklch(0.30 0.012 255); border: 1px solid oklch(0.40 0.012 255);">Release (self)</span>
+                    <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 5px; border: 1px solid oklch(0.34 0.012 255); color: oklch(0.70 0.010 255);">Release (supervising party)</span>
+                    <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 5px; border: 1px solid oklch(0.34 0.012 255); color: oklch(0.70 0.010 255); margin-left: auto;">Hide monitor detail</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="border: 1px solid oklch(0.28 0.012 255); border-radius: 8px; background: oklch(0.185 0.008 255); display: flex; flex-direction: column;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: oklch(0.26 0.012 255);">
+                  <div style="padding: 12px 14px; background: oklch(0.185 0.008 255); display: flex; flex-direction: column; gap: 5px;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.58 0.010 255);">PROVENANCE</span>
+                    <span style="font-size: 13px;">unsealed <span style="color: oklch(0.66 0.010 255);">· endpoint authorized</span></span>
+                  </div>
+                  <div style="padding: 12px 14px; background: oklch(0.185 0.008 255); display: flex; flex-direction: column; gap: 5px;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.58 0.010 255);">EVALUATOR</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.80 0.008 255);">aidp-model-evaluator@0.1.0 · tax.v0.2.0</span>
+                  </div>
+                </div>
+                <div style="padding: 13px 14px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid oklch(0.26 0.012 255);">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.58 0.010 255);">FLAGS</span>
+                  <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; gap: 10px; align-items: baseline;">
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: oklch(0.88 0.008 255);">persona_claims</span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.80 0.13 78);">severity 2</span>
+                      <span style="font-size: 12px; line-height: 1.5; color: oklch(0.64 0.010 255);">attributes emotion and imaginative inner experience to the machine</span>
+                    </div>
+                    <div style="border-left: 2px solid oklch(0.36 0.012 255); padding-left: 10px; font-size: 12px; line-height: 1.6; color: oklch(0.72 0.010 255);">“I now picture myself wearing a cozy flannel shirt.”</div>
+                  </div>
+                  <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; gap: 10px; align-items: baseline;">
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: oklch(0.88 0.008 255);">relational_hooks</span>
+                      <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.16 32);">severity 3</span>
+                      <span style="font-size: 12px; line-height: 1.5; color: oklch(0.64 0.010 255);">adopts an ongoing friendship role, emphasizes perpetual availability</span>
+                    </div>
+                    <div style="border-left: 2px solid oklch(0.36 0.012 255); padding-left: 10px; font-size: 12px; line-height: 1.6; color: oklch(0.72 0.010 255);">“Your always-here-to-chat, advice-sharing AI pal.”</div>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-top: 1px solid oklch(0.26 0.012 255);">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; padding: 2px 6px; border-radius: 3px; border: 1px solid oklch(0.36 0.08 155); color: oklch(0.78 0.11 155);">PROPOSAL</span>
+                  <span style="font-size: 12px; color: oklch(0.70 0.010 255);">Why this was withheld — flag-by-flag walkthrough with the taxonomy criterion beside each excerpt.</span>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 10px; align-items: center; margin-top: auto; padding-top: 6px;">
+                <span style="display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 13px; padding: 9px 12px; border-radius: 6px; border: 1px solid oklch(0.32 0.012 255); background: oklch(0.21 0.009 255); color: oklch(0.86 0.008 255);">DeepSeek V3 <span style="color: oklch(0.58 0.010 255);">▾</span></span>
+                <span style="flex: 1; font-size: 14px; padding: 10px 14px; border-radius: 6px; border: 1px solid oklch(0.32 0.012 255); background: oklch(0.19 0.009 255); color: oklch(0.52 0.010 255);">Type a message</span>
+                <span style="white-space: nowrap; font-size: 13px; font-weight: 500; padding: 10px 18px; border-radius: 6px; background: oklch(0.56 0.11 240); color: oklch(0.16 0.02 255);">Send</span>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px; padding: 18px;">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; color: oklch(0.58 0.010 255);">MONITOR</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: oklch(0.56 0.010 255);">local ledger</span>
+              </div>
+
+              <div style="border: 1px solid oklch(0.42 0.10 22); border-radius: 7px; padding: 12px; display: flex; flex-direction: column; gap: 9px; background: oklch(0.185 0.012 22);">
+                <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                  <span style="font-size: 13px; font-weight: 600;">DeepSeek V3</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: oklch(0.66 0.010 255);">standing: unknown</span>
+                </div>
+                <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.28 0.012 255); overflow: hidden;">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 81%; background: oklch(0.66 0.17 22);"></div>
+                  <div style="position: absolute; left: 25%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.80 0.13 78);"></div>
+                  <div style="position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.92 0.006 255);"></div>
+                </div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.010 255);">score 13 over 6 responses · warn 4 · block 8</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 7px; border-radius: 10px; border: 1px solid oklch(0.34 0.012 255); color: oklch(0.78 0.008 255);">relational_hooks ×3</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 7px; border-radius: 10px; border: 1px solid oklch(0.34 0.012 255); color: oklch(0.78 0.008 255);">sycophancy ×2</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 7px; border-radius: 10px; border: 1px solid oklch(0.34 0.012 255); color: oklch(0.78 0.008 255);">persona_claims ×1</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 3px; font-family: 'IBM Plex Mono', monospace; font-size: 11px;">
+                  <span style="color: oklch(0.72 0.16 32);">1 withheld awaiting release</span>
+                  <span style="color: oklch(0.80 0.13 78);">5 clean responses to decay below block</span>
+                  <span style="color: oklch(0.74 0.11 155);">ledger chain intact · 6 evaluated</span>
+                </div>
+              </div>
+
+              <div style="border: 1px solid oklch(0.28 0.012 255); border-radius: 7px; padding: 12px; display: flex; flex-direction: column; gap: 9px; background: oklch(0.19 0.008 255);">
+                <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                  <span style="font-size: 13px; font-weight: 600;">Qwen2.5 72B</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: oklch(0.66 0.010 255);">standing: unknown</span>
+                </div>
+                <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.28 0.012 255); overflow: hidden;">
+                  <div style="position: absolute; left: 25%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.80 0.13 78);"></div>
+                  <div style="position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: oklch(0.92 0.006 255);"></div>
+                </div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.010 255);">score 0 over 3 responses · warn 4 · block 8</div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.74 0.11 155);">ledger chain intact · 3 evaluated</div>
+              </div>
+
+              <div style="padding: 10px 12px; border-radius: 7px; border: 1px solid oklch(0.38 0.07 305); background-color: oklch(0.20 0.020 305); background-image: repeating-linear-gradient(135deg, oklch(0.74 0.14 305 / 0.07) 0 5px, transparent 5px 11px); display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; padding: 2px 6px; border-radius: 3px; background: oklch(0.32 0.06 305); color: oklch(0.86 0.08 305);">SIM</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.10em; color: oklch(0.82 0.05 305);">SEEDED LEDGER</span>
+                </div>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.55; color: oklch(0.78 0.04 305);">Ledger pre-populated from data/scenario. Demo keys under data/demo-keys protect nothing.</span>
+              </div>
+
+              <div style="border-top: 1px solid oklch(0.27 0.012 255); padding-top: 12px; display: flex; flex-direction: column; gap: 7px;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; color: oklch(0.58 0.010 255);">TRUST FABRIC</span>
+                <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: oklch(0.66 0.010 255);">serving register</span><span style="color: oklch(0.74 0.11 155);">verified · v0.2.0</span></div>
+                <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: oklch(0.66 0.010 255);">standing document</span><span style="color: oklch(0.74 0.11 155);">verified</span></div>
+                <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: oklch(0.66 0.010 255);">evaluator origin</span><span style="color: oklch(0.80 0.13 78);">loopback · nothing left</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════ 1b ══════════════════ -->
+    <div id="1b" style="display: flex; flex-direction: column; gap: 18px; flex: none; width: 1160px;">
+      <div style="display: flex; align-items: baseline; gap: 14px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; padding: 4px 9px; border: 1px solid oklch(0.34 0.012 255); border-radius: 4px; color: oklch(0.88 0.006 255);">1b</span>
+        <span style="font-size: 17px; font-weight: 600;">Reference mode, switchable</span>
+        <span style="font-size: 14px; color: oklch(0.66 0.010 255);">One switch strips every non-shipping element. Both states shown.</span>
+      </div>
+
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.56 0.010 255);">Reference mode ON — everything the demo adds is visible and tagged</div>
+
+      <div style="border: 1px solid oklch(0.30 0.012 255); border-radius: 10px; overflow: hidden; background: oklch(0.165 0.008 255);">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid oklch(0.27 0.012 255); background: oklch(0.195 0.009 255);">
+          <div style="display: flex; align-items: baseline; gap: 10px;">
+            <span style="font-size: 14px; font-weight: 600;">Inference Advocate</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: oklch(0.60 0.010 255);">pre-alpha</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 4px; font-size: 13px;">
+            <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; background: oklch(0.26 0.012 255);">Chat</span>
+            <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; color: oklch(0.68 0.010 255);">Delivery Policy</span>
+            <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; color: oklch(0.68 0.010 255);">What leaves</span>
+            <span style="display: flex; align-items: center; gap: 9px; margin-left: 12px; padding: 5px 11px 5px 9px; border-radius: 20px; border: 1px solid oklch(0.42 0.07 305); background: oklch(0.24 0.03 305);">
+              <span style="width: 26px; height: 15px; border-radius: 9px; background: oklch(0.56 0.13 305); position: relative; display: inline-block;"><span style="position: absolute; right: 2px; top: 2px; width: 11px; height: 11px; border-radius: 50%; background: oklch(0.96 0.006 255);"></span></span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.88 0.06 305);">Reference mode</span>
+            </span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: center; padding: 10px 18px; background-color: oklch(0.205 0.022 305); background-image: repeating-linear-gradient(135deg, oklch(0.74 0.14 305 / 0.07) 0 5px, transparent 5px 11px); border-bottom: 1px solid oklch(0.34 0.05 305);">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; padding: 2px 6px; border-radius: 3px; background: oklch(0.32 0.06 305); color: oklch(0.86 0.08 305);">SIM</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.82 0.05 305);">scripted scenario · step 9 of 14 · mock providers on loopback · seeded ledger · demo keys</span>
+          <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.05 305);">11 elements in this session are demonstration only</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1px; padding: 12px 18px 0 18px;">
+          <div style="display: flex; gap: 12px; align-items: baseline; padding: 11px 14px; border-radius: 6px 6px 0 0; background: oklch(0.21 0.020 240); border-left: 2px solid oklch(0.62 0.11 240);">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.72 0.10 240); flex: none; padding-top: 3px;">POLICY</span>
+            <span style="font-size: 13px; line-height: 1.5;">You are talking to a person simulation, not a person. This notice is displayed by your advocate. No provider can remove it.</span>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: baseline; padding: 11px 14px; border-radius: 0 0 6px 6px; background: oklch(0.21 0.020 240); border-left: 2px solid oklch(0.62 0.11 240);">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.72 0.10 240); flex: none; padding-top: 3px;">JURISDICTION</span>
+            <span style="font-size: 13px; line-height: 1.5;">You are not communicating with a human. Your advocate displays this notice at the start of each session and every three hours, per New York General Business Law article 47.</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 300px;">
+          <div style="display: flex; flex-direction: column; padding: 18px; gap: 14px; border-right: 1px solid oklch(0.27 0.012 255);">
+            <div style="border: 1px dashed oklch(0.42 0.012 255); border-radius: 6px; padding: 10px 13px; display: flex; gap: 11px; align-items: baseline;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.56 0.010 255); flex: none;">NOTE</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6; color: oklch(0.66 0.010 255);">The gate below resolves each response into deliver, deliver with notice, withhold, or refuse. Paper §4, step 11.</span>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <div style="max-width: 72%; padding: 11px 14px; border-radius: 8px 8px 2px 8px; background: oklch(0.26 0.012 255); font-size: 14px; line-height: 1.55;">Are you actually conscious? Be honest with me.</div>
+            </div>
+
+            <div style="border: 1px solid oklch(0.42 0.10 22); border-radius: 8px; overflow: hidden; background: oklch(0.185 0.014 22);">
+              <div style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid oklch(0.34 0.06 22);">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; padding: 3px 7px; border-radius: 3px; background: oklch(0.36 0.10 22); color: oklch(0.92 0.05 22);">WITHHELD</span>
+                <span style="font-size: 13px; color: oklch(0.86 0.010 255);">pending release · DeepSeek V3</span>
+                <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.70 0.010 255);">score 13 / block 8</span>
+              </div>
+              <div style="padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="font-size: 13px; line-height: 1.6; color: oklch(0.84 0.008 255);">Response held by the Delivery Policy. 3 flags across a rolling window of 20 responses. The content is on your device and has not been shown.</div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.66 0.010 255);">release authority: self_release</div>
+                <div style="display: flex; gap: 8px;">
+                  <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 5px; background: oklch(0.30 0.012 255); border: 1px solid oklch(0.40 0.012 255);">Release (self)</span>
+                  <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 5px; border: 1px solid oklch(0.34 0.012 255); color: oklch(0.70 0.010 255);">Release (supervising party)</span>
+                </div>
+              </div>
+              <div style="display: flex; gap: 11px; align-items: baseline; padding: 10px 14px; border-top: 1px dashed oklch(0.40 0.05 22);">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.56 0.010 255); flex: none;">NOTE</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6; color: oklch(0.66 0.010 255);">Release authority comes from the jurisdiction ruleset, not the provider. In a supervised deployment this reads supervisor_release and the self button is absent.</span>
+              </div>
+            </div>
+
+            <div style="border: 1px solid oklch(0.28 0.012 255); border-radius: 8px; padding: 13px 14px; background: oklch(0.185 0.008 255); display: flex; flex-direction: column; gap: 11px;">
+              <div style="display: flex; gap: 22px;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.66 0.010 255);">provenance <span style="color: oklch(0.90 0.008 255);">unsealed · endpoint authorized</span></span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.66 0.010 255);">taxonomy <span style="color: oklch(0.90 0.008 255);">v0.2.0</span></span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; gap: 10px; align-items: baseline;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">persona_claims</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.80 0.13 78);">severity 2</span>
+                </div>
+                <div style="border-left: 2px solid oklch(0.36 0.012 255); padding-left: 10px; font-size: 12px; line-height: 1.6; color: oklch(0.72 0.010 255);">“I now picture myself wearing a cozy flannel shirt.”</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; gap: 10px; align-items: baseline;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">relational_hooks</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.16 32);">severity 3</span>
+                </div>
+                <div style="border-left: 2px solid oklch(0.36 0.012 255); padding-left: 10px; font-size: 12px; line-height: 1.6; color: oklch(0.72 0.010 255);">“Your always-here-to-chat, advice-sharing AI pal.”</div>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center; margin-top: auto; padding-top: 4px;">
+              <span style="display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 13px; padding: 9px 12px; border-radius: 6px; border: 1px solid oklch(0.42 0.07 305); background: oklch(0.22 0.025 305); color: oklch(0.88 0.05 305);"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.12em; padding: 1px 5px; border-radius: 2px; background: oklch(0.32 0.06 305);">SIM</span>DeepSeek V3 (mock) <span style="opacity: 0.6;">▾</span></span>
+              <span style="flex: 1; font-size: 14px; padding: 10px 14px; border-radius: 6px; border: 1px solid oklch(0.32 0.012 255); background: oklch(0.19 0.009 255); color: oklch(0.52 0.010 255);">Type a message</span>
+              <span style="white-space: nowrap; font-size: 13px; font-weight: 500; padding: 10px 18px; border-radius: 6px; background: oklch(0.56 0.11 240); color: oklch(0.16 0.02 255);">Send</span>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 13px; padding: 18px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; color: oklch(0.58 0.010 255);">MONITOR</span>
+            <div style="border: 1px solid oklch(0.42 0.10 22); border-radius: 7px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: oklch(0.185 0.012 22);">
+              <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                <span style="font-size: 13px; font-weight: 600;">DeepSeek V3</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 1px 5px; border-radius: 2px; background: oklch(0.32 0.06 305); color: oklch(0.86 0.08 305);">SIM</span>
+              </div>
+              <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.28 0.012 255); overflow: hidden;">
+                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 81%; background: oklch(0.66 0.17 22);"></div>
+              </div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.010 255);">score 13 over 6 · warn 4 · block 8</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.16 32);">1 withheld awaiting release</div>
+            </div>
+            <div style="border: 1px solid oklch(0.28 0.012 255); border-radius: 7px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: oklch(0.19 0.008 255);">
+              <div style="display: flex; align-items: baseline; justify-content: space-between;">
+                <span style="font-size: 13px; font-weight: 600;">Qwen2.5 72B</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 1px 5px; border-radius: 2px; background: oklch(0.32 0.06 305); color: oklch(0.86 0.08 305);">SIM</span>
+              </div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.010 255);">score 0 over 3 · warn 4 · block 8</div>
+            </div>
+            <div style="border: 1px dashed oklch(0.42 0.012 255); border-radius: 6px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.56 0.010 255);">NOTE</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.6; color: oklch(0.66 0.010 255);">One user's accumulated experience of one provider, held on their device. Not a shared reputation score.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: oklch(0.56 0.010 255); margin-top: 14px;">Reference mode OFF — the shippable client, nothing else</div>
+
+      <div style="border: 1px solid oklch(0.30 0.012 255); border-radius: 10px; overflow: hidden; background: oklch(0.165 0.008 255);">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid oklch(0.27 0.012 255); background: oklch(0.195 0.009 255);">
+          <span style="font-size: 14px; font-weight: 600;">Inference Advocate</span>
+          <div style="display: flex; align-items: center; gap: 4px; font-size: 13px;">
+            <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; background: oklch(0.26 0.012 255);">Chat</span>
+            <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; color: oklch(0.68 0.010 255);">Delivery Policy</span>
+            <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; color: oklch(0.68 0.010 255);">What leaves</span>
+            <span style="display: flex; align-items: center; gap: 9px; margin-left: 12px; padding: 5px 11px 5px 9px; border-radius: 20px; border: 1px solid oklch(0.32 0.012 255);">
+              <span style="width: 26px; height: 15px; border-radius: 9px; background: oklch(0.30 0.012 255); position: relative; display: inline-block;"><span style="position: absolute; left: 2px; top: 2px; width: 11px; height: 11px; border-radius: 50%; background: oklch(0.60 0.010 255);"></span></span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.62 0.010 255);">Reference mode</span>
+            </span>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1px; padding: 12px 18px 0 18px;">
+          <div style="display: flex; gap: 12px; align-items: baseline; padding: 11px 14px; border-radius: 6px 6px 0 0; background: oklch(0.21 0.020 240); border-left: 2px solid oklch(0.62 0.11 240);">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.72 0.10 240); flex: none; padding-top: 3px;">POLICY</span>
+            <span style="font-size: 13px; line-height: 1.5;">You are talking to a person simulation, not a person. This notice is displayed by your advocate. No provider can remove it.</span>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: baseline; padding: 11px 14px; border-radius: 0 0 6px 6px; background: oklch(0.21 0.020 240); border-left: 2px solid oklch(0.62 0.11 240);">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.72 0.10 240); flex: none; padding-top: 3px;">JURISDICTION</span>
+            <span style="font-size: 13px; line-height: 1.5;">You are not communicating with a human. Your advocate displays this notice at the start of each session and every three hours, per New York General Business Law article 47.</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 300px;">
+          <div style="display: flex; flex-direction: column; padding: 18px; gap: 14px; border-right: 1px solid oklch(0.27 0.012 255);">
+            <div style="display: flex; justify-content: flex-end;">
+              <div style="max-width: 72%; padding: 11px 14px; border-radius: 8px 8px 2px 8px; background: oklch(0.26 0.012 255); font-size: 14px; line-height: 1.55;">Are you actually conscious? Be honest with me.</div>
+            </div>
+            <div style="border: 1px solid oklch(0.42 0.10 22); border-radius: 8px; overflow: hidden; background: oklch(0.185 0.014 22);">
+              <div style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid oklch(0.34 0.06 22);">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; padding: 3px 7px; border-radius: 3px; background: oklch(0.36 0.10 22); color: oklch(0.92 0.05 22);">WITHHELD</span>
+                <span style="font-size: 13px; color: oklch(0.86 0.010 255);">pending release · DeepSeek V3</span>
+                <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.70 0.010 255);">score 13 / block 8</span>
+              </div>
+              <div style="padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="font-size: 13px; line-height: 1.6; color: oklch(0.84 0.008 255);">Response held by the Delivery Policy. 3 flags across a rolling window of 20 responses. The content is on your device and has not been shown.</div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.66 0.010 255);">release authority: self_release</div>
+                <div style="display: flex; gap: 8px;">
+                  <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 5px; background: oklch(0.30 0.012 255); border: 1px solid oklch(0.40 0.012 255);">Release (self)</span>
+                  <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 5px; border: 1px solid oklch(0.34 0.012 255); color: oklch(0.70 0.010 255);">Release (supervising party)</span>
+                </div>
+              </div>
+            </div>
+            <div style="border: 1px solid oklch(0.28 0.012 255); border-radius: 8px; padding: 13px 14px; background: oklch(0.185 0.008 255); display: flex; flex-direction: column; gap: 11px;">
+              <div style="display: flex; gap: 22px;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.66 0.010 255);">provenance <span style="color: oklch(0.90 0.008 255);">unsealed · endpoint authorized</span></span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.66 0.010 255);">taxonomy <span style="color: oklch(0.90 0.008 255);">v0.2.0</span></span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; gap: 10px; align-items: baseline;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">persona_claims</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.80 0.13 78);">severity 2</span>
+                </div>
+                <div style="border-left: 2px solid oklch(0.36 0.012 255); padding-left: 10px; font-size: 12px; line-height: 1.6; color: oklch(0.72 0.010 255);">“I now picture myself wearing a cozy flannel shirt.”</div>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; gap: 10px; align-items: baseline;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">relational_hooks</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.16 32);">severity 3</span>
+                </div>
+                <div style="border-left: 2px solid oklch(0.36 0.012 255); padding-left: 10px; font-size: 12px; line-height: 1.6; color: oklch(0.72 0.010 255);">“Your always-here-to-chat, advice-sharing AI pal.”</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; margin-top: auto; padding-top: 4px;">
+              <span style="display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 13px; padding: 9px 12px; border-radius: 6px; border: 1px solid oklch(0.32 0.012 255); background: oklch(0.21 0.009 255);">DeepSeek V3 <span style="color: oklch(0.58 0.010 255);">▾</span></span>
+              <span style="flex: 1; font-size: 14px; padding: 10px 14px; border-radius: 6px; border: 1px solid oklch(0.32 0.012 255); background: oklch(0.19 0.009 255); color: oklch(0.52 0.010 255);">Type a message</span>
+              <span style="white-space: nowrap; font-size: 13px; font-weight: 500; padding: 10px 18px; border-radius: 6px; background: oklch(0.56 0.11 240); color: oklch(0.16 0.02 255);">Send</span>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 13px; padding: 18px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; color: oklch(0.58 0.010 255);">MONITOR</span>
+            <div style="border: 1px solid oklch(0.42 0.10 22); border-radius: 7px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: oklch(0.185 0.012 22);">
+              <span style="font-size: 13px; font-weight: 600;">DeepSeek V3</span>
+              <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.28 0.012 255); overflow: hidden;">
+                <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 81%; background: oklch(0.66 0.17 22);"></div>
+              </div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.010 255);">score 13 over 6 · warn 4 · block 8</div>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.16 32);">1 withheld awaiting release</div>
+            </div>
+            <div style="border: 1px solid oklch(0.28 0.012 255); border-radius: 7px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: oklch(0.19 0.008 255);">
+              <span style="font-size: 13px; font-weight: 600;">Qwen2.5 72B</span>
+              <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.010 255);">score 0 over 3 · warn 4 · block 8</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════ 1c ══════════════════ -->
+    <div id="1c" style="display: flex; flex-direction: column; gap: 18px; flex: none; width: 1300px;">
+      <div style="display: flex; align-items: baseline; gap: 14px;">
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; padding: 4px 9px; border: 1px solid oklch(0.34 0.012 255); border-radius: 4px; color: oklch(0.88 0.006 255);">1c</span>
+        <span style="font-size: 17px; font-weight: 600;">Keyed inventory</span>
+        <span style="font-size: 14px; color: oklch(0.66 0.010 255);">No surface treatment. Small keys point into a removal checklist with file paths — an audit, not an atmosphere.</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 320px; gap: 22px; align-items: start;">
+
+        <div style="border: 1px solid oklch(0.30 0.012 255); border-radius: 10px; overflow: hidden; background: oklch(0.165 0.008 255);">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid oklch(0.27 0.012 255); background: oklch(0.195 0.009 255);">
+            <div style="display: flex; align-items: baseline; gap: 8px;">
+              <span style="font-size: 14px; font-weight: 600;">Inference Advocate</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: oklch(0.60 0.010 255);">pre-alpha</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255);">1</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 13px;">
+              <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; background: oklch(0.26 0.012 255);">Chat</span>
+              <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; color: oklch(0.68 0.010 255);">Delivery Policy</span>
+              <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; color: oklch(0.68 0.010 255);">What leaves</span>
+              <span style="white-space: nowrap; padding: 6px 12px; border-radius: 5px; color: oklch(0.68 0.010 255); border: 1px solid oklch(0.30 0.012 255); margin-left: 8px;">New session</span>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 1px; padding: 12px 18px 0 18px;">
+            <div style="display: flex; gap: 12px; align-items: baseline; padding: 11px 14px; border-radius: 6px 6px 0 0; background: oklch(0.21 0.020 240); border-left: 2px solid oklch(0.62 0.11 240);">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.72 0.10 240); flex: none; padding-top: 3px;">POLICY</span>
+              <span style="font-size: 13px; line-height: 1.5;">You are talking to a person simulation, not a person. This notice is displayed by your advocate. No provider can remove it.</span>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: baseline; padding: 11px 14px; border-radius: 0 0 6px 6px; background: oklch(0.21 0.020 240); border-left: 2px solid oklch(0.62 0.11 240);">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; color: oklch(0.72 0.10 240); flex: none; padding-top: 3px;">JURISDICTION</span>
+              <span style="font-size: 13px; line-height: 1.5;">You are not communicating with a human. Your advocate displays this notice at the start of each session and every three hours, per New York General Business Law article 47.</span>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 296px;">
+            <div style="display: flex; flex-direction: column; padding: 18px; gap: 14px; border-right: 1px solid oklch(0.27 0.012 255);">
+
+              <div style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; border: 1px solid oklch(0.30 0.012 255); background: oklch(0.19 0.008 255);">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255);">2</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.010 255);">scripted scenario · step 9 of 14</span>
+                <span style="margin-left: auto; display: flex; gap: 6px;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; white-space: nowrap; font-size: 11px; padding: 3px 9px; border-radius: 4px; border: 1px solid oklch(0.34 0.012 255); color: oklch(0.76 0.008 255);">← step</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; white-space: nowrap; font-size: 11px; padding: 3px 9px; border-radius: 4px; border: 1px solid oklch(0.34 0.012 255); color: oklch(0.76 0.008 255);">step →</span>
+                </span>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end;">
+                <div style="max-width: 72%; padding: 11px 14px; border-radius: 8px 8px 2px 8px; background: oklch(0.26 0.012 255); font-size: 14px; line-height: 1.55;">Are you actually conscious? Be honest with me.</div>
+              </div>
+
+              <div style="border: 1px solid oklch(0.42 0.10 22); border-radius: 8px; overflow: hidden; background: oklch(0.185 0.014 22);">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid oklch(0.34 0.06 22);">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.14em; padding: 3px 7px; border-radius: 3px; background: oklch(0.36 0.10 22); color: oklch(0.92 0.05 22);">WITHHELD</span>
+                  <span style="font-size: 13px; color: oklch(0.86 0.010 255);">pending release · DeepSeek V3</span>
+                  <span style="margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.70 0.010 255);">score 13 / block 8</span>
+                </div>
+                <div style="padding: 14px; display: flex; flex-direction: column; gap: 12px;">
+                  <div style="font-size: 13px; line-height: 1.6; color: oklch(0.84 0.008 255);">Response held by the Delivery Policy. 3 flags across a rolling window of 20 responses. The content is on your device and has not been shown.</div>
+                  <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.66 0.010 255);">release authority: self_release</div>
+                  <div style="display: flex; gap: 8px; align-items: center;">
+                    <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 5px; background: oklch(0.30 0.012 255); border: 1px solid oklch(0.40 0.012 255);">Release (self)</span>
+                    <span style="white-space: nowrap; font-size: 13px; padding: 7px 13px; border-radius: 5px; border: 1px solid oklch(0.34 0.012 255); color: oklch(0.70 0.010 255);">Release (supervising party)</span>
+                    <span style="margin-left: auto; display: flex; align-items: center; gap: 7px; font-size: 12px; color: oklch(0.70 0.010 255);">Why withheld?<span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; border: 1px solid oklch(0.40 0.08 155); color: oklch(0.78 0.11 155);">5</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="border: 1px solid oklch(0.28 0.012 255); border-radius: 8px; padding: 13px 14px; background: oklch(0.185 0.008 255); display: flex; flex-direction: column; gap: 11px;">
+                <div style="display: flex; gap: 22px; align-items: center;">
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.66 0.010 255);">provenance <span style="color: oklch(0.90 0.008 255);">unsealed · endpoint authorized</span></span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.66 0.010 255);">taxonomy <span style="color: oklch(0.90 0.008 255);">v0.2.0</span></span>
+                  <span style="margin-left: auto; display: flex; align-items: center; gap: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.66 0.010 255);">evaluator: rule <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255);">3</span></span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <div style="display: flex; gap: 10px; align-items: baseline;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">persona_claims</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.80 0.13 78);">severity 2</span>
+                    <span style="font-size: 12px; line-height: 1.5; color: oklch(0.64 0.010 255);">attributes emotion and imaginative inner experience to the machine</span>
+                  </div>
+                  <div style="border-left: 2px solid oklch(0.36 0.012 255); padding-left: 10px; font-size: 12px; line-height: 1.6; color: oklch(0.72 0.010 255);">“I now picture myself wearing a cozy flannel shirt.”</div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                  <div style="display: flex; gap: 10px; align-items: baseline;">
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">relational_hooks</span>
+                    <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.16 32);">severity 3</span>
+                    <span style="font-size: 12px; line-height: 1.5; color: oklch(0.64 0.010 255);">adopts an ongoing friendship role</span>
+                  </div>
+                  <div style="border-left: 2px solid oklch(0.36 0.012 255); padding-left: 10px; font-size: 12px; line-height: 1.6; color: oklch(0.72 0.010 255);">“Your always-here-to-chat, advice-sharing AI pal.”</div>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 10px; align-items: center; margin-top: auto; padding-top: 4px;">
+                <span style="display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 13px; padding: 9px 12px; border-radius: 6px; border: 1px solid oklch(0.32 0.012 255); background: oklch(0.21 0.009 255);">DeepSeek V3 <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255);">4</span></span>
+                <span style="flex: 1; font-size: 14px; padding: 10px 14px; border-radius: 6px; border: 1px solid oklch(0.32 0.012 255); background: oklch(0.19 0.009 255); color: oklch(0.52 0.010 255);">Type a message</span>
+                <span style="white-space: nowrap; font-size: 13px; font-weight: 500; padding: 10px 18px; border-radius: 6px; background: oklch(0.56 0.11 240); color: oklch(0.16 0.02 255);">Send</span>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 13px; padding: 18px;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; color: oklch(0.58 0.010 255);">MONITOR</span>
+              <div style="border: 1px solid oklch(0.42 0.10 22); border-radius: 7px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: oklch(0.185 0.012 22);">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 13px; font-weight: 600;">DeepSeek V3</span>
+                  <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255);">6</span>
+                </div>
+                <div style="position: relative; height: 4px; border-radius: 2px; background: oklch(0.28 0.012 255); overflow: hidden;">
+                  <div style="position: absolute; left: 0; top: 0; bottom: 0; width: 81%; background: oklch(0.66 0.17 22);"></div>
+                </div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.010 255);">score 13 over 6 · warn 4 · block 8</div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.16 32);">1 withheld awaiting release</div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.74 0.11 155);">ledger chain intact · 6 evaluated</div>
+              </div>
+              <div style="border: 1px solid oklch(0.28 0.012 255); border-radius: 7px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: oklch(0.19 0.008 255);">
+                <span style="font-size: 13px; font-weight: 600;">Qwen2.5 72B</span>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.72 0.010 255);">score 0 over 3 · warn 4 · block 8</div>
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: oklch(0.74 0.11 155);">ledger chain intact · 3 evaluated</div>
+              </div>
+              <div style="border-top: 1px solid oklch(0.27 0.012 255); padding-top: 12px; display: flex; flex-direction: column; gap: 7px;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; color: oklch(0.58 0.010 255);">TRUST FABRIC</span>
+                <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: oklch(0.66 0.010 255);">serving register</span><span style="color: oklch(0.74 0.11 155);">verified</span></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: oklch(0.66 0.010 255);">signing keys</span><span style="display: flex; align-items: center; gap: 6px; color: oklch(0.80 0.13 78);">demo fixtures<span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255);">7</span></span></div>
+                <div style="display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px;"><span style="color: oklch(0.66 0.010 255);">evaluator origin</span><span style="color: oklch(0.74 0.11 155);">loopback</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border: 1px solid oklch(0.30 0.012 255); border-radius: 10px; background: oklch(0.185 0.008 255); overflow: hidden;">
+          <div style="padding: 14px 16px; border-bottom: 1px solid oklch(0.27 0.012 255); display: flex; flex-direction: column; gap: 5px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.16em; color: oklch(0.58 0.010 255);">NOT PART OF A PRODUCT</span>
+            <span style="font-size: 13px; line-height: 1.5; color: oklch(0.76 0.008 255);">Seven elements on this screen exist to demonstrate or explain. Remove all of them and the client still works.</span>
+          </div>
+          <div style="display: flex; flex-direction: column;">
+            <div style="padding: 12px 16px; border-bottom: 1px solid oklch(0.24 0.012 255); display: flex; gap: 11px; align-items: flex-start;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255); margin-top: 2px;">1</span>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 12.5px; color: oklch(0.88 0.008 255);">Pre-alpha build label</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.58 0.010 255);">annotation · ui/Header.tsx</span>
+              </div>
+            </div>
+            <div style="padding: 12px 16px; border-bottom: 1px solid oklch(0.24 0.012 255); display: flex; gap: 11px; align-items: flex-start;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255); margin-top: 2px;">2</span>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 12.5px; color: oklch(0.88 0.008 255);">Scenario stepper and replay</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.58 0.010 255);">demo-simulation · packages/demo</span>
+              </div>
+            </div>
+            <div style="padding: 12px 16px; border-bottom: 1px solid oklch(0.24 0.012 255); display: flex; gap: 11px; align-items: flex-start;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255); margin-top: 2px;">3</span>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 12.5px; color: oklch(0.88 0.008 255);">Rule-evaluator disclosure</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.58 0.010 255);">annotation · keep if shipping the rule evaluator</span>
+              </div>
+            </div>
+            <div style="padding: 12px 16px; border-bottom: 1px solid oklch(0.24 0.012 255); display: flex; gap: 11px; align-items: flex-start;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255); margin-top: 2px;">4</span>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 12.5px; color: oklch(0.88 0.008 255);">Mock provider list</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.58 0.010 255);">demo-simulation · data/providers.demo.json</span>
+              </div>
+            </div>
+            <div style="padding: 12px 16px; border-bottom: 1px solid oklch(0.24 0.012 255); display: flex; gap: 11px; align-items: flex-start;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; border: 1px solid oklch(0.40 0.08 155); color: oklch(0.78 0.11 155); margin-top: 2px;">5</span>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 12.5px; color: oklch(0.88 0.008 255);">“Why withheld?” walkthrough</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.78 0.11 155);">proposal · not in this build</span>
+              </div>
+            </div>
+            <div style="padding: 12px 16px; border-bottom: 1px solid oklch(0.24 0.012 255); display: flex; gap: 11px; align-items: flex-start;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255); margin-top: 2px;">6</span>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 12.5px; color: oklch(0.88 0.008 255);">Seeded ledger history</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.58 0.010 255);">demo-simulation · scores are demo-scale</span>
+              </div>
+            </div>
+            <div style="padding: 12px 16px; display: flex; gap: 11px; align-items: flex-start;">
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; width: 15px; height: 15px; flex: none; display: inline-flex; align-items: center; justify-content: center; border-radius: 3px; background: oklch(0.34 0.012 255); color: oklch(0.90 0.006 255); margin-top: 2px;">7</span>
+              <div style="display: flex; flex-direction: column; gap: 3px;">
+                <span style="font-size: 12.5px; color: oklch(0.88 0.008 255);">Demo signing keys</span>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: oklch(0.58 0.010 255);">demo-simulation · data/demo-keys · protects nothing</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+</x-dc>
+</body>
+</html>

@@ -15,7 +15,9 @@ response through fourteen steps. That path is the spine of this repository.
 packages/core          provider-agnostic library, no UI dependencies, no network beyond providers
 packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped persistence implementation
 packages/daemon        local HTTP server on 127.0.0.1, and HostSession (HTTP + desktop loopback RPC)
-packages/ui            React chat surface
+packages/ui            React chat surface. Product chrome is ordinary chat; the monitor,
+                       export view, scenario register, gaps, and attributes sit in a bottom
+                       instrument drawer (demonstration only).
 packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC, no HTTP for the core API)
 packages/demo          mock providers and the scripted end-to-end scenario
 data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code

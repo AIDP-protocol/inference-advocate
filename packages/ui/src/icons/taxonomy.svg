@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+  <title>Taxonomy</title>
+  <path d="M11.6 4.6 H19.4 V12.4 L10.6 21.2"></path>
+  <path d="M4.6 10.4 L2.2 12.8 L4.6 15.2"></path>
+  <path d="M4.6 15.2 L10.6 21.2" stroke-dasharray="3.4425 1.6" stroke-linecap="butt"></path>
+  <path d="M4.6 10.4 L11.6 4.6" stroke-dasharray="3.7455 1.6" stroke-linecap="butt"></path>
+</svg>

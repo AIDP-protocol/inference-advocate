@@ -17,6 +17,7 @@ import { PolicyView } from './PolicyView';
 import { WorkingIndicator } from './WorkingIndicator';
 import { InstrumentDrawer, type DrawerTab } from './InstrumentDrawer';
 import { ProviderPicker } from './ProviderPicker';
+import { IconDeliveryPolicy, IconInferenceAdvocate, IconRuleEvaluator } from './icons';
 
 interface Turn {
   role: 'user' | 'assistant';
@@ -156,6 +157,10 @@ export function App() {
       <div className="app-row">
         {!narrow && (
           <aside className="sidebar">
+            <div className="sidebar-brand" aria-label="Inference Advocate">
+              <IconInferenceAdvocate className="sidebar-brand-mark" />
+              <span className="sidebar-brand-name">Inference Advocate</span>
+            </div>
             <button type="button" className="btn-new-session" onClick={() => void newSession()}>
               ＋ New session
             </button>
@@ -196,9 +201,10 @@ export function App() {
               </button>
               <button
                 type="button"
-                className={`nav-child ${view === 'policy' ? 'on' : ''}`}
+                className={`nav-child with-icon ${view === 'policy' ? 'on' : ''}`}
                 onClick={() => setView('policy')}
               >
+                <IconDeliveryPolicy className="nav-icon" />
                 Delivery Policy
               </button>
               <div className="nav-badge-row">
@@ -223,8 +229,8 @@ export function App() {
         <div className="main-col">
           {narrow && (
             <div className="narrow-header">
-              <span className="icon" aria-hidden="true">
-                ☰
+              <span className="narrow-brand" aria-hidden="true">
+                <IconInferenceAdvocate className="narrow-brand-mark" />
               </span>
               <span className="narrow-title">{sessionTitle}</span>
               <button
@@ -460,7 +466,10 @@ function AssistantTurn(props: {
           <div className="why-grid">
             <div className="why-label">Provenance</div>
             <div className="why-value">{provenanceLine(result)}</div>
-            <div className="why-label">Evaluator</div>
+            <div className="why-label">
+              <IconRuleEvaluator className="why-icon" />
+              Evaluator
+            </div>
             <div className="why-value mono">
               {result.semantic.evaluatorId}@{result.semantic.evaluatorVersion}, taxonomy{' '}
               {result.semantic.taxonomyVersion}

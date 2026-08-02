@@ -73,5 +73,6 @@ npm run check-deps --workspace @aidp/desktop
 
 1. Embed a JS runtime in the Tauri binary, or port the host and a StoreBackend to Rust, so
    HostSession does not need a Node launcher at all.
-2. Real app icons and `bundle.active` once that packaging claim is honest (a shipped binary
-   still needs the Node launcher today).
+2. `bundle.active` once that packaging claim is honest (a shipped binary still needs the Node
+   launcher today). App icons under `src-tauri/icons/` are generated from the Inference Advocate
+   mark (`npm run tauri icon` against `packages/ui/public/app-icon-1024.png`).

@@ -118,6 +118,27 @@ a:hover {
   padding: 14px 12px;
 }
 
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px 12px;
+  color: var(--text-body);
+}
+
+.sidebar-brand-mark {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+
+.sidebar-brand-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-body);
+}
+
 .btn-new-session {
   width: 100%;
   cursor: pointer;
@@ -250,6 +271,20 @@ button.session-item:not(.active):hover {
   color: oklch(0.44 0.008 70);
 }
 
+.nav-child.with-icon {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding-left: 11px;
+}
+
+.nav-icon {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  opacity: 0.85;
+}
+
 .nav-child:hover {
   background: oklch(0.93 0.004 70);
 }
@@ -327,6 +362,17 @@ button.session-item:not(.active):hover {
   border: none;
   padding: 0;
   line-height: 1;
+}
+
+.narrow-brand {
+  display: flex;
+  align-items: center;
+  color: var(--text-body);
+}
+
+.narrow-brand-mark {
+  width: 18px;
+  height: 18px;
 }
 
 .narrow-header .icon.plus {
@@ -589,6 +635,16 @@ button.session-item:not(.active):hover {
 .why-label {
   font-size: 11.5px;
   color: oklch(0.55 0.008 70);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.why-icon {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  opacity: 0.8;
 }
 
 .why-value {
@@ -963,6 +1019,16 @@ button.session-item:not(.active):hover {
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.policy-title-icon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: oklch(0.40 0.04 250);
 }
 
 .policy-deck {
@@ -1001,10 +1067,21 @@ button.session-item:not(.active):hover {
 }
 
 .jurisdiction-card .lead {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
   font-size: 13px;
   line-height: 1.6;
   color: oklch(0.32 0.012 250);
   text-wrap: pretty;
+}
+
+.jurisdiction-card .lead .section-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin-top: 2px;
+  color: oklch(0.42 0.06 250);
 }
 
 .jurisdiction-card .lead strong {
@@ -1076,6 +1153,16 @@ button.session-item:not(.active):hover {
   margin: 0;
   font-size: 15px;
   font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.taxonomy-block h2 .section-icon {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: oklch(0.42 0.04 70);
 }
 
 .taxonomy-table {
@@ -1183,6 +1270,13 @@ button.session-item:not(.active):hover {
 
 .drawer-strip:hover {
   background: var(--strip-hover);
+}
+
+.drawer-strip-icon {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  color: oklch(0.42 0.04 255);
 }
 
 .drawer-strip .label {
@@ -1513,6 +1607,16 @@ button.session-item:not(.active):hover {
 
 .fabric-row .k {
   color: oklch(0.64 0.010 255);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fabric-icon {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  opacity: 0.85;
 }
 
 .fabric-row .v {

@@ -7,6 +7,12 @@
 
 import type { AdvocateState, ProviderState } from './types';
 import { splitProviderLabel } from './provider-label';
+import {
+  IconDeliveryPolicy,
+  IconJurisdiction,
+  IconServingRegister,
+  IconTaxonomy,
+} from './icons';
 
 export function MonitorPanel({
   state,
@@ -151,7 +157,10 @@ function TrustFabric({ state }: { state: AdvocateState }) {
     <div className="fabric-card">
       <h2>Trust fabric</h2>
       <div className="fabric-row">
-        <span className="k">Serving Register</span>
+        <span className="k">
+          <IconServingRegister className="fabric-icon" />
+          Serving Register
+        </span>
         <span className={`v ${state.register.signatureValid ? 'ok' : 'bad'}`}>
           {state.register.signatureValid ? 'signature verified' : 'signature INVALID'},{' '}
           {state.register.entries} entries
@@ -164,12 +173,25 @@ function TrustFabric({ state }: { state: AdvocateState }) {
         </span>
       </div>
       <div className="fabric-row">
-        <span className="k">Taxonomy</span>
+        <span className="k">
+          <IconTaxonomy className="fabric-icon" />
+          Taxonomy
+        </span>
         <span className="v">{state.taxonomy.version}</span>
       </div>
       <div className="fabric-row">
-        <span className="k">Jurisdiction</span>
+        <span className="k">
+          <IconJurisdiction className="fabric-icon" />
+          Jurisdiction
+        </span>
         <span className="v">{state.jurisdiction.name}</span>
+      </div>
+      <div className="fabric-row">
+        <span className="k">
+          <IconDeliveryPolicy className="fabric-icon" />
+          Delivery Policy
+        </span>
+        <span className="v">{state.policy.policyVersion}</span>
       </div>
       <div className="fabric-row">
         <span className="k">User attribute</span>

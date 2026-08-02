@@ -9,6 +9,7 @@
 import { useEffect, useState } from 'react';
 import type { AdvocateState } from './types';
 import { hostCall } from './host-client';
+import { IconDeliveryPolicy, IconJurisdiction, IconTaxonomy } from './icons';
 
 export function PolicyView({ state }: { state: AdvocateState | null }) {
   const [markdown, setMarkdown] = useState<string>('');
@@ -32,7 +33,10 @@ export function PolicyView({ state }: { state: AdvocateState | null }) {
       <div className="policy">
         <div className="policy-header">
           <span className="policy-eyebrow">Settings</span>
-          <h1>Delivery Policy</h1>
+          <h1>
+            <IconDeliveryPolicy className="policy-title-icon" />
+            Delivery Policy
+          </h1>
           <p className="policy-deck">
             The same file that ships in the repository is what renders here. No paraphrase written
             for the screen. If the policy is wrong, it is wrong in both places at once.
@@ -55,10 +59,13 @@ export function PolicyView({ state }: { state: AdvocateState | null }) {
         {state && (
           <div className="jurisdiction-card">
             <div className="lead">
-              <strong>
-                Jurisdiction ruleset — {state.jurisdiction.name}, {state.jurisdiction.version}:
-              </strong>{' '}
-              {state.jurisdiction.disclaimer}
+              <IconJurisdiction className="section-icon" />
+              <div>
+                <strong>
+                  Jurisdiction ruleset ({state.jurisdiction.name}, {state.jurisdiction.version}):
+                </strong>{' '}
+                {state.jurisdiction.disclaimer}
+              </div>
             </div>
 
             {state.pendingProvisions.length > 0 && (
@@ -90,7 +97,10 @@ export function PolicyView({ state }: { state: AdvocateState | null }) {
 
         {state && (
           <div className="taxonomy-block">
-            <h2>Flag taxonomy {state.taxonomy.version}</h2>
+            <h2>
+              <IconTaxonomy className="section-icon" />
+              Flag taxonomy {state.taxonomy.version}
+            </h2>
             <div className="taxonomy-table">
               <div className="taxonomy-head">
                 <span>Type</span>

@@ -238,9 +238,10 @@ and calls `HostSession` through Tauri commands over loopback RPC into a HostSess
 launcher constructed in-process (`packages/daemon/src/host-rpc.ts`). There is no HTTP listener
 for advocate operations in the desktop path, and no Node stdio IPC child. The browser-tab path
 still uses the loopback daemon. HostSession is not embedded inside the Tauri binary;
-`AIDP_DESKTOP=1` reports that gap at startup. Bundled installers (`bundle.active`) are off;
-icons are placeholders. Building the shell needs Rust and Tauri 2 system libraries
-(webkit2gtk 4.1 on Linux). See `packages/desktop/README.md`.
+`AIDP_DESKTOP=1` reports that gap at startup. Bundled installers (`bundle.active`) are off.
+App icons under `packages/desktop/src-tauri/icons/` and the web favicon set under
+`packages/ui/public/` use the Inference Advocate mark. Building the shell needs Rust and
+Tauri 2 system libraries (webkit2gtk 4.1 on Linux). See `packages/desktop/README.md`.
 
 ## Working agreements
 

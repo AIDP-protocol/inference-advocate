@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+  <title>Serving Register</title>
+  <path d="M4.8 4.5 H19.2 A1.8 1.8 0 0 1 21 6.3 V17.7 A1.8 1.8 0 0 1 19.2 19.5 H4.8"></path>
+  <path d="M4.8 19.5 A1.8 1.8 0 0 1 3 17.7 V6.3 A1.8 1.8 0 0 1 4.8 4.5" stroke-dasharray="4.285 2.1" stroke-linecap="butt"></path>
+  <circle cx="6.8" cy="9.5" r="1.05" fill="currentColor" stroke="none"></circle>
+  <circle cx="6.8" cy="14.5" r="1.05" fill="currentColor" stroke="none"></circle>
+  <path d="M10.4 9.5 H17.2"></path>
+  <path d="M10.4 14.5 H17.2"></path>
+</svg>

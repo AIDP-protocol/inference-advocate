@@ -16,6 +16,7 @@ export type HostMethod =
   | 'release'
   | 'session.new'
   | 'attestations.set'
+  | 'reputation.reset'
   | 'export';
 
 interface TauriGlobal {
@@ -57,6 +58,8 @@ export async function hostCall(
       return jsonFetch('/api/session/new', { method: 'POST', body: {} });
     case 'attestations.set':
       return jsonFetch('/api/attestations', { method: 'POST', body: params });
+    case 'reputation.reset':
+      return jsonFetch('/api/reputation/reset', { method: 'POST', body: params });
     case 'export': {
       const floor = params['floor'];
       const q =

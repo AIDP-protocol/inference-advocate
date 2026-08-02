@@ -39,6 +39,19 @@ SQLite rows and asserts conversation content is not in the ledger, and
 
 **Small, message-disciplined commits.** The history is meant to read as a build narrative.
 
+**Refresh the public demo when UI or daemon changes are viewable.** This host is the production
+demo site. When changes are ready to look at (committed or not), rebuild what the daemon serves
+and restart it so the live site updates:
+
+```bash
+npm run build:ui          # when packages/ui changed
+# also rebuild/restart if packages/daemon or core packages the daemon loads changed
+pm2 restart aidp-daemon
+```
+
+The daemon (`aidp-daemon` under PM2) serves `packages/ui/dist` from `.advocate-public` on
+127.0.0.1:8790. Do not leave the user staring at a stale build.
+
 ## Structural boundaries
 
 - `packages/core` has no UI dependency and no framework, and reaches the network only to talk

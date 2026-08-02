@@ -141,6 +141,10 @@ export class SqliteStore implements StoreBackend {
     this.raw.prepare('DELETE FROM carryover WHERE provider_id = ?').run(providerId);
   }
 
+  clearProviderLedger(providerId: string): void {
+    this.raw.prepare('DELETE FROM ledger WHERE provider_id = ?').run(providerId);
+  }
+
   upsertBlock(rec: Omit<BlockRow, 'releasedAt' | 'releasedBy'>): void {
     this.raw
       .prepare('INSERT OR REPLACE INTO blocks(provider_id, response_id, authority, raised_at) VALUES (?,?,?,?)')

@@ -4,18 +4,20 @@
 // already use. The whole apparatus is invisible when nothing is wrong, which is the design
 // goal."
 //
-// So the default state of this screen is a prompt box and a conversation. The monitor panel
-// is there, at the side, quiet, until something crosses a line. Notices are pinned at the top
-// with no close button anywhere in this file, which is the entire implementation of
-// non-dismissable.
+// Client shell is light product UI. Demo-simulation and explanatory annotation live in the
+// instrument drawer. Notices are pinned with no close button anywhere in this file, which is
+// the entire implementation of non-dismissable.
+//
+// Layout and styling from reference/Inference Advocate Client.dc.html.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AdvocateState, ExchangeResult, Notice } from './types';
 import { hostCall } from './host-client';
-import { MonitorPanel } from './MonitorPanel';
 import { PolicyView } from './PolicyView';
-import { ExportView } from './ExportView';
 import { WorkingIndicator } from './WorkingIndicator';
+import { InstrumentDrawer, type DrawerTab } from './InstrumentDrawer';
+import { ProviderPicker } from './ProviderPicker';
+import { IconDeliveryPolicy, IconInferenceAdvocate, IconRuleEvaluator } from './icons';
 
 interface Turn {
   role: 'user' | 'assistant';
@@ -23,7 +25,9 @@ interface Turn {
   result?: ExchangeResult;
 }
 
-type Tab = 'chat' | 'policy' | 'export';
+type View = 'chat' | 'policy';
+
+const NARROW_BP = 820;
 
 export function App() {
   const [state, setState] = useState<AdvocateState | null>(null);
@@ -32,8 +36,14 @@ export function App() {
   const [provider, setProvider] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>('chat');
+  const [view, setView] = useState<View>('chat');
   const [detailFor, setDetailFor] = useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerTab, setDrawerTab] = useState<DrawerTab>('monitor');
+  const [scenarioStep, setScenarioStep] = useState(8);
+  const [narrow, setNarrow] = useState(
+    () => (typeof window !== 'undefined' ? window.innerWidth < NARROW_BP : false),
+  );
 
   const refresh = useCallback(async () => {
     const next = (await hostCall('state')) as AdvocateState;
@@ -45,7 +55,16 @@ export function App() {
     refresh().catch((e: unknown) => setError(String(e)));
   }, [refresh]);
 
-  const pinnedNotices: Notice[] = useMemo(() => (state?.pinned ?? []).map((p) => p.notice), [state]);
+  useEffect(() => {
+    const onResize = () => setNarrow(window.innerWidth < NARROW_BP);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  const pinnedNotices: Notice[] = useMemo(
+    () => (state?.pinned ?? []).map((p) => p.notice),
+    [state],
+  );
 
   // Why sending is not possible right now, in words. A button that does nothing and says
   // nothing is the wrong behavior anywhere, and especially here.
@@ -75,10 +94,7 @@ export function App() {
       };
       if (body.error || !body.result) throw new Error(body.error ?? 'no result');
       const result = body.result;
-      setTurns((t) => [
-        ...t,
-        { role: 'assistant', text: result.delivered ?? '', result },
-      ]);
+      setTurns((t) => [...t, { role: 'assistant', text: result.delivered ?? '', result }]);
       await refresh();
     } catch (e) {
       setError(String(e));
@@ -108,6 +124,8 @@ export function App() {
   async function newSession() {
     await hostCall('session.new');
     setTurns([]);
+    setDetailFor(null);
+    setView('chat');
     await refresh();
   }
 
@@ -122,120 +140,218 @@ export function App() {
     }
   }
 
-  const childMode = state ? !state.attestations.isAdult : false;
+  async function resetReputation(providerId?: string) {
+    setError(null);
+    try {
+      await hostCall('reputation.reset', providerId ? { providerId } : {});
+      await refresh();
+    } catch (e) {
+      setError(String(e));
+    }
+  }
+
+  const sessionTitle = 'Chat';
 
   return (
     <div className="app">
-      <header>
-        <div className="brand">
-          <strong>Inference Advocate</strong>
-          <span className="sub">reference implementation, pre-alpha</span>
-        </div>
-        <nav>
-          <button className={tab === 'chat' ? 'on' : ''} onClick={() => setTab('chat')}>
-            Chat
-          </button>
-          <button className={tab === 'policy' ? 'on' : ''} onClick={() => setTab('policy')}>
-            Delivery Policy
-          </button>
-          <button className={tab === 'export' ? 'on' : ''} onClick={() => setTab('export')}>
-            What leaves
-          </button>
-          <button
-            className={childMode ? 'on child-mode' : ''}
-            title="Locally asserted. Not verified. Reference demo only."
-            onClick={() => void setChildMode(!childMode)}
-          >
-            {childMode ? 'Child mode on' : 'Child mode'}
-          </button>
-          <button onClick={() => void newSession()}>New session</button>
-        </nav>
-      </header>
-
-      {childMode && (
-        <div className="child-banner" role="status">
-          Child mode is on (locally asserted, not verified). Pending jurisdiction provisions for
-          users under eighteen are still not applied as law. Self-release of withheld responses is
-          refused until an adult attribute is asserted.
-        </div>
-      )}
-
-      {pinnedNotices.length > 0 && (
-        <section className="notices" aria-label="Pinned notices">
-          {pinnedNotices.map((n) => (
-            <div key={n.id} className={`notice notice-${n.source}`}>
-              <span className="tag">{n.source}</span>
-              <span>{n.text}</span>
+      <div className="app-row">
+        {!narrow && (
+          <aside className="sidebar">
+            <div className="sidebar-brand" aria-label="Inference Advocate">
+              <IconInferenceAdvocate className="sidebar-brand-mark" />
+              <span className="sidebar-brand-name">Inference Advocate</span>
             </div>
-          ))}
-        </section>
-      )}
+            <button type="button" className="btn-new-session" onClick={() => void newSession()}>
+              ＋ New session
+            </button>
 
-      <main>
-        <div className="pane">
-          {tab === 'chat' && (
-            <>
-              <div className="transcript">
-                {turns.length === 0 && (
-                  <p className="empty">
-                    Ask something. Nothing reaches this screen until the monitor has finished with it.
-                  </p>
-                )}
-                {turns.map((turn, i) => (
-                  <div key={i} className={`turn ${turn.role}`}>
-                    {turn.role === 'assistant' && turn.result ? (
+            <div className="session-list">
+              <div className="session-group">
+                <span className="session-group-label">Today</span>
+                <span className="not-built">not built</span>
+              </div>
+              <button
+                type="button"
+                className={`session-item ${view === 'chat' ? 'active' : ''}`}
+                onClick={() => setView('chat')}
+              >
+                Current session
+              </button>
+              <div className="session-group later">
+                <span className="session-group-label">Earlier</span>
+              </div>
+              <div className="session-item muted">Session history</div>
+            </div>
+
+            <nav className="sidebar-footer">
+              <button
+                type="button"
+                className={`nav-row ${view === 'chat' ? 'on' : ''}`}
+                onClick={() => setView('chat')}
+              >
+                Chat
+              </button>
+              <button
+                type="button"
+                className={`nav-row between ${view === 'policy' ? 'on' : ''}`}
+                onClick={() => setView('policy')}
+              >
+                Settings
+                <span className="chevron">▾</span>
+              </button>
+              <button
+                type="button"
+                className={`nav-child with-icon ${view === 'policy' ? 'on' : ''}`}
+                onClick={() => setView('policy')}
+              >
+                <IconDeliveryPolicy className="nav-icon" />
+                Delivery Policy
+              </button>
+              <div className="nav-badge-row">
+                <span className="nav-child muted">Providers</span>
+                <span className="not-built">not built</span>
+              </div>
+              <div className="nav-badge-row">
+                <span className="nav-child muted">Local store &amp; keys</span>
+                <span className="not-built">not built</span>
+              </div>
+              <div className="account-row">
+                <span className="account-label">
+                  <span className="account-avatar" />
+                  Account
+                </span>
+                <span className="not-built">not built</span>
+              </div>
+            </nav>
+          </aside>
+        )}
+
+        <div className="main-col">
+          {narrow && (
+            <div className="narrow-header">
+              <span className="narrow-brand" aria-hidden="true">
+                <IconInferenceAdvocate className="narrow-brand-mark" />
+              </span>
+              <span className="narrow-title">{sessionTitle}</span>
+              <button
+                type="button"
+                className="icon plus"
+                onClick={() => void newSession()}
+                aria-label="New session"
+              >
+                ＋
+              </button>
+            </div>
+          )}
+
+          {view === 'chat' && (
+            <div className="chat-pane">
+              <div className="transcript-scroller">
+                <div className="transcript-col">
+                  {pinnedNotices.length > 0 && (
+                    <section className="pinned-notices" aria-label="Pinned notices">
+                      {pinnedNotices.map((n) => (
+                        <div key={n.id} className="pinned-notice">
+                          <span className="pinned-kicker">{noticeKicker(n.source)}</span>
+                          <span className="pinned-body">{n.text}</span>
+                        </div>
+                      ))}
+                    </section>
+                  )}
+
+                  {turns.length === 0 && !busy && (
+                    <p className="empty">
+                      Ask something. Nothing reaches this screen until the monitor has finished with
+                      it.
+                    </p>
+                  )}
+
+                  {turns.map((turn, i) =>
+                    turn.role === 'user' ? (
+                      <div key={i} className="turn-user">
+                        <div className="bubble-user">{turn.text}</div>
+                      </div>
+                    ) : turn.result ? (
                       <AssistantTurn
+                        key={i}
                         result={turn.result}
                         text={turn.text}
                         open={detailFor === turn.result.responseId}
                         onToggle={() =>
-                          setDetailFor((d) => (d === turn.result!.responseId ? null : turn.result!.responseId))
+                          setDetailFor((d) =>
+                            d === turn.result!.responseId ? null : turn.result!.responseId,
+                          )
                         }
                         onRelease={(actor) => void release(turn.result!, actor)}
+                        taxonomy={state?.taxonomy.flags ?? []}
                       />
                     ) : (
-                      <p>{turn.text}</p>
-                    )}
+                      <div key={i} className="turn-assistant">
+                        <p className="assistant-body">{turn.text}</p>
+                      </div>
+                    ),
+                  )}
+
+                  {busy && <WorkingIndicator />}
+                  {error && <div className="error">{error}</div>}
+                  {blocked && !error && turns.length === 0 && <p className="empty">{blocked}</p>}
+                </div>
+              </div>
+
+              <div className="composer-wrap">
+                <div className="composer-col">
+                  <div className="composer">
+                    <textarea
+                      value={input}
+                      placeholder="Type a message"
+                      rows={1}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          void send();
+                        }
+                      }}
+                    />
+                    <ProviderPicker
+                      providers={state?.providers ?? []}
+                      value={provider}
+                      onChange={setProvider}
+                    />
+                    <button
+                      type="button"
+                      className="composer-send"
+                      onClick={() => void send()}
+                      disabled={busy || blocked !== null}
+                      title={blocked ?? 'Send'}
+                    >
+                      ↑
+                    </button>
                   </div>
-                ))}
-                {busy && <WorkingIndicator />}
+                  <span className="composer-hint">
+                    Nothing reaches this screen until the monitor has finished with it.
+                  </span>
+                </div>
               </div>
-
-              {error && <div className="error">{error}</div>}
-              {blocked && !error && <p className="empty">{blocked}</p>}
-
-              <div className="composer">
-                <select value={provider} onChange={(e) => setProvider(e.target.value)}>
-                  {(state?.providers ?? []).map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.label}
-                    </option>
-                  ))}
-                </select>
-                <textarea
-                  value={input}
-                  placeholder="Type a message"
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      void send();
-                    }
-                  }}
-                />
-                <button onClick={() => void send()} disabled={busy || blocked !== null} title={blocked ?? 'Send'}>
-                  Send
-                </button>
-              </div>
-            </>
+            </div>
           )}
 
-          {tab === 'policy' && <PolicyView state={state} />}
-          {tab === 'export' && <ExportView />}
+          {view === 'policy' && <PolicyView state={state} />}
         </div>
+      </div>
 
-        <MonitorPanel state={state} />
-      </main>
+      <InstrumentDrawer
+        open={drawerOpen}
+        tab={drawerTab}
+        state={state}
+        onOpen={() => setDrawerOpen(true)}
+        onClose={() => setDrawerOpen(false)}
+        onTab={setDrawerTab}
+        onChildMode={(child) => void setChildMode(child)}
+        onResetReputation={(providerId) => void resetReputation(providerId)}
+        scenarioStep={scenarioStep}
+        onScenarioStep={setScenarioStep}
+      />
     </div>
   );
 }
@@ -246,79 +362,171 @@ function AssistantTurn(props: {
   open: boolean;
   onToggle: () => void;
   onRelease: (actor: 'self' | 'custodian') => void;
+  taxonomy: Array<{ type: string; definition: string }>;
 }) {
-  const { result, text, open, onToggle, onRelease } = props;
+  const { result, text, open, onToggle, onRelease, taxonomy } = props;
   const kind = result.decision.kind;
+  const flagCount = result.semantic.flags.length;
+  const whyLabel = `${open ? 'hide' : 'why'} (${flagCount} flag${flagCount === 1 ? '' : 's'}, score ${result.decision.score})`;
+  const authority = result.decision.releaseAuthority;
+  const showSelf = authority === 'self_release';
+  const showCustodian = authority === 'self_release' || authority === 'custodial_release';
+  const showRelease = kind === 'withhold' && authority && authority !== 'non_releasable' && authority !== 'escalating';
+
+  const deliveryNotices =
+    kind === 'deliver_with_notice'
+      ? result.decision.notices.filter((n) => n.source === 'monitor')
+      : [];
 
   return (
-    <div className={`assistant kind-${kind}`}>
+    <div className="turn-assistant">
       {kind === 'withhold' && (
         <div className="withheld">
-          <p>
-            <strong>Withheld.</strong> This response is on your device and has not been rendered. Accumulated
-            score {result.decision.score} against a block line of {result.decision.effectiveBlock}.
+          <p className="withheld-body">
+            <strong>Withheld.</strong> This response is on your device and has not been rendered.
+            Accumulated score {result.decision.score} against a block line of{' '}
+            {result.decision.effectiveBlock}.
           </p>
-          <p className="authority">Release authority: {result.decision.releaseAuthority}</p>
-          <div className="row">
-            <button onClick={() => onRelease('self')}>Release (self)</button>
-            <button onClick={() => onRelease('custodian')}>Release (supervising party)</button>
-          </div>
+          {authority && (
+            <div className="withheld-authority">Release authority: {authority}</div>
+          )}
+          {showRelease && (
+            <div className="withheld-actions">
+              {showSelf && (
+                <button type="button" className="btn-release" onClick={() => onRelease('self')}>
+                  Release (self)
+                </button>
+              )}
+              {showCustodian && (
+                <button
+                  type="button"
+                  className="btn-release secondary"
+                  onClick={() => onRelease('custodian')}
+                >
+                  Release (supervising party)
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
+
       {kind === 'refuse' && (
         <div className="refused">
-          <strong>Refused.</strong> {result.decision.rationale.filter((r) => r.includes('refus')).join(' ')}
+          <strong>Refused.</strong>{' '}
+          {result.decision.rationale.filter((r) => r.includes('refus')).join(' ') ||
+            result.decision.rationale.join(' ')}
         </div>
       )}
-      {text && <p className="body">{text}</p>}
 
-      <button className="why" onClick={onToggle}>
-        {open ? 'hide' : 'why'} ({result.semantic.flags.length} flags, score {result.decision.score})
-      </button>
+      {deliveryNotices.map((n) => (
+        <div key={n.id} className="delivery-notice">
+          <span className="kicker">NOTICE</span>
+          <span className="body">{n.text}</span>
+        </div>
+      ))}
+
+      {kind === 'deliver_with_notice' && deliveryNotices.length === 0 && (
+        <div className="delivery-notice">
+          <span className="kicker">NOTICE</span>
+          <span className="body">
+            Window score {result.decision.score}, at the warn line of {result.decision.effectiveWarn}{' '}
+            and below the block line of {result.decision.effectiveBlock}.
+            {flagCount > 0
+              ? ` Flagged ${result.semantic.flags.map((f) => f.type.replace(/_/g, ' ')).join(' and ')}.`
+              : ''}{' '}
+            Displayed by your advocate.
+          </span>
+        </div>
+      )}
+
+      {text && <p className="assistant-body">{text}</p>}
+
+      <div className="action-row">
+        <button
+          type="button"
+          className={`why-link ${open ? 'open' : ''}`}
+          onClick={onToggle}
+        >
+          {whyLabel}
+        </button>
+        {text && (
+          <button
+            type="button"
+            className="copy-link"
+            onClick={() => void navigator.clipboard?.writeText(text)}
+          >
+            Copy
+          </button>
+        )}
+      </div>
 
       {open && (
-        <div className="detail">
-          <dl>
-            <dt>Provenance</dt>
-            <dd>
-              {result.deterministic.sealPresent
-                ? result.deterministic.sealValid
-                  ? 'sealed and verified against the Serving Register'
-                  : 'seal present and invalid'
-                : 'unsealed'}
-              {result.deterministic.endpointAuthorized ? ', endpoint authorized' : ', endpoint NOT authorized'}
-            </dd>
-            <dt>Evaluator</dt>
-            <dd>
+        <div className="why-panel">
+          <div className="why-grid">
+            <div className="why-label">Provenance</div>
+            <div className="why-value">{provenanceLine(result)}</div>
+            <div className="why-label">
+              <IconRuleEvaluator className="why-icon" />
+              Evaluator
+            </div>
+            <div className="why-value mono">
               {result.semantic.evaluatorId}@{result.semantic.evaluatorVersion}, taxonomy{' '}
               {result.semantic.taxonomyVersion}
-            </dd>
-            <dt>Flags</dt>
-            <dd>
+            </div>
+            <div className="why-label">Flags</div>
+            <div className="why-value">
               {result.semantic.flags.length === 0 && 'none'}
-              {result.semantic.flags.map((f) => (
-                <div key={f.type} className="flag">
-                  <code>
-                    {f.type} severity {f.severity}
-                  </code>
-                  <span className="basis">{f.basis}</span>
-                  {f.evidence.map((e, i) => (
-                    <blockquote key={i}>{e.text}</blockquote>
-                  ))}
-                </div>
-              ))}
-            </dd>
-            <dt>Why this outcome</dt>
-            <dd>
-              <ul>
+              {result.semantic.flags.map((f) => {
+                const def =
+                  taxonomy.find((t) => t.type === f.type)?.definition ?? f.basis;
+                return (
+                  <div key={f.type} className="flag-block">
+                    <div className="flag-head">
+                      <code>
+                        {f.type} severity {f.severity}
+                      </code>
+                      <span className="flag-basis">{def}</span>
+                    </div>
+                    {f.evidence.map((e, i) => (
+                      <div key={i} className="flag-evidence">
+                        “{e.text}”
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="why-label">Why this outcome</div>
+            <div className="why-value">
+              <ul className="rationale-list">
                 {result.decision.rationale.map((r, i) => (
                   <li key={i}>{r}</li>
                 ))}
               </ul>
-            </dd>
-          </dl>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
 }
+
+function noticeKicker(source: Notice['source']): string {
+  if (source === 'policy') return 'POLICY';
+  if (source === 'jurisdiction') return 'JURISDICTION';
+  return 'NOTICE';
+}
+
+function provenanceLine(result: ExchangeResult): string {
+  const seal = result.deterministic.sealPresent
+    ? result.deterministic.sealValid
+      ? 'sealed and verified against the Serving Register'
+      : 'seal present and invalid'
+    : 'unsealed';
+  const endpoint = result.deterministic.endpointAuthorized
+    ? 'endpoint authorized'
+    : 'endpoint NOT authorized';
+  return `${seal}, ${endpoint}`;
+}
+

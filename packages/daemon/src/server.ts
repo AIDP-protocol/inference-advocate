@@ -35,6 +35,10 @@ const MIME: Record<string, string> = {
   '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.ico': 'image/x-icon',
+  '.webmanifest': 'application/manifest+json',
+  '.xml': 'application/xml; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
 };
 
@@ -99,6 +103,12 @@ const server = createServer(async (req, res) => {
     if (url.pathname === '/api/attestations' && req.method === 'POST') {
       const body = await readBody<{ isAdult?: boolean }>(req);
       json(res, 200, await dispatchHostMethod(host, 'attestations.set', { ...body }));
+      return;
+    }
+
+    if (url.pathname === '/api/reputation/reset' && req.method === 'POST') {
+      const body = await readBody<{ providerId?: string }>(req);
+      json(res, 200, await dispatchHostMethod(host, 'reputation.reset', { ...body }));
       return;
     }
 

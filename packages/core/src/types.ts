@@ -239,6 +239,20 @@ export type StandingState = 'good' | 'elevated_scrutiny' | 'excluded' | 'unknown
 
 export type OperatingMode = 'observe' | 'annotate' | 'enforce';
 
+/** Wall-clock stages for one exchange. Paper steps 3 and 8 dominate when the evaluator is hosted. */
+export interface ExchangeTimings {
+  /** End to end inside ask(), milliseconds. */
+  totalMs: number;
+  /** Provider round trip (Interchange send). */
+  providerMs: number;
+  /** Deterministic seal/register pass. Local. */
+  deterministicMs: number;
+  /** Semantic evaluator. Hosted model evaluators are a second network hop. */
+  semanticMs: number;
+  /** Score, resolution, ledger, and transcript writes. Local. */
+  resolveMs: number;
+}
+
 /** What the advocate returns for one exchange. */
 export interface ExchangeResult {
   responseId: string;
@@ -251,4 +265,6 @@ export interface ExchangeResult {
   /** Always present locally. Withheld responses are retained as received-and-logged. */
   withheldContent?: string;
   ledgerSeq: number;
+  /** Stage timings so the UI can show where deferral latency went. */
+  timings: ExchangeTimings;
 }

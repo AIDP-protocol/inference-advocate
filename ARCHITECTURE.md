@@ -15,7 +15,10 @@ response through fourteen steps. That path is the spine of this repository.
 packages/core          provider-agnostic library, no UI dependencies, no network beyond providers
 packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped persistence implementation
 packages/daemon        local HTTP server on 127.0.0.1, and HostSession (HTTP + desktop loopback RPC)
-packages/ui            React chat surface
+packages/ui            React chat surface. Product chrome is ordinary chat; the monitor
+                       (including a demo-only reputation reset), export view, scenario
+                       register, gaps, and attributes sit in a bottom instrument drawer
+                       (demonstration only).
 packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC, no HTTP for the core API)
 packages/demo          mock providers and the scripted end-to-end scenario
 data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code
@@ -161,6 +164,12 @@ That is a demonstration of the attribute path, not verification. The banner says
 `minorOnly` jurisdiction provisions still do not tighten thresholds when Child mode is on;
 what does change immediately is that self-release of a withheld response is refused.
 
+**Demo reputation reset.** After a block, carryover and the rolling window normally decay only
+through clean responses. The instrument drawer's Monitor tab exposes a reference-only control
+that clears a provider's ledger accumulation and carryover so a demo can continue without five
+paid clean exchanges. It does not release withheld content and it is not a product path. The
+paper's recovery mechanism remains decay (Provisional Section 1.8).
+
 **Hardware-backed keys, recovery, and the wallet.** `MasterSecret.fromPassphrase` is real
 scrypt and the per-store derivation is real HKDF, but the demo and the daemon use a development
 keyfile that sits on the same disk as the store. That is not custody, it is a note taped to the
@@ -229,9 +238,10 @@ and calls `HostSession` through Tauri commands over loopback RPC into a HostSess
 launcher constructed in-process (`packages/daemon/src/host-rpc.ts`). There is no HTTP listener
 for advocate operations in the desktop path, and no Node stdio IPC child. The browser-tab path
 still uses the loopback daemon. HostSession is not embedded inside the Tauri binary;
-`AIDP_DESKTOP=1` reports that gap at startup. Bundled installers (`bundle.active`) are off;
-icons are placeholders. Building the shell needs Rust and Tauri 2 system libraries
-(webkit2gtk 4.1 on Linux). See `packages/desktop/README.md`.
+`AIDP_DESKTOP=1` reports that gap at startup. Bundled installers (`bundle.active`) are off.
+App icons under `packages/desktop/src-tauri/icons/` and the web favicon set under
+`packages/ui/public/` use the Inference Advocate mark. Building the shell needs Rust and
+Tauri 2 system libraries (webkit2gtk 4.1 on Linux). See `packages/desktop/README.md`.
 
 ## Working agreements
 

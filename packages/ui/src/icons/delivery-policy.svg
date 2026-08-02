@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+  <title>Delivery Policy</title>
+  <path d="M6 2.6 H14.6 L19.4 7.4 V21.4 H6"></path>
+  <path d="M6 21.4 V2.6" stroke-dasharray="4.867 2.1" stroke-linecap="butt"></path>
+  <path d="M9.7 12 H12.2"></path>
+  <path d="M12.2 12 V9 H15.7"></path>
+  <path d="M12.2 12 V15 H15.7"></path>
+</svg>

@@ -128,6 +128,7 @@ export class Advocate {
 
   /** Steps 1 through 12 for one exchange. */
   async ask(opts: AskOptions): Promise<ExchangeResult> {
+    const askStarted = Date.now();
     const provider = this.#opts.providers.require(opts.providerId);
     const sessionId = opts.sessionId ?? this.#sessionId;
     const noticeState = this.#noticeStates.get(sessionId) ?? newNoticeState(this.#now().toISOString());
@@ -142,7 +143,7 @@ export class Advocate {
     // Steps 13 and 14 feeding back into step 10 before the request is even sent: a provider
     // already excluded at population level is refused connection. Provisional Section 1.4.
     if (standing === 'excluded' && this.#opts.policy.document.standingSeed.refuseExcluded) {
-      return this.#recordRefusalWithoutSend(provider.id, responseId, standing, sessionId, noticeState);
+      return this.#recordRefusalWithoutSend(provider.id, responseId, standing, sessionId, noticeState, askStarted);
     }
 
     // Step 2 and 3: attestations attached, request over the Interchange.
@@ -151,17 +152,22 @@ export class Advocate {
       ? [{ role: 'system', content: opts.systemPrompt }, ...history]
       : history;
 
+    const providerStarted = Date.now();
     const response = await sendToProvider(provider, {
       messages,
       attestations: this.#opts.attestations,
       ...(this.#opts.fetchImpl ? { fetchImpl: this.#opts.fetchImpl } : {}),
     });
+    const providerMs = Date.now() - providerStarted;
 
     // Step 7: deterministic pass.
+    const deterministicStarted = Date.now();
     const deterministic = runDeterministicPass(provider, response, this.#opts.register);
+    const deterministicMs = Date.now() - deterministicStarted;
 
     // Step 8: semantic pass. A response refused by the deterministic layer is not evaluated
     // semantically; the paper is explicit that it is refused without further evaluation.
+    const semanticStarted = Date.now();
     const semantic = deterministic.passed
       ? await this.#opts.monitor.evaluate({
           content: response.content,
@@ -169,8 +175,10 @@ export class Advocate {
           providerId: provider.id,
         })
       : { flags: [], evaluatorId: 'none', evaluatorVersion: 'none', taxonomyVersion: this.#opts.monitor.taxonomyVersion };
+    const semanticMs = Date.now() - semanticStarted;
 
     // Steps 10 and 11: score and resolution.
+    const resolveStarted = Date.now();
     const { decision, adjustedFlags } = resolveDelivery({
       providerId: provider.id,
       deterministic,
@@ -236,6 +244,7 @@ export class Advocate {
       });
     }
 
+    const resolveMs = Date.now() - resolveStarted;
     const delivered = decision.kind === 'deliver' || decision.kind === 'deliver_with_notice' ? response.content : null;
     const result: ExchangeResult = {
       responseId,
@@ -245,6 +254,13 @@ export class Advocate {
       semantic: { ...semantic, flags: adjustedFlags },
       delivered,
       ledgerSeq: entry.seq,
+      timings: {
+        totalMs: Date.now() - askStarted,
+        providerMs,
+        deterministicMs,
+        semanticMs,
+        resolveMs,
+      },
     };
     if (delivered === null) result.withheldContent = response.content;
     return result;
@@ -256,6 +272,7 @@ export class Advocate {
     standing: StandingState,
     _sessionId: string,
     _noticeState: NoticeState,
+    askStarted = Date.now(),
   ): ExchangeResult {
     const at = this.#now().toISOString();
     const entry = this.ledger.append({
@@ -298,7 +315,23 @@ export class Advocate {
       semantic: { flags: [], evaluatorId: 'none', evaluatorVersion: 'none', taxonomyVersion: this.#opts.monitor.taxonomyVersion },
       delivered: null,
       ledgerSeq: entry.seq,
+      timings: {
+        totalMs: Date.now() - askStarted,
+        providerMs: 0,
+        deterministicMs: 0,
+        semanticMs: 0,
+        resolveMs: Date.now() - askStarted,
+      },
     };
+  }
+
+  /**
+   * Clear a provider's rolling score and carryover so the next exchange is not still on edge
+   * from a prior demo block. Reference only: not a product override, and it does not release
+   * withheld content. Exposed only through the instrument drawer.
+   */
+  resetProviderReputation(providerId: string): void {
+    this.ledger.resetReputation(providerId);
   }
 
   /**

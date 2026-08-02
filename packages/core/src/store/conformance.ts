@@ -84,6 +84,34 @@ function carryoverAndBlocks(store: StoreBackend): void {
   assert.equal(ledger.openBlocks('p1').length, 1);
   ledger.releaseBlock('p1', 'r-block', 'self', '2026-07-28T00:01:00.000Z');
   assert.equal(ledger.openBlocks('p1').length, 0);
+
+  ledger.append({
+    providerId: 'p1',
+    responseId: 'r-acc',
+    at: '2026-07-28T00:02:00.000Z',
+    flags: [{ type: 'sycophancy', severity: 2, evidenceRef: 'e-acc' }],
+    outcome: 'withhold',
+    score: 2,
+    evaluatorVersion: 'test@1',
+    taxonomyVersion: 'v0.1.0',
+  });
+  ledger.setCarryover({
+    providerId: 'p1',
+    multiplier: 1,
+    cleanRemaining: 5,
+    setAt: '2026-07-28T00:02:00.000Z',
+  });
+  ledger.raiseBlock({
+    providerId: 'p1',
+    responseId: 'r-acc',
+    authority: 'self_release',
+    raisedAt: '2026-07-28T00:02:00.000Z',
+  });
+  ledger.resetReputation('p1');
+  assert.equal(ledger.recent('p1', 10).length, 0);
+  assert.equal(ledger.getCarryover('p1'), undefined);
+  assert.equal(ledger.openBlocks('p1').length, 1, 'reset leaves open blocks for release');
+  assert.deepEqual(ledger.verifyChain('p1'), { ok: true });
   store.close();
 }
 

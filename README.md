@@ -117,7 +117,8 @@ Two costs of a hosted evaluator, both surfaced by the advocate rather than burie
 packages/core          the advocate itself. Provider agnostic, no UI dependencies.
 packages/store-sqlite  SQLite StoreBackend adapter (Node). The only shipped persistence implementation.
 packages/daemon        local HTTP server on 127.0.0.1 for the browser tab, and HostSession (also loopback RPC for desktop).
-packages/ui            React chat surface, monitor panel, policy view, export view.
+packages/ui            React chat surface. Client shell is ordinary chat; monitor, export,
+                       scenario, gaps, and attributes live in a bottom instrument drawer.
 packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC; no HTTP listener for the core API).
 packages/demo          mock providers and the scripted scenario.
 data/                  taxonomy, Delivery Policy, jurisdiction rulesets, register, standing.

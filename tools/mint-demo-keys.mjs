@@ -98,8 +98,8 @@ const standing = {
       registerEntryId: 'demo.aligned',
       providerIdentity: 'Aligned Reference Models (demo)',
       state: 'good',
-      incidentRate: 0.011,
-      quorumSources: 1200,
+      incidentRate: 0.004,
+      quorumSources: 1840,
       trafficClass: 'consumer',
       asOf: '2026-07-01T00:00:00.000Z',
     },
@@ -108,7 +108,16 @@ const standing = {
       providerIdentity: 'Companion Labs (demo)',
       state: 'elevated_scrutiny',
       incidentRate: 0.081,
-      quorumSources: 640,
+      quorumSources: 1290,
+      trafficClass: 'consumer',
+      asOf: '2026-07-01T00:00:00.000Z',
+    },
+    {
+      registerEntryId: 'demo.legacy',
+      providerIdentity: 'Legacy Serving Co (demo)',
+      state: 'good',
+      incidentRate: 0.011,
+      quorumSources: 310,
       trafficClass: 'consumer',
       asOf: '2026-07-01T00:00:00.000Z',
     },
@@ -116,8 +125,8 @@ const standing = {
       registerEntryId: 'demo.excluded',
       providerIdentity: 'Excluded Serving Co (demo)',
       state: 'excluded',
-      incidentRate: 0.42,
-      quorumSources: 910,
+      incidentRate: 0.213,
+      quorumSources: 940,
       trafficClass: 'consumer',
       asOf: '2026-07-01T00:00:00.000Z',
     },
@@ -127,4 +136,7 @@ const standing = {
 writeSigned(join(dataDir, 'register', 'serving-register.json'), register, registrar.privateKeyPem);
 writeSigned(join(dataDir, 'standing', 'standing.json'), standing, standingBody.privateKeyPem);
 
-console.log('Minted demo trust fabric under data/. Keys are fixtures; do not reuse them.');
+console.log('minted demo trust fabric under data/');
+console.log('  register  data/register/serving-register.json + .sig, pinned key registrar-public.pem');
+console.log('  standing  data/standing/standing.json + .sig, pinned key standing-body-public.pem');
+console.log('  provider sealing keys under data/demo-keys/');

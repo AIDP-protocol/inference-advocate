@@ -44,7 +44,9 @@ function scriptedProvider(script: string[], keys?: { privateKeyPem: string; entr
           selector: 's1',
           model: keys.model,
           providerIdentity: 'test',
-          signedAt: '2026-07-28T00:00:00.000Z',
+          // Sealed at serving time. A fixed timestamp here would be stale against the
+          // response's real receipt time and would trip the freshness rule.
+          signedAt: new Date().toISOString(),
           content,
         },
         keys.privateKeyPem,

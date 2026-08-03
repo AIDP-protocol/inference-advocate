@@ -70,7 +70,7 @@ function build(opts: {
 }) {
   const keys = generateSealKeypair();
   const register = ServingRegister.fromDocument({
-    aidpRegisterVersion: '0.1',
+    aidpRegisterVersion: '1',
     issuedAt: '2026-07-01T00:00:00.000Z',
     registrar: { id: 'test', publicKeyPem: 'unused' },
     entries: [

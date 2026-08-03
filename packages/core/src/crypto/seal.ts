@@ -33,10 +33,28 @@ export interface SealSubject {
 }
 
 /**
+ * Header field values are joined with LF, so a value containing LF or CR could forge a
+ * header line inside the signed region and make two conforming implementations agree on
+ * different parses of the same bytes. Field values are therefore constrained. `content` is
+ * exempt: it is last and its byte length is bound in the header block above it.
+ */
+function assertNoLineBreak(field: string, value: string): void {
+  if (/[\r\n]/.test(value)) {
+    throw new Error(`seal field ${field} contains a line break`);
+  }
+}
+
+/**
  * Canonical bytes over which the signature is computed. Field order is fixed here rather
  * than taken from object iteration order, so that two implementations agree.
  */
 export function canonicalSealPayload(s: SealSubject): Buffer {
+  assertNoLineBreak('register-entry', s.registerEntryId);
+  assertNoLineBreak('selector', s.selector);
+  assertNoLineBreak('model', s.model);
+  assertNoLineBreak('provider', s.providerIdentity);
+  assertNoLineBreak('signed-at', s.signedAt);
+
   const lines = [
     'aidp-seal/v1',
     `register-entry:${s.registerEntryId}`,

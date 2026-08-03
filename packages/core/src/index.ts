@@ -44,13 +44,18 @@ export { ProviderRegistry, type ProvidersFile } from './interchange/providers.js
 
 export {
   ServingRegister,
+  endpointMatches,
   type RegisterDocument,
   type RegisterEntry,
   type RegisterKey,
   type EntryStatus,
   type KeyStatus,
 } from './monitor/register.js';
-export { runDeterministicPass } from './monitor/deterministic.js';
+export {
+  runDeterministicPass,
+  MAX_SEAL_AGE_MS,
+  MAX_SEAL_FUTURE_SKEW_MS,
+} from './monitor/deterministic.js';
 export { Taxonomy, type TaxonomyDocument, type FlagDefinition, type Criterion } from './monitor/taxonomy.js';
 export { SemanticMonitor, type Evaluator, type EvaluationRequest } from './monitor/semantic.js';
 export { RuleEvaluator } from './monitor/evaluators/rule-evaluator.js';

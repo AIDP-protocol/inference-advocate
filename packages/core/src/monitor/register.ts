@@ -36,6 +36,7 @@ export interface RegisterEntry {
 }
 
 export interface RegisterDocument {
+  /** Register format version. draft-flores-aidp-provenance Section 4.1 defines "1". */
   aidpRegisterVersion: string;
   issuedAt: string;
   registrar: { id: string; publicKeyPem: string };

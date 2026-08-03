@@ -10,13 +10,66 @@ import type { DeterministicFinding, DeterministicVerdict, ProviderConfig, Provid
 import { verifySeal } from '../crypto/seal.js';
 import type { ServingRegister } from './register.js';
 
+/**
+ * Tolerance for a seal dated after the response arrived. Signing precedes receipt, so any
+ * forward offset is clock skew between the provider and the advocate.
+ */
+export const MAX_SEAL_FUTURE_SKEW_MS = 300_000;
+
+/**
+ * How stale a seal may be relative to the response that carried it. Without this bound a
+ * captured seal replays against its content forever.
+ */
+export const MAX_SEAL_AGE_MS = 3_600_000;
+
+/**
+ * Freshness is measured against the response's own receipt time rather than wall clock, so
+ * that verifying a stored exchange from the ledger produces the same verdict it produced on
+ * the delivery path.
+ */
+function sealFreshness(signedAt: string, receivedAt: string): DeterministicFinding | undefined {
+  const signed = Date.parse(signedAt);
+  const received = Date.parse(receivedAt);
+  if (Number.isNaN(signed)) {
+    return {
+      code: 'seal_malformed',
+      detail: `seal signed-at ${signedAt} is not a parseable timestamp`,
+      refuses: true,
+    };
+  }
+  if (Number.isNaN(received)) return undefined;
+
+  const offset = signed - received;
+  if (offset > MAX_SEAL_FUTURE_SKEW_MS) {
+    return {
+      code: 'seal_not_fresh',
+      detail: `seal is dated ${Math.round(offset / 1000)}s after the response was received`,
+      refuses: true,
+    };
+  }
+  if (-offset > MAX_SEAL_AGE_MS) {
+    return {
+      code: 'seal_not_fresh',
+      detail: `seal is ${Math.round(-offset / 1000)}s older than the response that carried it`,
+      refuses: true,
+    };
+  }
+  return undefined;
+}
+
 export function runDeterministicPass(
   provider: ProviderConfig,
   response: ProviderResponse,
   register: ServingRegister,
 ): DeterministicVerdict {
   const findings: DeterministicFinding[] = [];
-  const entryId = response.seal?.registerEntryId ?? provider.registerEntryId;
+
+  // The register entry is selected from the provider the advocate intended to contact, never
+  // from the response. Letting response.seal.registerEntryId choose the entry would let a
+  // response name the authority that vouches for it, which is the attack DKIM's d= field
+  // invites when a verifier trusts it without binding it to what it expected. A seal that
+  // claims a different entry than the one selected is a refusing finding, not a redirect.
+  const entryId = provider.registerEntryId;
   const entry = entryId ? register.entry(entryId) : undefined;
 
   if (entryId && !entry) {
@@ -50,6 +103,18 @@ export function runDeterministicPass(
   } else {
     const seal = response.seal!;
     const key = entry ? register.key(entry.id, seal.selector) : undefined;
+
+    if (entryId && seal.registerEntryId !== entryId) {
+      findings.push({
+        code: 'seal_entry_mismatch',
+        detail: `seal claims register entry ${seal.registerEntryId}, but the advocate contacted ${entryId}`,
+        refuses: true,
+      });
+    }
+
+    const freshness = sealFreshness(seal.signedAt, response.receivedAt);
+    if (freshness) findings.push(freshness);
+
     if (!entry) {
       // Already recorded as unknown entry above, or no entry claimed at all.
       if (!entryId) {

@@ -122,6 +122,8 @@ export type DeterministicFindingCode =
   | 'seal_signature_invalid'
   | 'seal_key_unknown'
   | 'seal_model_mismatch'
+  | 'seal_entry_mismatch'
+  | 'seal_not_fresh'
   | 'endpoint_not_authorized'
   | 'register_entry_unknown'
   | 'register_entry_revoked';

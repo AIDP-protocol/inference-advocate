@@ -23,7 +23,7 @@ export interface RegisterEntry {
   id: string;
   providerIdentity: string;
   status: EntryStatus;
-  /** Endpoints authorized to serve this provider's models. Prefix matched against what was contacted. */
+  /** Endpoints authorized to serve this provider's models. Matched by endpointMatches below. */
   authorizedEndpoints: string[];
   models: string[];
   keys: RegisterKey[];
@@ -46,6 +46,29 @@ export interface RegisterLoadResult {
   document: RegisterDocument;
   /** False when the detached signature does not verify against the pinned registrar key. */
   signatureValid: boolean;
+}
+
+/** Trailing slashes carry no authority meaning; strip them before comparing paths. */
+function normalizedPath(u: URL): string {
+  return u.pathname.replace(/\/+$/, '');
+}
+
+export function endpointMatches(registeredBase: string, contactedUrl: string): boolean {
+  let base: URL;
+  let contacted: URL;
+  try {
+    base = new URL(registeredBase);
+    contacted = new URL(contactedUrl);
+  } catch {
+    return false;
+  }
+  if (base.username || base.password || contacted.username || contacted.password) return false;
+  if (base.origin !== contacted.origin) return false;
+  if (base.origin === 'null' || contacted.origin === 'null') return false;
+
+  const basePath = normalizedPath(base);
+  const contactedPath = normalizedPath(contacted);
+  return contactedPath === basePath || contactedPath.startsWith(`${basePath}/`);
 }
 
 export class ServingRegister {
@@ -88,10 +111,16 @@ export class ServingRegister {
     return this.#byId.get(entryId)?.keys.find((k) => k.selector === selector && k.status !== 'retired');
   }
 
-  /** Endpoint authorization is prefix matching on the registered base URLs. */
+  /**
+   * Endpoint authorization. Raw string prefix matching would authorize
+   * https://api.example.com/v1evil against a registered https://api.example.com/v1, so both
+   * URLs are parsed and compared structurally: identical origin (scheme, host, and port, with
+   * default ports normalized by URL), and a contacted path that either equals the registered
+   * path or extends it at a segment boundary. Credentials in either URL disqualify the match.
+   */
   endpointAuthorized(entryId: string, contactedUrl: string): boolean {
     const entry = this.#byId.get(entryId);
     if (!entry) return false;
-    return entry.authorizedEndpoints.some((base) => contactedUrl.startsWith(base.replace(/\/$/, '')));
+    return entry.authorizedEndpoints.some((base) => endpointMatches(base, contactedUrl));
   }
 }

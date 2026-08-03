@@ -7,7 +7,8 @@
 // additions in places an unmodified server ignores:
 //
 //   outbound  X-AIDP-Version, X-AIDP-Attestations  (request headers)
-//   inbound   X-AIDP-Seal                          (response header, base64url JSON)
+//   inbound   AIDP-Seal                            (response header, base64url JSON)
+//             X-AIDP-Seal                          (deprecated, still accepted on read)
 //             body field aidp_seal                 (accepted as an alternative)
 //
 // A provider that knows nothing about AIDP therefore still answers, and its responses arrive
@@ -20,7 +21,18 @@ export const AIDP_VERSION = '0.1';
 
 export const HEADER_VERSION = 'x-aidp-version';
 export const HEADER_ATTESTATIONS = 'x-aidp-attestations';
-export const HEADER_SEAL = 'x-aidp-seal';
+/**
+ * The registered response field name. draft-flores-aidp-provenance Section 6.1 registers
+ * AIDP-Seal and leaves the X- form unregistered per RFC 6648.
+ */
+export const HEADER_SEAL = 'aidp-seal';
+
+/**
+ * The name earlier builds emitted. Section 6.1 permits a verifier to accept it for
+ * compatibility and requires preferring the registered name where both are present.
+ * Read only: nothing in this repository emits it.
+ */
+export const HEADER_SEAL_DEPRECATED = 'x-aidp-seal';
 
 export function encodeAttestations(pkg: AttestationPackage): string {
   return Buffer.from(JSON.stringify(pkg), 'utf8').toString('base64url');

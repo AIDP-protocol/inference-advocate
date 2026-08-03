@@ -12,6 +12,7 @@ import {
   AIDP_VERSION,
   HEADER_ATTESTATIONS,
   HEADER_SEAL,
+  HEADER_SEAL_DEPRECATED,
   HEADER_VERSION,
   decodeSeal,
   encodeAttestations,
@@ -82,7 +83,9 @@ export async function send(provider: ProviderConfig, opts: SendOptions): Promise
   const json = (await res.json()) as ChatCompletionResponse;
   const content = json.choices?.[0]?.message?.content ?? '';
 
-  const headerSeal = res.headers.get(HEADER_SEAL);
+  // Registered name first. Where both are present the registered one wins, which is what
+  // draft-flores-aidp-provenance Section 6.1 requires of a verifier.
+  const headerSeal = res.headers.get(HEADER_SEAL) ?? res.headers.get(HEADER_SEAL_DEPRECATED);
   const seal = headerSeal ? decodeSeal(headerSeal) : json.aidp_seal;
 
   const response: ProviderResponse = {

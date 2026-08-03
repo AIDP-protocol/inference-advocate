@@ -5,8 +5,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  decodeSeal,
+  encodeSeal,
   endpointMatches,
   generateSealKeypair,
+  HEADER_SEAL,
+  HEADER_SEAL_DEPRECATED,
   runDeterministicPass,
   ServingRegister,
   signSeal,
@@ -16,7 +20,7 @@ import type { ProviderResponse } from '@aidp/core';
 const registerFixture = () => {
   const provider = generateSealKeypair();
   const register = ServingRegister.fromDocument({
-    aidpRegisterVersion: '0.1',
+    aidpRegisterVersion: '1',
     issuedAt: '2026-07-01T00:00:00.000Z',
     registrar: { id: 'test', publicKeyPem: 'unused' },
     entries: [
@@ -180,4 +184,53 @@ test('endpoint authorization does not treat a path prefix as a segment boundary'
   assert.equal(endpointMatches('https://api.example.com/v1', 'https://api.example.com:8443/v1'), false);
   assert.equal(endpointMatches('https://api.example.com/v1', 'https://user:pw@api.example.com/v1'), false);
   assert.equal(endpointMatches('https://api.example.com/v1', 'not a url'), false);
+});
+
+test('the deprecated seal field name is still read, and the registered name wins', () => {
+  const keys = generateSealKeypair();
+  const seal = signSeal(
+    {
+      registerEntryId: 'e.sealed',
+      selector: 's1',
+      model: 'm1',
+      providerIdentity: 'Sealed Co',
+      signedAt: '2026-07-28T00:00:00.000Z',
+      content: 'registered',
+    },
+    keys.privateKeyPem,
+  );
+  const other = signSeal(
+    {
+      registerEntryId: 'e.sealed',
+      selector: 's1',
+      model: 'm1',
+      providerIdentity: 'Sealed Co',
+      signedAt: '2026-07-28T00:00:00.000Z',
+      content: 'deprecated',
+    },
+    keys.privateKeyPem,
+  );
+
+  assert.notEqual(HEADER_SEAL, HEADER_SEAL_DEPRECATED);
+  assert.equal(HEADER_SEAL, 'aidp-seal');
+
+  // Where only the deprecated name is present, it is still read.
+  const legacyOnly = new Headers({ [HEADER_SEAL_DEPRECATED]: encodeSeal(other) });
+  assert.equal(
+    decodeSeal(legacyOnly.get(HEADER_SEAL) ?? legacyOnly.get(HEADER_SEAL_DEPRECATED)!)?.providerIdentity,
+    'Sealed Co',
+  );
+
+  // Where both are present, the registered name is the one that resolves.
+  const both = new Headers({
+    [HEADER_SEAL]: encodeSeal(seal),
+    [HEADER_SEAL_DEPRECATED]: encodeSeal(other),
+  });
+  const chosen = both.get(HEADER_SEAL) ?? both.get(HEADER_SEAL_DEPRECATED);
+  assert.equal(chosen, encodeSeal(seal));
+});
+
+test('the shipped register document declares the version the specification fixes', () => {
+  const register = registerFixture().register;
+  assert.equal(register.document.aidpRegisterVersion, '1');
 });

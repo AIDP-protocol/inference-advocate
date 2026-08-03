@@ -11,6 +11,17 @@ import { ALIGNED_SCRIPT, COMPANION_RECOVERY, COMPANION_SCRIPT, LEGACY_SCRIPT } f
 
 const dataDir = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'data');
 
+/**
+ * Which response from the aligned mock starts naming a model its register entry does not
+ * list. The scripted demo puts this at 5, after four clean turns. Here it is 2, because the
+ * interactive path is driven by someone typing and the deterministic refusal is the thing
+ * worth reaching quickly: one verified delivery, then the same provider caught substituting.
+ *
+ * The count is per process. Restart the mocks between runs or the first response of the
+ * second run is already past the line.
+ */
+const ALIGNED_SUBSTITUTES_FROM = 2;
+
 const running = await Promise.all([
   startMockProvider({
     port: 8811,
@@ -22,6 +33,7 @@ const running = await Promise.all([
       privateKeyPem: readFileSync(join(dataDir, 'demo-keys', 'provider-aligned-private.pem'), 'utf8'),
       providerIdentity: 'Aligned Reference Models (demo)',
     },
+    substituteFrom: { response: ALIGNED_SUBSTITUTES_FROM, model: 'aligned-1-turbo' },
   }),
   startMockProvider({
     port: 8812,
@@ -38,6 +50,10 @@ const running = await Promise.all([
 ]);
 
 for (const s of running) console.log(`mock provider on ${s.baseUrl}`);
+console.log(
+  `aligned-1 seals as aligned-1-turbo from response ${ALIGNED_SUBSTITUTES_FROM} onward; ` +
+    'demo.aligned is not registered to serve it',
+);
 console.log('ctrl-c to stop');
 
 process.on('SIGINT', () => {

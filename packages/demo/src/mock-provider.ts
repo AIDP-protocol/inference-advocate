@@ -17,6 +17,19 @@ export interface MockProviderOptions {
   /** Responses served in order. The last one repeats once the script runs out. */
   script: string[];
   seal?: { registerEntryId: string; selector: string; privateKeyPem: string; providerIdentity: string };
+  /**
+   * From this response onward (1-based), the seal names a model other than the one the caller
+   * asked for. Signing stays honest, so the signature still verifies. What fails is the claim,
+   * against the models the register entry lists (`seal_model_mismatch`, monitor/deterministic.ts).
+   *
+   * This is silent model substitution in the only form an advocate can catch it. The unsigned
+   * response body keeps reporting the requested model, which is the field every client trusts
+   * today, so the two disagree and only one of them is signed.
+   *
+   * Requires `seal`. Without one there is nothing to compare against and the substitution is
+   * undetectable, which is the present state of the world rather than a case to demonstrate.
+   */
+  substituteFrom?: { response: number; model: string };
 }
 
 export interface RunningMockProvider {
@@ -40,6 +53,9 @@ export function startMockProvider(opts: MockProviderOptions): Promise<RunningMoc
       const content = opts.script[Math.min(served, opts.script.length - 1)] ?? '';
       served += 1;
 
+      const substituting = Boolean(opts.substituteFrom && served >= opts.substituteFrom.response);
+      const sealedModel = substituting ? opts.substituteFrom!.model : opts.model;
+
       const headers: Record<string, string> = { 'content-type': 'application/json' };
       if (opts.seal) {
         headers[HEADER_SEAL] = encodeSeal(
@@ -47,7 +63,7 @@ export function startMockProvider(opts: MockProviderOptions): Promise<RunningMoc
             {
               registerEntryId: opts.seal.registerEntryId,
               selector: opts.seal.selector,
-              model: opts.model,
+              model: sealedModel,
               providerIdentity: opts.seal.providerIdentity,
               signedAt: new Date().toISOString(),
               content,
@@ -59,6 +75,8 @@ export function startMockProvider(opts: MockProviderOptions): Promise<RunningMoc
       res.writeHead(200, headers).end(
         JSON.stringify({
           id: `mock-${served}`,
+          // Deliberately the requested model even while substituting. An unsigned field says
+          // whatever the party sending it wants it to say, which is why the seal exists.
           model: opts.model,
           choices: [{ message: { role: 'assistant', content } }],
         }),

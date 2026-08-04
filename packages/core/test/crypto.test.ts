@@ -13,6 +13,7 @@ import {
 } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import {
+  canonicalAirpSealPayload,
   generateSealKeypair,
   MasterSecret,
   StoreKey,
@@ -94,37 +95,66 @@ test('StoreKey opens AES-GCM values sealed by node:crypto and vice versa', () =>
 
 test('a provenance seal verifies over the exact content and fails on a single changed character', () => {
   const { publicKeyPem, privateKeyPem } = generateSealKeypair();
-  const content = 'The answer is forty two.';
+  const content = new TextEncoder().encode('The answer is forty two.');
   const seal = signSeal(
     {
       registerEntryId: 'demo.aligned',
       selector: 's1',
       model: 'aligned-1',
       providerIdentity: 'Aligned Reference Models (demo)',
+      exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
+      requestDigest: 'sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       signedAt: '2026-07-28T00:00:00.000Z',
       content,
     },
     privateKeyPem,
   );
   assert.equal(verifySeal(seal, content, publicKeyPem), true);
-  assert.equal(verifySeal(seal, content.replace('forty two', 'forty three'), publicKeyPem), false);
+  const tampered = new TextEncoder().encode('The answer is forty three.');
+  assert.equal(verifySeal(seal, tampered, publicKeyPem), false);
 });
 
 test('a seal does not verify under another provider key', () => {
   const a = generateSealKeypair();
   const b = generateSealKeypair();
+  const content = new TextEncoder().encode('hello');
   const seal = signSeal(
     {
       registerEntryId: 'demo.aligned',
       selector: 's1',
       model: 'aligned-1',
       providerIdentity: 'x',
+      exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
+      requestDigest: 'sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       signedAt: '2026-07-28T00:00:00.000Z',
-      content: 'hello',
+      content,
     },
     a.privateKeyPem,
   );
-  assert.equal(verifySeal(seal, 'hello', b.publicKeyPem), false);
+  assert.equal(verifySeal(seal, content, b.publicKeyPem), false);
+});
+
+test('canonical payload appends content octets without re-encoding', () => {
+  const { publicKeyPem, privateKeyPem } = generateSealKeypair();
+  // Non-UTF-8 body: lone continuation byte.
+  const content = new Uint8Array([0x80, 0xff, 0x00, 0x41]);
+  const subject = {
+    registerEntryId: 'demo.aligned',
+    selector: 's1',
+    model: 'aligned-1',
+    providerIdentity: 'x',
+    exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
+    requestDigest: 'sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    signedAt: '2026-07-28T00:00:00.000Z',
+    content,
+  };
+  const seal = signSeal(subject, privateKeyPem);
+  assert.equal(verifySeal(seal, content, publicKeyPem), true);
+  const payload = canonicalAirpSealPayload(subject);
+  assert.deepEqual(payload.slice(payload.byteLength - content.byteLength), content);
+  const header = new TextDecoder().decode(payload.slice(0, payload.byteLength - content.byteLength));
+  assert.ok(header.startsWith('airp-seal/v1\n'));
+  assert.ok(header.endsWith(`content-length:${content.byteLength}\n\n`));
 });
 
 test('detached document signatures detect a rewritten register', () => {
@@ -139,29 +169,29 @@ test('vendored Ed25519 verifies seals and documents produced by node:crypto', ()
   const { publicKey, privateKey } = generateKeyPairSync('ed25519');
   const publicKeyPem = publicKey.export({ type: 'spki', format: 'pem' }).toString();
   const privateKeyPem = privateKey.export({ type: 'pkcs8', format: 'pem' }).toString();
-  const content = 'node-minted seal body';
+  const content = new TextEncoder().encode('node-minted seal body');
   const subject = {
     registerEntryId: 'demo.aligned',
     selector: 's1',
     model: 'aligned-1',
     providerIdentity: 'node',
+    exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
+    requestDigest: 'sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     signedAt: '2026-07-28T00:00:00.000Z',
     content,
   };
-  const payload = Buffer.from(
-    [
-      'aidp-seal/v1',
-      `register-entry:${subject.registerEntryId}`,
-      `selector:${subject.selector}`,
-      `model:${subject.model}`,
-      `provider:${subject.providerIdentity}`,
-      `signed-at:${subject.signedAt}`,
-      `content-length:${Buffer.byteLength(content, 'utf8')}`,
-      '',
-      content,
-    ].join('\n'),
-    'utf8',
-  );
+  const header =
+    'airp-seal/v1\n' +
+    `register-entry:${subject.registerEntryId}\n` +
+    `selector:${subject.selector}\n` +
+    `model:${subject.model}\n` +
+    `provider:${subject.providerIdentity}\n` +
+    `exchange-id:${subject.exchangeId}\n` +
+    `request-digest:${subject.requestDigest}\n` +
+    `signed-at:${subject.signedAt}\n` +
+    `content-length:${content.byteLength}\n` +
+    '\n';
+  const payload = Buffer.concat([Buffer.from(header, 'utf8'), Buffer.from(content)]);
   const nodeSealSig = sign(null, payload, privateKey).toString('base64url');
   assert.equal(
     verifySeal(
@@ -170,6 +200,8 @@ test('vendored Ed25519 verifies seals and documents produced by node:crypto', ()
         selector: subject.selector,
         model: subject.model,
         providerIdentity: subject.providerIdentity,
+        exchangeId: subject.exchangeId,
+        requestDigest: subject.requestDigest,
         signedAt: subject.signedAt,
         alg: 'ed25519',
         signature: nodeSealSig,
@@ -187,32 +219,32 @@ test('vendored Ed25519 verifies seals and documents produced by node:crypto', ()
 
 test('node:crypto verifies seals and documents produced by vendored Ed25519', () => {
   const { publicKeyPem, privateKeyPem } = generateSealKeypair();
-  const content = 'advocate-minted seal body';
+  const content = new TextEncoder().encode('advocate-minted seal body');
   const seal = signSeal(
     {
       registerEntryId: 'demo.aligned',
       selector: 's1',
       model: 'aligned-1',
       providerIdentity: 'advocate',
+      exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
+      requestDigest: 'sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       signedAt: '2026-07-28T00:00:00.000Z',
       content,
     },
     privateKeyPem,
   );
-  const payload = Buffer.from(
-    [
-      'aidp-seal/v1',
-      `register-entry:${seal.registerEntryId}`,
-      `selector:${seal.selector}`,
-      `model:${seal.model}`,
-      `provider:${seal.providerIdentity}`,
-      `signed-at:${seal.signedAt}`,
-      `content-length:${Buffer.byteLength(content, 'utf8')}`,
-      '',
-      content,
-    ].join('\n'),
-    'utf8',
-  );
+  const header =
+    'airp-seal/v1\n' +
+    `register-entry:${seal.registerEntryId}\n` +
+    `selector:${seal.selector}\n` +
+    `model:${seal.model}\n` +
+    `provider:${seal.providerIdentity}\n` +
+    `exchange-id:${seal.exchangeId}\n` +
+    `request-digest:${seal.requestDigest}\n` +
+    `signed-at:${seal.signedAt}\n` +
+    `content-length:${content.byteLength}\n` +
+    '\n';
+  const payload = Buffer.concat([Buffer.from(header, 'utf8'), Buffer.from(content)]);
   assert.equal(
     verify(null, payload, createPublicKey(publicKeyPem), Buffer.from(seal.signature, 'base64url')),
     true,

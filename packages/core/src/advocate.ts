@@ -35,8 +35,10 @@ import { LedgerStore } from './store/ledger.js';
 import { PreferenceStore } from './store/preferences.js';
 import { ProviderRegistry } from './interchange/providers.js';
 import { send as sendToProvider } from './interchange/openai-adapter.js';
-import { ServingRegister } from './monitor/register.js';
+import { ServingRegister, computeKeySetDigest } from './monitor/register.js';
 import { runDeterministicPass } from './monitor/deterministic.js';
+import { lookupAirpBinding } from './monitor/dns-binding.js';
+import { defaultContentBindings } from './monitor/content-bindings.js';
 import { SemanticMonitor } from './monitor/semantic.js';
 import { DeliveryPolicy } from './policy/config.js';
 import { Jurisdiction } from './policy/jurisdiction.js';
@@ -160,9 +162,40 @@ export class Advocate {
     });
     const providerMs = Date.now() - providerStarted;
 
-    // Step 7: deterministic pass.
+    // Step 7: deterministic pass. DNS may confirm the entry and its key set; absence leaves
+    // the attribution unconfirmed rather than refused. Spec §4.7 / §6.3.
     const deterministicStarted = Date.now();
-    const deterministic = runDeterministicPass(provider, response, this.#opts.register);
+    const configuredEntry = provider.registerEntryId
+      ? this.#opts.register.entry(provider.registerEntryId)
+      : undefined;
+    let effectiveProvider = provider;
+    const passOpts: Parameters<typeof runDeterministicPass>[3] = {};
+
+    if (configuredEntry?.identityDomain) {
+      const dns = await lookupAirpBinding(configuredEntry.identityDomain);
+      if (dns.ok) {
+        const dnsEntry = this.#opts.register.entry(dns.binding.entryId);
+        if (dnsEntry) {
+          effectiveProvider = { ...provider, registerEntryId: dns.binding.entryId };
+          if (dns.binding.keySetDigest) {
+            passOpts.keySetDigestFromDns = dns.binding.keySetDigest;
+            passOpts.keySetDigestComputed = computeKeySetDigest(dnsEntry);
+          }
+        }
+        if (dnsEntry?.contentBinding && !defaultContentBindings.has(dnsEntry.contentBinding)) {
+          passOpts.unknownContentBinding = true;
+        }
+      }
+    } else if (configuredEntry?.contentBinding && !defaultContentBindings.has(configuredEntry.contentBinding)) {
+      passOpts.unknownContentBinding = true;
+    }
+
+    const deterministic = runDeterministicPass(
+      effectiveProvider,
+      response,
+      this.#opts.register,
+      passOpts,
+    );
     const deterministicMs = Date.now() - deterministicStarted;
 
     // Step 8: semantic pass. A response refused by the deterministic layer is not evaluated
@@ -311,6 +344,7 @@ export class Advocate {
         sealValid: false,
         endpointAuthorized: false,
         findings: [],
+        attribution: 'none',
       },
       semantic: { flags: [], evaluatorId: 'none', evaluatorVersion: 'none', taxonomyVersion: this.#opts.monitor.taxonomyVersion },
       delivered: null,

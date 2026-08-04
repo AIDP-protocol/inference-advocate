@@ -1,6 +1,6 @@
 {
   "airpRegisterVersion": "1",
-  "issuedAt": "2026-07-01T00:00:00.000Z",
+  "issuedAt": "2026-08-04T19:36:47.260Z",
   "registrar": {
     "id": "demo-registrar",
     "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo5LqGJ4KMaIsrcIFk6tpQDVAX7WLfbAtZrsURQZ+OPo=\n-----END PUBLIC KEY-----\n"
@@ -69,6 +69,48 @@
       ],
       "keys": [],
       "sealPolicy": "none"
+    },
+    {
+      "id": "honestmodel.win.entry",
+      "providerIdentity": "honestmodel.win",
+      "status": "active",
+      "authorizedEndpoints": [
+        "https://api.honestmodel.win/v1"
+      ],
+      "models": [
+        "honestmodel-1"
+      ],
+      "keys": [
+        {
+          "selector": "s1",
+          "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEABaZBjHcOia88PXF3z2xwEAX4yxrHLpwM18UkKOpeJp8=\n-----END PUBLIC KEY-----\n",
+          "status": "current"
+        }
+      ],
+      "sealPolicy": "all",
+      "contentBinding": "sse-chat-delta-v1",
+      "identityDomain": "honestmodel.win"
+    },
+    {
+      "id": "cheapai.win.entry",
+      "providerIdentity": "cheapai.win",
+      "status": "active",
+      "authorizedEndpoints": [
+        "https://api.cheapai.win/v1"
+      ],
+      "models": [
+        "cheapai-1"
+      ],
+      "keys": [
+        {
+          "selector": "s1",
+          "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAz7mh83gHPycCRfhGSvAbGyFT2nPfNyMaGJxu7GA1BlY=\n-----END PUBLIC KEY-----\n",
+          "status": "current"
+        }
+      ],
+      "sealPolicy": "all",
+      "contentBinding": "sse-chat-delta-v1",
+      "identityDomain": "cheapai.win"
     }
   ]
 }

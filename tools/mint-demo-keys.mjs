@@ -35,6 +35,8 @@ const registrar = keypair();
 const standingBody = keypair();
 const aligned = keypair();
 const companion = keypair();
+const honestmodel = keypair();
+const cheapai = keypair();
 
 mkdirSync(join(dataDir, 'demo-keys'), { recursive: true });
 writeFileSync(join(dataDir, 'register', 'registrar-public.pem'), registrar.publicKeyPem);
@@ -43,6 +45,8 @@ writeFileSync(join(dataDir, 'standing', 'standing-body-public.pem'), standingBod
 writeFileSync(join(dataDir, 'demo-keys', 'standing-body-private.pem'), standingBody.privateKeyPem);
 writeFileSync(join(dataDir, 'demo-keys', 'provider-aligned-private.pem'), aligned.privateKeyPem);
 writeFileSync(join(dataDir, 'demo-keys', 'provider-companion-private.pem'), companion.privateKeyPem);
+writeFileSync(join(dataDir, 'demo-keys', 'provider-honestmodel-private.pem'), honestmodel.privateKeyPem);
+writeFileSync(join(dataDir, 'demo-keys', 'provider-cheapai-private.pem'), cheapai.privateKeyPem);
 
 const register = {
   airpRegisterVersion: '1',
@@ -84,6 +88,28 @@ const register = {
       models: ['excluded-1'],
       keys: [],
       sealPolicy: 'none',
+    },
+    {
+      id: 'honestmodel.win.entry',
+      providerIdentity: 'honestmodel.win',
+      status: 'active',
+      authorizedEndpoints: ['https://api.honestmodel.win/v1'],
+      models: ['honestmodel-1'],
+      keys: [{ selector: 's1', publicKeyPem: honestmodel.publicKeyPem, status: 'current' }],
+      sealPolicy: 'all',
+      contentBinding: 'sse-chat-delta-v1',
+      identityDomain: 'honestmodel.win',
+    },
+    {
+      id: 'cheapai.win.entry',
+      providerIdentity: 'cheapai.win',
+      status: 'active',
+      authorizedEndpoints: ['https://api.cheapai.win/v1'],
+      models: ['cheapai-1'],
+      keys: [{ selector: 's1', publicKeyPem: cheapai.publicKeyPem, status: 'current' }],
+      sealPolicy: 'all',
+      contentBinding: 'sse-chat-delta-v1',
+      identityDomain: 'cheapai.win',
     },
   ],
 };

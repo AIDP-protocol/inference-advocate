@@ -1,6 +1,6 @@
 // Public surface of the advocate core. Provider agnostic, no UI dependencies.
 //
-// Paper: Accountable Inference Delivery Protocol (AIRP), Justin Philip Flores, 2026.
+// Paper: Accountable Inference Reputation Protocol (AIRP), Justin Philip Flores, 2026.
 // Every module below states the paper section and step it implements at the top of its file.
 
 export * from './types.js';

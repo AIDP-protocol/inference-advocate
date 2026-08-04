@@ -5,7 +5,7 @@ repository states the paper section and step it implements at the top of its fil
 index of those statements, plus an honest list of what the reference implementation does not
 do.
 
-The paper is *Accountable Inference Delivery Protocol (AIRP): An Advocate for AI Users and a
+The paper is *Accountable Inference Reputation Protocol (AIRP): An Advocate for AI Users and a
 Surface for Policy Implementation* (Justin Philip Flores, 2026). Section 4 follows a single
 response through fourteen steps. That path is the spine of this repository. The public demo is
 at `https://tryairp.com`.

@@ -1,10 +1,10 @@
 # Inference Advocate
 
-Reference implementation of the client side of the **Accountable Inference Delivery
-Protocol**, now published on the wire as **AIRP** (see
-[`draft-flores-airp-provenance`](https://datatracker.ietf.org/doc/draft-flores-aidp-provenance/)).
-The architecture paper that this client implements was released under the earlier name
-[*Accountable Inference Delivery Protocol (AIRP): An Advocate for AI Users and a Surface for
+Reference implementation of the client side of the **Accountable Inference Reputation
+Protocol (AIRP)** (see
+[`draft-flores-airp-provenance`](https://datatracker.ietf.org/doc/draft-flores-airp-provenance/)).
+The architecture paper this client implements is
+[*Accountable Inference Reputation Protocol (AIRP): An Advocate for AI Users and a Surface for
 Policy Implementation*](https://doi.org/10.5281/zenodo.21610185) (Justin Philip Flores, 2026).
 
 Live public demo: **[https://tryairp.com](https://tryairp.com)** (legacy hostnames under
@@ -153,7 +153,7 @@ overstates itself is worse than none.
 
 ## Licensing and patent posture
 
-This repository is licensed under the **Apache License 2.0**, which includes an express patent grant. The AIDP protocol, architecture, and methods are dedicated to open use under **Creative Commons Attribution 4.0** in the [paper](https://doi.org/10.5281/zenodo.21610185). The author has filed a United States provisional patent application covering client-side implementation mechanisms, including the deferred-delivery gate, the local custody split, the independent monitor, and the statistical enforcement engine. The filing is defensive: royalty-free for anyone who builds to the standard. The division between what is filed and what is open is deliberate, and is discussed in Section 8 of the paper (and disclosed in the [essay](https://logosanalog.com/p/we-can-pace-the-frontier-today-heres) above). An open protocol is what keeps a certification regime from becoming a moat, and provisions of this kind have to exist before the position they govern is valuable enough to be worth capturing.
+This repository is licensed under the **Apache License 2.0**, which includes an express patent grant. The AIRP protocol, architecture, and methods are dedicated to open use under **Creative Commons Attribution 4.0** in the [paper](https://doi.org/10.5281/zenodo.21610185). The author has filed a United States provisional patent application covering client-side implementation mechanisms, including the deferred-delivery gate, the local custody split, the independent monitor, and the statistical enforcement engine. The filing is defensive: royalty-free for anyone who builds to the standard. The division between what is filed and what is open is deliberate, and is discussed in Section 8 of the paper (and disclosed in the [essay](https://logosanalog.com/p/we-can-pace-the-frontier-today-heres) above). An open protocol is what keeps a certification regime from becoming a moat, and provisions of this kind have to exist before the position they govern is valuable enough to be worth capturing.
 
 The keys under `data/demo-keys/` are demonstration fixtures, committed on purpose so that the
 signed register and standing documents can actually be verified by anyone who clones this. They

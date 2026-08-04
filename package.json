@@ -2,7 +2,7 @@
   "name": "inference-advocate",
   "version": "0.1.0-pre",
   "private": true,
-  "description": "Reference implementation of the client side of AIRP (Accountable Inference Delivery Protocol)",
+  "description": "Reference implementation of the client side of AIRP (Accountable Inference Reputation Protocol)",
   "license": "Apache-2.0",
   "type": "module",
   "engines": {

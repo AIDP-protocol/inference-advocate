@@ -115,7 +115,7 @@ writeFileSync(
     {
       name: 'Inference Advocate',
       short_name: 'Advocate',
-      description: 'Local inference advocate for the Accountable Inference Delivery Protocol',
+      description: 'Local inference advocate for the Accountable Inference Reputation Protocol',
       start_url: './',
       display: 'standalone',
       background_color: BG,

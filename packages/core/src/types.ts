@@ -1,6 +1,6 @@
 // Shared types for the inference advocate.
 //
-// Paper: Accountable Inference Delivery Protocol (AIRP), Section 4 (the fourteen-step path).
+// Paper: Accountable Inference Reputation Protocol (AIRP), Section 4 (the fourteen-step path).
 // Steps: all. This module names the things the other modules pass to each other.
 
 /** A provider is the party performing the serving function. Paper, Definitions. */

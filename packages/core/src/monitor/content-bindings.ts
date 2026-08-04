@@ -143,3 +143,54 @@ export function accumulateStream(
     multipleTerminalSeals,
   };
 }
+
+/**
+ * Parse an SSE byte stream into seal-oriented events. Spec §3.8.3.
+ *
+ * Content bindings select on the data object's members, never on the SSE `event:` field.
+ * The `event:` field is how terminal-seal and pre-seal events are framed on the wire:
+ * `event: airp-seal` / `event: airp-preseal` with `data:` holding the same base64url value
+ * the AIRP-Seal header would carry on a non-streamed response. Ordinary chat chunks have no
+ * event type (or an unrecognized one) and are treated as data objects when `data:` is JSON.
+ * The OpenAI `[DONE]` marker ends the stream and contributes nothing.
+ */
+export function parseSseStream(raw: string): StreamSealEvent[] {
+  const events: StreamSealEvent[] = [];
+  // SSE events are separated by a blank line. Tolerate CRLF.
+  const blocks = raw.replace(/\r\n/g, '\n').split(/\n\n+/);
+  for (const block of blocks) {
+    const trimmed = block.trim();
+    if (!trimmed) continue;
+
+    let eventType = '';
+    const dataLines: string[] = [];
+    for (const line of trimmed.split('\n')) {
+      if (line.startsWith('event:')) {
+        eventType = line.slice('event:'.length).trim();
+      } else if (line.startsWith('data:')) {
+        // Spec allows one leading space after the colon.
+        dataLines.push(line.slice('data:'.length).replace(/^ /, ''));
+      }
+      // Ignore id:, retry:, comments.
+    }
+    const dataText = dataLines.join('\n');
+    if (dataText === '[DONE]') continue;
+
+    if (eventType === 'airp-seal') {
+      events.push({ kind: 'terminal-seal', sealValue: dataText });
+      continue;
+    }
+    if (eventType === 'airp-preseal') {
+      events.push({ kind: 'pre-seal', sealValue: dataText });
+      continue;
+    }
+
+    if (!dataText) continue;
+    try {
+      events.push({ kind: 'data', data: JSON.parse(dataText) as unknown });
+    } catch {
+      // Non-JSON data that is not a known seal event contributes nothing.
+    }
+  }
+  return events;
+}

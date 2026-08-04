@@ -90,7 +90,11 @@ responses arrive unsealed, which is a finding rather than an error. That is the 
 **Deferral is fully blocking.** Nothing streams to the user before evaluation completes. The
 provisional discloses pipelined evaluation against a stream as an alternative embodiment. A
 reference implementation should demonstrate the primary claim, not the optimization, and a
-response that has already been rendered cannot be withheld.
+response that has already been rendered cannot be withheld. The public mock providers can
+emit `text/event-stream` with a terminal-seal event when asked (`stream: true`), and
+`deploy/verify-public-stream.mjs` proves that path through Apache. The advocate adapter
+still requests non-streamed completions and evaluates only after the full response is in
+hand.
 
 **Evidence spans live in the transcript store, not the ledger.** This falls out of the paper
 rather than being invented for the code. Section 5 says telemetry carries no evidence spans,

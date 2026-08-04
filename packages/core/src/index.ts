@@ -74,6 +74,7 @@ export {
   accumulateStream,
   SSE_CHAT_DELTA_V1,
   SSE_CONTENT_BLOCK_DELTA_V1,
+  parseSseStream,
   type ContentBinding,
   type StreamSealEvent,
 } from './monitor/content-bindings.js';

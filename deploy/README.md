@@ -57,10 +57,19 @@ ufw.
 ## SSE-safe proxy settings
 
 API vhosts force HTTP/1.1, disable gzip/brotli on the proxy path, set
-`ProxyPass ... flushpackets=on`, and send `Cache-Control: no-store`. Those
-settings are in place before the mock gains a streaming path. Acceptance for
-this deploy is a **non-streamed** sealed exchange through the proxy. Streamed
-verification is a follow-up task.
+`ProxyPass ... flushpackets=on`, and send `Cache-Control: no-store`. The public
+mocks emit `text/event-stream` when the request sets `stream: true`, with an
+`event: airp-seal` terminal-seal event after the content deltas.
+
+Acceptance:
+
+```bash
+node deploy/verify-public-seal.mjs     # non-streamed
+node deploy/verify-public-stream.mjs   # streamed terminal seal through Apache
+```
+
+The streamed proof is the one that catches proxy buffering: a mangled stream
+presents as a signature mismatch, not as a proxy error.
 
 ## Trust fabric
 

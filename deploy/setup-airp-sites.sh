@@ -222,6 +222,7 @@ verify_register_sig() {
 
 verify_seal_through_proxy() {
   "$NODE_BIN" "$DEPLOY/verify-public-seal.mjs"
+  "$NODE_BIN" "$DEPLOY/verify-public-stream.mjs"
 }
 
 verify_existing_demo() {

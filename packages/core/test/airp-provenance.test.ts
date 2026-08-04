@@ -11,6 +11,7 @@ import {
   isForbiddenAutoFetchHost,
   parseAirpTxt,
   parseJsonNoDuplicates,
+  parseSseStream,
   selectAirpTxtRecords,
 } from '@aidp/core';
 test('sse-chat-delta-v1 extracts content and ignores tool/thinking deltas', () => {
@@ -42,6 +43,25 @@ test('content after a terminal-seal event is flagged and excluded from sealed oc
   assert.equal(new TextDecoder().decode(result.sealedContent), 'ok');
   assert.equal(result.contentAfterTerminalSeal, true);
   assert.equal(result.terminalSealValue, 'seal');
+});
+
+test('parseSseStream maps airp-seal framing and ignores [DONE]', () => {
+  const raw =
+    'data: {"choices":[{"delta":{"content":"Hi"}}]}\n\n' +
+    'data: {"choices":[{"delta":{}}]}\n\n' +
+    'event: airp-seal\n' +
+    'data: seal-value\n\n' +
+    'data: [DONE]\n\n';
+  const events = parseSseStream(raw);
+  assert.equal(events.length, 3);
+  assert.equal(events[0]?.kind, 'data');
+  assert.equal(events[1]?.kind, 'data');
+  assert.equal(events[2]?.kind, 'terminal-seal');
+  assert.equal(events[2]?.sealValue, 'seal-value');
+  const sealed = accumulateStream(SSE_CHAT_DELTA_V1, events);
+  assert.equal(new TextDecoder().decode(sealed.sealedContent), 'Hi');
+  assert.equal(sealed.terminalSealValue, 'seal-value');
+  assert.equal(sealed.contentAfterTerminalSeal, false);
 });
 
 test('key set digest sorts by selector and ignores array order and status', () => {

@@ -22,7 +22,8 @@ packages/ui            React chat surface. Product chrome is ordinary chat; the 
 packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC, no HTTP for the core API)
 packages/demo          mock providers and the scripted end-to-end scenario
 data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code
-tools/                 demo key minting
+tools/                 demo key minting and additive public-entry re-sign
+deploy/                idempotent Apache/TLS/PM2 setup for the public AIRP domains
 ```
 
 Three deliberate boundaries.
@@ -206,10 +207,12 @@ defending it.
 **DNS deployment.** draft-flores-airp-provenance §4.7 puts entry selection on `_airp` TXT
 records beneath the provider identity domain, with a key set digest (`k`) confirming the
 selected entry. The reference client parses those records, refuses unsafe `r` auto-fetch
-targets, and computes the key set digest, but the demo trust fabric still loads a local signed
-register file and treats entries as unconfirmed when DNS is absent. Full deployment (encrypted
-DNS transport, TTL-cached live lookups driving every exchange, HTTPS fetch of `r`) is not the
-demo path.
+targets, and computes the key set digest. Public demo DNS and Apache publish
+`honestmodel.win` / `cheapai.win` bindings and serve the register at the `r=` URL
+(`deploy/`), including a detached `.sig` alongside the document. The client still loads a
+local signed register file rather than fetching `r` over HTTPS with `maxAge` caching, and
+DNS `k` is not published yet. Entries without `identityDomain` (the `demo.*` fixtures behind
+`tryaidp.com`) stay unconfirmed by DNS.
 
 **Real thresholds.** Every number in `data/policy/delivery-policy.json` is demonstration scale
 and labeled as such in three places. Calibration is an open question in the paper and it stays

@@ -24,3 +24,6 @@ tsconfig.tsbuildinfo
 # Public tree stays public. The tracked README explains the convention.
 .private/*
 !.private/README.md
+
+# Host-local deploy paths and operator email. Templates stay in deploy/apache/.
+deploy/local.env

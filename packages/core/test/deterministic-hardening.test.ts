@@ -10,12 +10,9 @@ import {
   endpointMatches,
   generateSealKeypair,
   HEADER_SEAL,
-  HEADER_SEAL_DEPRECATED,
-  HEADER_SEAL_LEGACY,
   runDeterministicPass,
   selectSealHeader,
   ServingRegister,
-  signAidpSeal,
   signSeal,
   verifySeal,
 } from '@airp/core';
@@ -176,56 +173,39 @@ test('endpoint authorization does not treat a path prefix as a segment boundary'
   assert.equal(endpointMatches('https://api.example.com/v1', 'not a url'), false);
 });
 
-test('AIRP-Seal is preferred over legacy names, and legacy remains readable', () => {
+test('AIRP-Seal is the only accepted seal header', () => {
   const keys = generateSealKeypair();
   const seal = signSeal(subject({ content: 'registered' }), keys.privateKeyPem);
-  const other = signAidpSeal(
-    {
-      registerEntryId: 'e.sealed',
-      selector: 's1',
-      model: 'm1',
-      providerIdentity: 'Sealed Co',
-      signedAt: '2026-07-28T00:00:00.000Z',
-      content: utf8.encode('deprecated'),
-    },
-    keys.privateKeyPem,
-  );
 
   assert.equal(HEADER_SEAL, 'airp-seal');
-  assert.equal(HEADER_SEAL_LEGACY, 'aidp-seal');
-  assert.notEqual(HEADER_SEAL, HEADER_SEAL_DEPRECATED);
 
-  const legacyOnly = selectSealHeader(new Headers({ [HEADER_SEAL_DEPRECATED]: encodeSeal(other) }));
-  assert.equal(legacyOnly.fieldName, 'x-aidp-seal');
-  assert.equal(decodeSeal(legacyOnly.value!)?.providerIdentity, 'Sealed Co');
+  const selected = selectSealHeader(new Headers({ [HEADER_SEAL]: encodeSeal(seal) }));
+  assert.equal(selected.fieldName, 'airp-seal');
+  assert.equal(selected.value, encodeSeal(seal));
+  assert.equal(decodeSeal(selected.value!)?.providerIdentity, 'Sealed Co');
 
-  const both = selectSealHeader(
+  const ignoredLegacy = selectSealHeader(
     new Headers({
-      [HEADER_SEAL]: encodeSeal(seal),
-      [HEADER_SEAL_DEPRECATED]: encodeSeal(other),
+      'aidp-seal': encodeSeal(seal),
+      'x-aidp-seal': encodeSeal(seal),
     }),
   );
-  assert.equal(both.fieldName, 'airp-seal');
-  assert.equal(both.value, encodeSeal(seal));
+  assert.equal(ignoredLegacy.fieldName, undefined);
+  assert.equal(ignoredLegacy.value, undefined);
 });
 
-test('legacy aidp-seal/v1 verifies under a legacy field name and fails under airp-seal', () => {
+test('airp-seal/v1 verifies and does not accept a truncated field set as valid', () => {
   const keys = generateSealKeypair();
-  const content = utf8.encode('legacy body');
-  const seal = signAidpSeal(
-    {
-      registerEntryId: 'e.sealed',
-      selector: 's1',
-      model: 'm1',
-      providerIdentity: 'Sealed Co',
-      signedAt: '2026-07-28T00:00:00.000Z',
-      content,
-    },
-    keys.privateKeyPem,
-  );
-  assert.equal(verifySeal(seal, content, keys.publicKeyPem, 'aidp-seal'), true);
-  assert.equal(verifySeal(seal, content, keys.publicKeyPem, 'x-aidp-seal'), true);
-  assert.equal(verifySeal(seal, content, keys.publicKeyPem, 'airp-seal'), false);
+  const content = utf8.encode('airp body');
+  const seal = signSeal(subject({ content: 'airp body' }), keys.privateKeyPem);
+  assert.equal(verifySeal(seal, content, keys.publicKeyPem), true);
+  // Dropping exchange-id / request-digest from the reconstructed subject fails verification.
+  const truncated = {
+    ...seal,
+    exchangeId: undefined,
+    requestDigest: undefined,
+  };
+  assert.equal(verifySeal(truncated, content, keys.publicKeyPem), false);
 });
 
 test('provider identity mismatch is refused', () => {

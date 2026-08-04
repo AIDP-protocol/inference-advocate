@@ -6,9 +6,9 @@ index of those statements, plus an honest list of what the reference implementat
 do.
 
 The paper is *Accountable Inference Delivery Protocol (AIRP): An Advocate for AI Users and a
-Surface for Policy Implementation* (Justin Philip Flores, 2026). The on-the-wire name is now
-AIRP; the paper title is unchanged. Section 4 follows a single response through fourteen
-steps. That path is the spine of this repository. The public demo is at `https://tryairp.com`.
+Surface for Policy Implementation* (Justin Philip Flores, 2026). Section 4 follows a single
+response through fourteen steps. That path is the spine of this repository. The public demo is
+at `https://tryairp.com`.
 
 ## Shape of the repository
 
@@ -84,8 +84,8 @@ The provisional patent application's four mechanisms map on top of the same file
 **The Interchange bootstraps on the OpenAI-compatible wire format.** A wire standard nobody
 serves is not an existence proof. The advocate speaks the format every provider already speaks
 and carries the AIRP additions in headers an unmodified server ignores: `AIRP-Exchange-Id` and
-`X-AIRP-Attestations` outbound, `AIRP-Seal` inbound (with `AIDP-Seal` / `X-AIDP-Seal` still
-accepted on read). A provider that has never heard of AIRP still answers, and its
+`X-AIRP-Attestations` outbound, `AIRP-Seal` inbound. A provider that has never heard of AIRP still
+answers, and its
 responses arrive unsealed, which is a finding rather than an error. That is the migration path.
 
 **Deferral is fully blocking.** Nothing streams to the user before evaluation completes. The

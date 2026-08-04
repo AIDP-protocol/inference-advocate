@@ -67,7 +67,7 @@ export interface ProvenanceSeal {
 }
 
 /** Header field that carried the seal. Selects the payload reconstruction path. Spec §7.1. */
-export type SealHeaderField = 'airp-seal' | 'aidp-seal' | 'x-aidp-seal';
+export type SealHeaderField = 'airp-seal';
 
 /** What the adapter hands back from a provider call. Paper step 6. Spec §3.8. */
 export interface ProviderResponse {

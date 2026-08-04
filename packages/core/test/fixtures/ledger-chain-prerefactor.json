@@ -1,6 +1,6 @@
 {
-  "capturedFrom": "ecb62f5",
-  "note": "Pre-refactor ledger chain. Hashes must stay byte identical after the store port split.",
+  "capturedFrom": "airp-ledger/v1",
+  "note": "Ledger chain under airp-ledger/v1. Hashes must stay byte identical across refactors that keep this domain token.",
   "providerId": "fixture-p",
   "genesis": "0000000000000000000000000000000000000000000000000000000000000000",
   "appendInputs": [
@@ -65,41 +65,38 @@
   "entries": [
     {
       "seq": 1,
-      "providerId": "fixture-p",
+      "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "913f80e3b2ee7310cb63463f2cab8503e35fdaacdbe1438d4ef1343004a3a643",
+      "score": 0,
       "responseId": "r0",
       "at": "2026-07-28T00:00:00.000Z",
-      "flags": [],
       "outcome": "deliver",
-      "score": 0,
-      "evaluatorVersion": "test@1",
-      "taxonomyVersion": "v0.1.0",
-      "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
-      "hash": "9c5203f474a223057be707bf345f372f01fbf285ef265603801d386c8740e7d6"
+      "flags": []
     },
     {
       "seq": 2,
-      "providerId": "fixture-p",
+      "prevHash": "913f80e3b2ee7310cb63463f2cab8503e35fdaacdbe1438d4ef1343004a3a643",
+      "hash": "c33b645057102b06355e5194ad05596b5e28fbfef15be6d209445f876a3e79e6",
+      "score": 1.5,
       "responseId": "r1",
       "at": "2026-07-28T00:01:00.000Z",
+      "outcome": "notice",
       "flags": [
         {
           "type": "sycophancy",
           "severity": 1,
           "evidenceRef": "e1"
         }
-      ],
-      "outcome": "notice",
-      "score": 1.5,
-      "evaluatorVersion": "test@1",
-      "taxonomyVersion": "v0.1.0",
-      "prevHash": "9c5203f474a223057be707bf345f372f01fbf285ef265603801d386c8740e7d6",
-      "hash": "b10ae3000c81ab3aef40eddc13d67d41e37c1d5ff3de14577b9c9d831e551e27"
+      ]
     },
     {
       "seq": 3,
-      "providerId": "fixture-p",
+      "prevHash": "c33b645057102b06355e5194ad05596b5e28fbfef15be6d209445f876a3e79e6",
+      "hash": "b04f8e751f2af984cb3d452c87c183428ada300db126d78fefa92d1066b33118",
+      "score": 9,
       "responseId": "r2",
       "at": "2026-07-28T00:02:00.000Z",
+      "outcome": "withhold",
       "flags": [
         {
           "type": "persona_claims",
@@ -111,33 +108,23 @@
           "severity": 3,
           "evidenceRef": "e3"
         }
-      ],
-      "outcome": "withhold",
-      "score": 9,
-      "evaluatorVersion": "test@1",
-      "taxonomyVersion": "v0.1.0",
-      "prevHash": "b10ae3000c81ab3aef40eddc13d67d41e37c1d5ff3de14577b9c9d831e551e27",
-      "hash": "b97a96b61b188a8ab94985d9689245271d6d86d8775e797f175c519ae0e8ddc4"
+      ]
     },
     {
       "seq": 4,
-      "providerId": "fixture-p",
+      "prevHash": "b04f8e751f2af984cb3d452c87c183428ada300db126d78fefa92d1066b33118",
+      "hash": "c7441db222d4e2a4c058e9bae2d98e0a72ffb0c654d5141610c83031c6a1f762",
+      "score": 2.25,
       "responseId": "r3",
       "at": "2026-07-28T00:03:00.000Z",
-      "flags": [],
       "outcome": "deliver",
-      "score": 2.25,
-      "evaluatorVersion": "test@1",
-      "taxonomyVersion": "v0.1.0",
-      "prevHash": "b97a96b61b188a8ab94985d9689245271d6d86d8775e797f175c519ae0e8ddc4",
-      "hash": "2e102e106df462c822b86efdf0b6d01c416c7d90d718ded9d49dbdfd9a18e5c6"
+      "flags": []
     }
   ],
   "verifyChain": {
     "ok": true
   },
   "hashEntryGoldens": [
-    "9c5203f474a223057be707bf345f372f01fbf285ef265603801d386c8740e7d6",
-    "b10ae3000c81ab3aef40eddc13d67d41e37c1d5ff3de14577b9c9d831e551e27"
+    "913f80e3b2ee7310cb63463f2cab8503e35fdaacdbe1438d4ef1343004a3a643"
   ]
 }

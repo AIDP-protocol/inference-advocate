@@ -6,8 +6,8 @@ import { sha256Hex } from '@airp/core';
 test('vendored sha256Hex matches node:crypto for ledger-shaped inputs', () => {
   const samples = [
     '',
-    'aidp-ledger/v1',
-    ['aidp-ledger/v1', 'fixture-p', '1', 'r0', '2026-07-28T00:00:00.000Z', 'deliver', '0.0000', '', '0'.repeat(64)].join(
+    'airp-ledger/v1',
+    ['airp-ledger/v1', 'fixture-p', '1', 'r0', '2026-07-28T00:00:00.000Z', 'deliver', '0.0000', '', '0'.repeat(64)].join(
       '\n',
     ),
     'a'.repeat(200),

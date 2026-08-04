@@ -149,7 +149,7 @@ test('resetReputation clears ledger and carryover but leaves open blocks', () =>
   assert.equal(carryRows.length, 0);
 });
 
-test('a pre-refactor ledger fixture verifies with identical hashes', () => {
+test('a captured ledger fixture verifies with identical hashes', () => {
   const fixturePath = join(repoRoot, 'packages', 'core', 'test', 'fixtures', 'ledger-chain-prerefactor.json');
   const captured = JSON.parse(readFileSync(fixturePath, 'utf8')) as {
     providerId: string;

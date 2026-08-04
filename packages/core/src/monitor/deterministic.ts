@@ -210,7 +210,6 @@ export function runDeterministicPass(
   } else if (response.seal) {
     const seal = response.seal;
     const key = entry ? register.key(entry.id, seal.selector) : undefined;
-    const fieldName = response.sealFieldName ?? 'airp-seal';
 
     if (entryId && seal.registerEntryId !== entryId) {
       findings.push({
@@ -220,7 +219,6 @@ export function runDeterministicPass(
       });
     }
 
-    if (fieldName === 'airp-seal') {
       const sealExchange = seal.exchangeId ?? '';
       if (sealExchange !== response.exchangeId) {
         findings.push({
@@ -229,7 +227,6 @@ export function runDeterministicPass(
           refuses: true,
         });
       }
-    }
 
     const freshness = sealFreshness(seal.signedAt, response.receivedAt);
     if (freshness) findings.push(freshness);
@@ -254,7 +251,7 @@ export function runDeterministicPass(
         findings.push(statusFinding);
         // Compromised / post-retirement: unattributed, do not treat as signature-valid.
       } else {
-        sealValid = verifySeal(seal, response.sealedContent, key.publicKeyPem, fieldName);
+        sealValid = verifySeal(seal, response.sealedContent, key.publicKeyPem);
         if (!sealValid) {
           findings.push({
             code: 'seal_signature_invalid',
@@ -284,7 +281,6 @@ export function runDeterministicPass(
         // Spec §6.11: request digest is last, reported not refusing, response still attributable.
         if (
           sealValid &&
-          fieldName === 'airp-seal' &&
           seal.requestDigest !== undefined &&
           seal.requestDigest !== response.requestDigest
         ) {

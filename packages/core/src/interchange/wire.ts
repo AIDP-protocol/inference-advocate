@@ -10,7 +10,6 @@
 //   outbound  AIRP-Exchange-Id, X-AIRP-Version, X-AIRP-Attestations
 //             Cache-Control: no-store (when an exchange id is present)
 //   inbound   AIRP-Seal                            (response header, base64url JSON)
-//             AIDP-Seal, X-AIDP-Seal               (legacy, accepted on read only)
 //
 // A provider that knows nothing about AIRP therefore still answers, and its responses arrive
 // unsealed, which is a finding rather than an error. That is the whole migration path: the
@@ -33,18 +32,6 @@ export const HEADER_EXCHANGE_ID = 'airp-exchange-id';
  * AIRP-Seal and leaves the X-form unregistered per RFC 6648.
  */
 export const HEADER_SEAL = 'airp-seal';
-
-/**
- * Pre-rename registered name. Section 7.1 permits a verifier to accept it for compatibility.
- * Prefer AIRP-Seal where both are present. Read only: nothing in this repository emits it.
- */
-export const HEADER_SEAL_LEGACY = 'aidp-seal';
-
-/**
- * The name earlier builds emitted. Section 7.1 permits a verifier to accept it for
- * compatibility. Read only: nothing in this repository emits it.
- */
-export const HEADER_SEAL_DEPRECATED = 'x-aidp-seal';
 
 export function encodeAttestations(pkg: AttestationPackage): string {
   return Buffer.from(JSON.stringify(pkg), 'utf8').toString('base64url');
@@ -71,8 +58,7 @@ export function decodeSeal(value: string): ProvenanceSeal | undefined {
 }
 
 /**
- * Resolve which seal header to use. Multiples of the registered name are invalid.
- * Prefer AIRP-Seal over legacy names. Spec §3.8.3 / §7.1.
+ * Resolve the AIRP-Seal header. Multiples of the registered name are invalid. Spec §3.8.3 / §7.1.
  */
 export function selectSealHeader(headers: Headers): {
   value?: string;
@@ -85,16 +71,6 @@ export function selectSealHeader(headers: Headers): {
   if (airpRaw !== null) {
     if (airpRaw.includes(',')) return { multipleAirpSeals: true };
     return { value: airpRaw, fieldName: 'airp-seal', multipleAirpSeals: false };
-  }
-  const legacy = headers.get(HEADER_SEAL_LEGACY);
-  if (legacy !== null) {
-    if (legacy.includes(',')) return { multipleAirpSeals: true };
-    return { value: legacy, fieldName: 'aidp-seal', multipleAirpSeals: false };
-  }
-  const deprecated = headers.get(HEADER_SEAL_DEPRECATED);
-  if (deprecated !== null) {
-    if (deprecated.includes(',')) return { multipleAirpSeals: true };
-    return { value: deprecated, fieldName: 'x-aidp-seal', multipleAirpSeals: false };
   }
   return { multipleAirpSeals: false };
 }

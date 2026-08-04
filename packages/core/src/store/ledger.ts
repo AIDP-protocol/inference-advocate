@@ -66,8 +66,9 @@ export class LedgerStore implements LedgerReader {
     score: number;
     prevHash: string;
   }): string {
+    // Persistence format token. Spec-aligned domain separator for the hash chain.
     const canonical = [
-      'aidp-ledger/v1',
+      'airp-ledger/v1',
       input.providerId,
       String(input.seq),
       input.responseId,

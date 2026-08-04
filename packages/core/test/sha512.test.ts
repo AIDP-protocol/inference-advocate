@@ -6,7 +6,7 @@ import { sha512 } from '@airp/core';
 test('vendored sha512 matches node:crypto for seal-shaped inputs', () => {
   const samples = [
     new Uint8Array(),
-    new TextEncoder().encode('aidp-seal/v1'),
+    new TextEncoder().encode('airp-seal/v1'),
     new TextEncoder().encode('a'.repeat(200)),
     new Uint8Array(130).fill(7),
   ];

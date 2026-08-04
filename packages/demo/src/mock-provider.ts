@@ -2,14 +2,20 @@
 // seals its responses when given a key.
 //
 // Paper: steps 4 and 5.
+// Spec: draft-flores-airp-provenance-00 §3.8.
 //
 // The demo runs over a real socket rather than through an in-process shortcut, because the
 // claim being demonstrated is about a wire between two parties. A stubbed function call would
 // prove that the code runs. An HTTP request proves that the pipe exists.
 
 import { createServer, type Server } from 'node:http';
-import { signSeal } from '@aidp/core';
-import { HEADER_SEAL, encodeSeal } from '@aidp/core';
+import {
+  HEADER_EXCHANGE_ID,
+  HEADER_SEAL,
+  computeRequestDigest,
+  encodeSeal,
+  signSeal,
+} from '@aidp/core';
 
 export interface MockProviderOptions {
   port: number;
@@ -50,11 +56,25 @@ export function startMockProvider(opts: MockProviderOptions): Promise<RunningMoc
     const chunks: Buffer[] = [];
     req.on('data', (c: Buffer) => chunks.push(c));
     req.on('end', () => {
+      const requestBody = Buffer.concat(chunks);
+      const exchangeId = String(req.headers[HEADER_EXCHANGE_ID] ?? '');
+      const requestDigest = computeRequestDigest(new Uint8Array(requestBody));
+
       const content = opts.script[Math.min(served, opts.script.length - 1)] ?? '';
       served += 1;
 
       const substituting = Boolean(opts.substituteFrom && served >= opts.substituteFrom.response);
       const sealedModel = substituting ? opts.substituteFrom!.model : opts.model;
+
+      // Body first, then seal over those octets. Spec §3.8.2.
+      const body = JSON.stringify({
+        id: `mock-${served}`,
+        // Deliberately the requested model even while substituting. An unsigned field says
+        // whatever the party sending it wants it to say, which is why the seal exists.
+        model: opts.model,
+        choices: [{ message: { role: 'assistant', content } }],
+      });
+      const bodyBytes = Buffer.from(body, 'utf8');
 
       const headers: Record<string, string> = { 'content-type': 'application/json' };
       if (opts.seal) {
@@ -65,22 +85,16 @@ export function startMockProvider(opts: MockProviderOptions): Promise<RunningMoc
               selector: opts.seal.selector,
               model: sealedModel,
               providerIdentity: opts.seal.providerIdentity,
+              exchangeId,
+              requestDigest,
               signedAt: new Date().toISOString(),
-              content,
+              content: new Uint8Array(bodyBytes),
             },
             opts.seal.privateKeyPem,
           ),
         );
       }
-      res.writeHead(200, headers).end(
-        JSON.stringify({
-          id: `mock-${served}`,
-          // Deliberately the requested model even while substituting. An unsigned field says
-          // whatever the party sending it wants it to say, which is why the seal exists.
-          model: opts.model,
-          choices: [{ message: { role: 'assistant', content } }],
-        }),
-      );
+      res.writeHead(200, headers).end(bodyBytes);
     });
   });
 

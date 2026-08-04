@@ -1,5 +1,5 @@
 {
-  "name": "@aidp/store-sqlite",
+  "name": "@airp/store-sqlite",
   "version": "0.1.0-pre",
   "description": "SQLite StoreBackend adapter for the AIDP advocate. Node only.",
   "license": "Apache-2.0",
@@ -15,7 +15,7 @@
     "test": "tsc -p tsconfig.test.json && node --test 'dist/test/**/*.test.js'"
   },
   "dependencies": {
-    "@aidp/core": "*"
+    "@airp/core": "*"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

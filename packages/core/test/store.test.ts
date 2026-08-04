@@ -2,13 +2,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { openSqliteStore, type SqliteStore } from '@aidp/store-sqlite';
+import { openSqliteStore, type SqliteStore } from '@airp/store-sqlite';
 import {
   LedgerStore,
   MasterSecret,
   TranscriptStore,
   type AppendInput,
-} from '@aidp/core';
+} from '@airp/core';
 import { repoRoot } from './helpers.js';
 
 function fixture() {

@@ -1,5 +1,5 @@
 {
-  "name": "@aidp/desktop",
+  "name": "@airp/desktop",
   "version": "0.1.0-pre",
   "description": "Tauri desktop shell for the inference advocate. HostSession in the Node launcher over loopback RPC, no HTTP listener for the core API.",
   "license": "Apache-2.0",

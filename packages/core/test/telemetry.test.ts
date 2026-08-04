@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { openSqliteStore } from '@aidp/store-sqlite';
+import { openSqliteStore } from '@airp/store-sqlite';
 import { dataPath } from './helpers.js';
 import {
   buildExportView,
@@ -11,7 +11,7 @@ import {
   StandingRegistry,
   TelemetryEmitter,
   TranscriptStore,
-} from '@aidp/core';
+} from '@airp/core';
 
 function fixture(responses: number) {
   const store = openSqliteStore(':memory:');

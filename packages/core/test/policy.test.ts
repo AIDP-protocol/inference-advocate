@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { openSqliteStore } from '@aidp/store-sqlite';
+import { openSqliteStore } from '@airp/store-sqlite';
 import { dataPath } from './helpers.js';
 import {
   computeScore,
@@ -11,8 +11,8 @@ import {
   newNoticeState,
   resolveDelivery,
   selectNotices,
-} from '@aidp/core';
-import type { DeterministicVerdict, Flag, Notice } from '@aidp/core';
+} from '@airp/core';
+import type { DeterministicVerdict, Flag, Notice } from '@airp/core';
 
 const policy = DeliveryPolicy.loadFromFile(dataPath('policy', 'delivery-policy.json'));
 const noJurisdiction = Jurisdiction.none();

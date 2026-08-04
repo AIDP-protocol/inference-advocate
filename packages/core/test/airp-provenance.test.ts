@@ -13,7 +13,7 @@ import {
   parseJsonNoDuplicates,
   parseSseStream,
   selectAirpTxtRecords,
-} from '@aidp/core';
+} from '@airp/core';
 test('sse-chat-delta-v1 extracts content and ignores tool/thinking deltas', () => {
   const sealed = accumulateBoundContent(SSE_CHAT_DELTA_V1, [
     { choices: [{ delta: { content: 'Hello' } }] },

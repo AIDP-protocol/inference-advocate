@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { sha256Hex } from '@aidp/core';
+import { sha256Hex } from '@airp/core';
 
 test('vendored sha256Hex matches node:crypto for ledger-shaped inputs', () => {
   const samples = [

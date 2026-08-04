@@ -16,8 +16,8 @@ import {
   ProviderRegistry,
   type ExchangeResult,
   type OpenedAdvocate,
-} from '@aidp/core';
-import { openAdvocate } from '@aidp/store-sqlite';
+} from '@airp/core';
+import { openAdvocate } from '@airp/store-sqlite';
 
 export interface HostPaths {
   dataDir: string;

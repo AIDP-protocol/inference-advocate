@@ -17,18 +17,18 @@
     "packages/desktop"
   ],
   "scripts": {
-    "build": "npm run build --workspace @aidp/core && npm run build --workspace @aidp/store-sqlite && npm run build --workspace @aidp/daemon && npm run build --workspace @aidp/demo",
-    "build:ui": "npm run build --workspace @aidp/ui",
-    "typecheck": "npm run build --workspace @aidp/core && npm run build --workspace @aidp/store-sqlite && npm run typecheck --workspaces --if-present",
-    "test": "npm run build && npm run test --workspace @aidp/core && npm run test --workspace @aidp/store-sqlite && npm run test --workspace @aidp/daemon",
+    "build": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/daemon && npm run build --workspace @airp/demo",
+    "build:ui": "npm run build --workspace @airp/ui",
+    "typecheck": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run typecheck --workspaces --if-present",
+    "test": "npm run build && npm run test --workspace @airp/core && npm run test --workspace @airp/store-sqlite && npm run test --workspace @airp/daemon",
     "demo": "npm run build && node packages/demo/dist/scenario.js",
     "daemon": "npm run build && node packages/daemon/dist/server.js",
-    "desktop": "npm run dev --workspace @aidp/desktop",
-    "ui": "npm run dev --workspace @aidp/ui",
+    "desktop": "npm run dev --workspace @airp/desktop",
+    "ui": "npm run dev --workspace @airp/ui",
     "keys": "node tools/mint-demo-keys.mjs",
-    "mocks": "npm run build --workspace @aidp/demo && node packages/demo/dist/mock-servers.js",
-    "mocks:public": "npm run build --workspace @aidp/demo && node packages/demo/dist/public-mock-servers.js",
-    "doctor": "npm run build --workspace @aidp/core && npm run build --workspace @aidp/store-sqlite && npm run build --workspace @aidp/daemon && node packages/daemon/dist/doctor.js",
+    "mocks": "npm run build --workspace @airp/demo && node packages/demo/dist/mock-servers.js",
+    "mocks:public": "npm run build --workspace @airp/demo && node packages/demo/dist/public-mock-servers.js",
+    "doctor": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/daemon && node packages/daemon/dist/doctor.js",
     "deploy:airp-sites": "bash deploy/setup-airp-sites.sh"
   },
   "devDependencies": {

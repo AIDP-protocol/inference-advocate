@@ -11,8 +11,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
-import { ProviderRegistry, type ExchangeResult } from '@aidp/core';
-import { openAdvocate } from '@aidp/store-sqlite';
+import { ProviderRegistry, type ExchangeResult } from '@airp/core';
+import { openAdvocate } from '@airp/store-sqlite';
 import { startMockProvider, type RunningMockProvider } from './mock-provider.js';
 import { ALIGNED_SCRIPT, COMPANION_RECOVERY, COMPANION_SCRIPT, LEGACY_SCRIPT } from './scripts.js';
 

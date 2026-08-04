@@ -50,7 +50,7 @@ npm run desktop        # builds if needed, checks deps, starts HostSession + Tau
 Or:
 
 ```bash
-npm run desktop --workspace @aidp/desktop
+npm run desktop --workspace @airp/desktop
 ```
 
 Environment the shell honors:
@@ -66,7 +66,7 @@ Environment the shell honors:
 ## Check without launching
 
 ```bash
-npm run check-deps --workspace @aidp/desktop
+npm run check-deps --workspace @airp/desktop
 ```
 
 ## Next slice

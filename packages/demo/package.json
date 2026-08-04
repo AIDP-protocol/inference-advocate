@@ -1,5 +1,5 @@
 {
-  "name": "@aidp/demo",
+  "name": "@airp/demo",
   "version": "0.1.0-pre",
   "description": "The scripted end-to-end scenario, plus the mock providers it runs against.",
   "license": "Apache-2.0",
@@ -9,8 +9,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@aidp/core": "*",
-    "@aidp/store-sqlite": "*"
+    "@airp/core": "*",
+    "@airp/store-sqlite": "*"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

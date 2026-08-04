@@ -12,7 +12,7 @@ import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { openAdvocate } from '@aidp/store-sqlite';
+import { openAdvocate } from '@airp/store-sqlite';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const dataDir = process.env['AIDP_DATA_DIR'] ?? join(repoRoot, 'data');

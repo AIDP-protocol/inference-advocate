@@ -4,9 +4,9 @@ import { createServer } from 'node:http';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { openAdvocate } from '@aidp/store-sqlite';
+import { openAdvocate } from '@airp/store-sqlite';
 import { dataPath } from './helpers.js';
-import { discoverEvaluatorConfig, resolveEvaluator, Taxonomy } from '@aidp/core';
+import { discoverEvaluatorConfig, resolveEvaluator, Taxonomy } from '@airp/core';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
 

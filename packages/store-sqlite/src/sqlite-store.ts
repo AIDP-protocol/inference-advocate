@@ -2,7 +2,7 @@
 //
 // Paper: Section 6 ("an operator who never holds a thing cannot be compelled to produce it").
 // Provisional: Mechanism 2, Section 2.2 (store segregation).
-// One file on the user's device. The port in @aidp/core names the rows; this class opens the
+// One file on the user's device. The port in @airp/core names the rows; this class opens the
 // file, applies the schema, and speaks SQL. `raw` is exposed so the load-bearing privacy tests
 // can read bytes on disk without going through the port.
 
@@ -17,7 +17,7 @@ import type {
   ResidencyCounts,
   StoreBackend,
   TranscriptRow,
-} from '@aidp/core';
+} from '@airp/core';
 import { SCHEMA } from './schema.js';
 
 export interface OpenSqliteOptions {

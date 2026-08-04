@@ -41,7 +41,7 @@ Requires Node 22.5 or later. Core has no npm runtime dependencies: Provenance Se
 verify are pure TypeScript (vendored Ed25519), ledger hashing is pure TypeScript SHA-256, and
 store custody crypto in `crypto/keys.ts` (scrypt, HKDF, AES-GCM) is pure TypeScript (vendored
 `@noble/hashes` and `@noble/ciphers`). Persistence is injected through `StoreBackend`
-(`@aidp/store-sqlite` uses `node:sqlite`).
+(`@airp/store-sqlite` uses `node:sqlite`).
 
 ```bash
 npm install

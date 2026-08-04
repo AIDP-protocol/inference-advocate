@@ -20,7 +20,7 @@ import {
   computeRequestDigest,
   encodeSeal,
   signSeal,
-} from '@aidp/core';
+} from '@airp/core';
 
 export interface MockProviderOptions {
   port: number;

@@ -135,7 +135,7 @@ that resolved. It sends no requests to anyone.
 Core keeps the ledger's canonical serialization and hash chaining, sequence assignment,
 `verifyChain`, key-scope guards, evidence-under-transcript, and carryover and block semantics.
 The host supplies opening, closing, migrating, and row-level reads and writes.
-`@aidp/store-sqlite` is the shipped adapter: schema, WAL, pragmas, and path handling.
+`@airp/store-sqlite` is the shipped adapter: schema, WAL, pragmas, and path handling.
 `runStoreConformance` in core is the behavioral suite a second adapter must pass.
 
 Ledger hashing uses a small pure-TypeScript SHA-256 in core so `hashEntry` stays synchronous

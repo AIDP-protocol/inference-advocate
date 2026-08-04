@@ -208,8 +208,8 @@ ensure_ufw() {
 }
 
 build_and_start_mocks() {
-  log 'building @aidp/demo (public mocks)'
-  (cd "$ROOT" && "$NPM_BIN" run build --workspace @aidp/core && "$NPM_BIN" run build --workspace @aidp/demo)
+  log 'building @airp/demo (public mocks)'
+  (cd "$ROOT" && "$NPM_BIN" run build --workspace @airp/core && "$NPM_BIN" run build --workspace @airp/demo)
 
   local script="$ROOT/packages/demo/dist/public-mock-servers.js"
   [[ -f "$script" ]] || die "missing $script after build"

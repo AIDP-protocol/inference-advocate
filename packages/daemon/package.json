@@ -1,5 +1,5 @@
 {
-  "name": "@aidp/daemon",
+  "name": "@airp/daemon",
   "version": "0.1.0-pre",
   "description": "Local HostSession host: HTTP daemon on 127.0.0.1 for the browser tab, and loopback RPC for desktop.",
   "license": "Apache-2.0",
@@ -10,8 +10,8 @@
     "test": "npm run build && node --test test/host.test.mjs"
   },
   "dependencies": {
-    "@aidp/core": "*",
-    "@aidp/store-sqlite": "*"
+    "@airp/core": "*",
+    "@airp/store-sqlite": "*"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",

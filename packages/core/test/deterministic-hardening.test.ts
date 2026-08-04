@@ -18,8 +18,8 @@ import {
   signAidpSeal,
   signSeal,
   verifySeal,
-} from '@aidp/core';
-import type { ProviderResponse } from '@aidp/core';
+} from '@airp/core';
+import type { ProviderResponse } from '@airp/core';
 
 const utf8 = new TextEncoder();
 

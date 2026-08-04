@@ -9,8 +9,8 @@ import {
   ServingRegister,
   signSeal,
   Taxonomy,
-} from '@aidp/core';
-import type { ProviderConfig, ProviderResponse } from '@aidp/core';
+} from '@airp/core';
+import type { ProviderConfig, ProviderResponse } from '@airp/core';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
 

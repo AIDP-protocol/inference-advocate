@@ -31,7 +31,7 @@ import type { AttestationPackage } from './types.js';
 export interface SetupOptions {
   /** Directory holding taxonomy, policy, jurisdictions, register and standing documents. */
   dataDir: string;
-  /** Injected persistence. Constructed by the host (for example @aidp/store-sqlite). */
+  /** Injected persistence. Constructed by the host (for example @airp/store-sqlite). */
   store: StoreBackend;
   /** Path to the providers file. Keys are read from named environment variables. */
   providersPath?: string;

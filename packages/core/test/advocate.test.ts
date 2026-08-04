@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { openSqliteStore, openAdvocate } from '@aidp/store-sqlite';
+import { openSqliteStore, openAdvocate } from '@airp/store-sqlite';
 import { dataPath } from './helpers.js';
 import {
   Advocate,
@@ -23,7 +23,7 @@ import {
   signSeal,
   StandingRegistry,
   Taxonomy,
-} from '@aidp/core';
+} from '@airp/core';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
 const policy = DeliveryPolicy.loadFromFile(dataPath('policy', 'delivery-policy.json'));

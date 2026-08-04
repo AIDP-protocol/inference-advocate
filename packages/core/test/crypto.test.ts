@@ -21,7 +21,7 @@ import {
   signSeal,
   verifyDocument,
   verifySeal,
-} from '@aidp/core';
+} from '@airp/core';
 import { dataPath } from './helpers.js';
 
 test('per-store keys are distinct and do not open each other', () => {

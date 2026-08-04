@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { sha512 } from '@aidp/core';
+import { sha512 } from '@airp/core';
 
 test('vendored sha512 matches node:crypto for seal-shaped inputs', () => {
   const samples = [

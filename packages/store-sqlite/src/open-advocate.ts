@@ -8,7 +8,7 @@ import {
   openAdvocate as openAdvocateCore,
   type OpenedAdvocate,
   type SetupOptions,
-} from '@aidp/core';
+} from '@airp/core';
 import { openSqliteStore } from './sqlite-store.js';
 
 export type SqliteSetupOptions = Omit<SetupOptions, 'store'> & {

@@ -150,10 +150,18 @@ export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
     );
   }
 
-  warnings.push(
-    'DNS binding (_airp) and key set digest confirmation are implemented but unused on the demo path: ' +
-      'register entries have no identityDomain, so attributions stay unconfirmed by DNS. Spec §4.7 / §4.8',
-  );
+  const hasIdentityDomain = register.document.entries.some((e) => e.identityDomain);
+  if (!hasIdentityDomain) {
+    warnings.push(
+      'DNS binding (_airp) and key set digest confirmation are implemented but unused: ' +
+        'no register entry has identityDomain, so attributions stay unconfirmed by DNS. Spec §4.7 / §4.8',
+    );
+  } else if (!register.document.entries.every((e) => e.identityDomain)) {
+    warnings.push(
+      'DNS binding (_airp) is engaged only for register entries that set identityDomain; ' +
+        'demo.* entries omit it, so their attributions stay unconfirmed by DNS. Spec §4.7 / §4.8',
+    );
+  }
 
   const advocate = new Advocate({
     store,

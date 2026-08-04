@@ -17,7 +17,7 @@ const { Resvg } = require('@resvg/resvg-js');
 const sharp = require('sharp');
 const pngToIco = require('png-to-ico').default;
 
-const root = process.env.AIDP_REPO_ROOT || join(dirname(fileURLToPath(import.meta.url)), '..');
+const root = process.env.AIRP_REPO_ROOT || join(dirname(fileURLToPath(import.meta.url)), '..');
 const uiPublic = join(root, 'packages/ui/public');
 const desktopIcons = join(root, 'packages/desktop/src-tauri/icons');
 

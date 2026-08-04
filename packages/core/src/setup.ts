@@ -40,7 +40,7 @@ export interface SetupOptions {
   /** An evaluator instance, if you are constructing one yourself. Wins over evaluatorPath. */
   evaluator?: Evaluator;
   /**
-   * Path to an evaluator config file. Falls back to the AIDP_EVALUATOR_CONFIG environment
+   * Path to an evaluator config file. Falls back to the AIRP_EVALUATOR_CONFIG environment
    * variable, and then to the rule evaluator. See data/evaluator.example.json.
    */
   evaluatorPath?: string;

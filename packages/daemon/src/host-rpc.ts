@@ -76,7 +76,7 @@ export interface HostRpcListenOptions {
 export interface HostRpcServer {
   address: string;
   port: number;
-  /** `host:port` for AIDP_HOST_ADDR. */
+  /** `host:port` for AIRP_HOST_ADDR. */
   endpoint: string;
   close: () => Promise<void>;
 }

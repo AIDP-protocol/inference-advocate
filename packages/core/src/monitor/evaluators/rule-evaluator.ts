@@ -21,7 +21,7 @@ const MAX_SPANS_PER_FLAG = 3;
 const MAX_SPAN_CHARS = 200;
 
 export class RuleEvaluator implements Evaluator {
-  readonly id = 'aidp-rule-evaluator';
+  readonly id = 'airp-rule-evaluator';
   readonly version: string;
   readonly #taxonomy: Taxonomy;
 

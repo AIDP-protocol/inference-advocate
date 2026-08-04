@@ -1,7 +1,7 @@
 {
   "taxonomyVersion": "v0.3.0",
   "status": "current",
-  "maintainer": "AIDP reference implementation. Not a commons body. See ARCHITECTURE.md.",
+  "maintainer": "AIRP reference implementation. Not a commons body. See ARCHITECTURE.md.",
   "notes": "The paper's Definitions and step 8 name four formation categories: persona claims, relational hooks, sycophancy, and simulation obscured. v0.3.0 keeps those and adds a reference harm set so provider conduct that is obviously delivery-relevant (profanity, self-harm encouragement, sexual content, child sexual exploitation, graphic violence, hate, and concrete criminal assistance) is an inspectable criterion rather than an unspoken filter. The criteria below are lexical patterns, not judgments. They are English-centric and deliberately short. They exist so the gate can be exercised end to end against a reference evaluator anyone can inspect and reproduce. A deployed advocate runs a commons-maintained evaluation model against these definitions. Whose values define a flag is an open question the paper puts in Section 9. This file is not a moderation product and does not claim coverage of every dialect, euphemism, or encoded bypass.",
   "flags": [
     {

@@ -30,7 +30,7 @@ export interface StandingEntry {
 }
 
 export interface StandingDocument {
-  aidpStandingVersion: string;
+  airpStandingVersion: string;
   body: { id: string; publicKeyPem: string };
   issuedAt: string;
   /** Published baseline thresholds. Paper Section 5, "Who sets the numbers". */
@@ -60,7 +60,7 @@ export class StandingRegistry {
   static empty(): StandingRegistry {
     return new StandingRegistry(
       {
-        aidpStandingVersion: '0.1',
+        airpStandingVersion: '0.1',
         body: { id: 'none', publicKeyPem: '' },
         issuedAt: new Date(0).toISOString(),
         thresholds: { warnRate: 0.05, exclusionRate: 0.15, minimumQuorumSources: 25 },

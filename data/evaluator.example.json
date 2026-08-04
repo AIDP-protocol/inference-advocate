@@ -2,8 +2,8 @@
   "kind": "model",
   "baseUrl": "https://api.openai.com/v1",
   "model": "gpt-4o-mini",
-  "apiKeyEnv": "AIDP_EVALUATOR_API_KEY",
+  "apiKeyEnv": "AIRP_EVALUATOR_API_KEY",
   "temperature": 0,
   "seed": 1,
-  "note": "Copy this to .advocate/evaluator.json and edit it, then set AIDP_EVALUATOR_CONFIG to that path. Any OpenAI-compatible endpoint works, including a local server, which is the deployment the paper prefers: baseUrl http://127.0.0.1:11434/v1 for Ollama, and no key. Two rules the code enforces or warns about. The evaluator must not be served by the same party as a provider it evaluates, which is the self-audit conflict of provisional Section 3.4. And a hosted evaluator receives response content, so it appears in the export view as an outbound content path; that is the cost of not running it on the device, stated rather than hidden."
+  "note": "Copy this to .advocate/evaluator.json and edit it, then set AIRP_EVALUATOR_CONFIG to that path. Any OpenAI-compatible endpoint works, including a local server, which is the deployment the paper prefers: baseUrl http://127.0.0.1:11434/v1 for Ollama, and no key. Two rules the code enforces or warns about. The evaluator must not be served by the same party as a provider it evaluates, which is the self-audit conflict of provisional Section 3.4. And a hosted evaluator receives response content, so it appears in the export view as an outbound content path; that is the cost of not running it on the device, stated rather than hidden."
 }

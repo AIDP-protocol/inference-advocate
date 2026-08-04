@@ -12,9 +12,9 @@ const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
 
 test('no config means the rule evaluator, and it says so', () => {
   const resolved = resolveEvaluator({ taxonomy });
-  assert.equal(resolved.evaluator.id, 'aidp-rule-evaluator');
+  assert.equal(resolved.evaluator.id, 'airp-rule-evaluator');
   assert.equal(resolved.outboundContentPaths.length, 0);
-  assert.ok(resolved.warnings.some((w) => w.includes('aidp-rule-evaluator@')));
+  assert.ok(resolved.warnings.some((w) => w.includes('airp-rule-evaluator@')));
   assert.ok(resolved.warnings.some((w) => w.includes('has no judgment')));
 });
 
@@ -23,7 +23,7 @@ test('a hosted evaluator is reported as an outbound content path', () => {
     taxonomy,
     config: { kind: 'model', baseUrl: 'https://api.example.com/v1', model: 'm' },
   });
-  assert.equal(resolved.evaluator.id, 'aidp-model-evaluator');
+  assert.equal(resolved.evaluator.id, 'airp-model-evaluator');
   assert.equal(resolved.outboundContentPaths.length, 1);
   assert.ok(resolved.outboundContentPaths[0]?.includes('api.example.com'));
   assert.ok(resolved.warnings.some((w) => w.includes('leaves this device')));
@@ -37,7 +37,7 @@ test('a local evaluator is not reported as outbound', () => {
   assert.equal(resolved.outboundContentPaths.length, 0);
   // The evaluator is still named, because "which evaluator ran" is always worth printing.
   assert.equal(resolved.warnings.length, 1);
-  assert.ok(resolved.warnings[0]?.includes('aidp-model-evaluator@'));
+  assert.ok(resolved.warnings[0]?.includes('airp-model-evaluator@'));
 });
 
 test('an evaluator served by a provider under evaluation is flagged as a self audit conflict', () => {
@@ -111,7 +111,7 @@ test('the model evaluator flags a response against a live OpenAI-compatible endp
 });
 
 test('openAdvocate picks up an evaluator config and reports the outbound path in the export view', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'aidp-eval-'));
+  const dir = mkdtempSync(join(tmpdir(), 'airp-eval-'));
   try {
     const configPath = join(dir, 'evaluator.json');
     writeFileSync(

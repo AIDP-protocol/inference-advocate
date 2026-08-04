@@ -1,4 +1,4 @@
-# AIDP icon family
+# AIRP icon family
 
 24×24 grid · stroke 2.1 · round caps and joins on solid strokes, butt caps on dashed ones.
 `stroke="currentColor"` throughout, so colour is inherited from CSS.
@@ -11,10 +11,10 @@ tiles under `packages/desktop/src-tauri/icons/`.
 ## The system
 
 Every icon is one recognizable object, and exactly one stroke of that object is dashed:
-the boundary AIDP governs. Dash arrays are solved against each path's measured length so
+the boundary AIRP governs. Dash arrays are solved against each path's measured length so
 every run closes on a whole number of cycles and no corner falls inside a gap.
 
-- **AIDP**: stamped ring with a solid token. Six ring segments, one per component below.
+- **AIRP**: stamped ring with a solid token. Six ring segments, one per component below.
 - **Inference Advocate**: shield, outline unbroken, boundary passing through it.
 - **Serving Register**: ruled card, spine dashed.
 - **Delivery Policy**: document with a cut corner and a forked route, spine dashed.

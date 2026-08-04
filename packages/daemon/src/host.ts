@@ -39,7 +39,7 @@ export interface PinnedNotice {
  */
 export function packagingWarnings(env: NodeJS.ProcessEnv = process.env): string[] {
   const out: string[] = [];
-  if (env['AIDP_DESKTOP'] === '1') {
+  if (env['AIRP_DESKTOP'] === '1') {
     out.push(
       'desktop packaging runs HostSession in-process in the Node launcher (library calls over a loopback RPC socket into the Tauri UI shell); HostSession is not embedded inside the Tauri binary, which would need an in-process JS runtime or a Rust port of the host and store',
     );

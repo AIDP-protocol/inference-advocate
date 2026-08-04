@@ -8,12 +8,12 @@ stdio child).
 
 A Node launcher that:
 
-1. Constructs `HostSession` in-process (`AIDP_DESKTOP=1`, library call into
+1. Constructs `HostSession` in-process (`AIRP_DESKTOP=1`, library call into
    `packages/daemon/src/host.ts`).
 2. Listens with `listenHostRpc` on `127.0.0.1` (line-delimited JSON, same method table as the
    HTTP daemon).
 3. Starts the Tauri window, which loads the built UI from `packages/ui/dist` and forwards
-   `host_call` invokes to that RPC endpoint (`AIDP_HOST_ADDR`).
+   `host_call` invokes to that RPC endpoint (`AIRP_HOST_ADDR`).
 
 The browser-tab path (`npm run daemon`) still uses the loopback HTTP daemon. Both seams share
 `HostSession` and `dispatchHostMethod` in `packages/daemon/src/host.ts`.
@@ -21,7 +21,7 @@ The browser-tab path (`npm run daemon`) still uses the loopback HTTP daemon. Bot
 Conversation content does not gain a new outbound path through this shell. The remaining
 packaging gap is honest: HostSession still runs under Node in the launcher, not inside the
 Rust binary. Embedding it in-process in Tauri would need a JS runtime inside the binary, or a
-Rust port of the host and store. That warning is reported at startup when `AIDP_DESKTOP=1`.
+Rust port of the host and store. That warning is reported at startup when `AIRP_DESKTOP=1`.
 
 ## Prerequisites
 
@@ -57,11 +57,11 @@ Environment the shell honors:
 
 | Variable | Role |
 | --- | --- |
-| `AIDP_REPO_ROOT` | Repository root (set automatically by `npm run desktop`) |
-| `AIDP_HOST_ADDR` | Loopback `host:port` for HostSession RPC (set by the launcher for Tauri) |
-| `AIDP_DESKTOP` | Set to `1` so HostSession reports the Node-launcher / not-in-Rust-binary gap |
-| `AIDP_RUN_DIR` | Advocate run directory (default `.advocate`) |
-| `AIDP_DATA_DIR` | Trust-document directory (default `data`) |
+| `AIRP_REPO_ROOT` | Repository root (set automatically by `npm run desktop`) |
+| `AIRP_HOST_ADDR` | Loopback `host:port` for HostSession RPC (set by the launcher for Tauri) |
+| `AIRP_DESKTOP` | Set to `1` so HostSession reports the Node-launcher / not-in-Rust-binary gap |
+| `AIRP_RUN_DIR` | Advocate run directory (default `.advocate`) |
+| `AIRP_DATA_DIR` | Trust-document directory (default `data`) |
 
 ## Check without launching
 

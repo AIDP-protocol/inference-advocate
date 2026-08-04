@@ -136,7 +136,7 @@ export function resolveEvaluator(input: ResolveEvaluatorInput): ResolvedEvaluato
 
 /**
  * Where the evaluator configuration comes from, in order: an explicit path, then the
- * AIDP_EVALUATOR_CONFIG environment variable, then nothing, which means the rule evaluator.
+ * AIRP_EVALUATOR_CONFIG environment variable, then nothing, which means the rule evaluator.
  * The environment variable exists so that the same demo and the same daemon can be run against
  * a real evaluator without editing either of them.
  */
@@ -144,7 +144,7 @@ export function discoverEvaluatorConfig(
   explicitPath?: string,
   env: NodeJS.ProcessEnv = process.env,
 ): EvaluatorConfig | undefined {
-  const path = explicitPath ?? env['AIDP_EVALUATOR_CONFIG'];
+  const path = explicitPath ?? env['AIRP_EVALUATOR_CONFIG'];
   if (!path) return undefined;
   if (!existsSync(path)) {
     // No absolute path in the message: openAdvocate folds this into UI warnings, and those

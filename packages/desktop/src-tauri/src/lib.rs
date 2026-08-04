@@ -3,12 +3,12 @@
 // Paper: steps 1 and 12.
 //
 // The desktop launcher (packages/desktop/scripts/run-tauri.mjs) constructs HostSession
-// in-process and listens with host-rpc.ts. This shell dials AIDP_HOST_ADDR and forwards
+// in-process and listens with host-rpc.ts. This shell dials AIRP_HOST_ADDR and forwards
 // UI invokes through the host_call command. Conversation content still does not leave
 // through this shell; telemetry still cannot see the transcript key.
 //
 // Remaining honesty: HostSession still runs under Node in the launcher process, not inside
-// this Rust binary. AIDP_DESKTOP=1 surfaces that packaging gap at startup.
+// this Rust binary. AIRP_DESKTOP=1 surfaces that packaging gap at startup.
 
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpStream;
@@ -26,8 +26,8 @@ struct HostIpc {
 struct HostBridge(Mutex<HostIpc>);
 
 fn host_endpoint() -> Result<String, String> {
-    std::env::var("AIDP_HOST_ADDR").map_err(|_| {
-        "AIDP_HOST_ADDR is unset. Start the desktop shell with npm run desktop so the Node launcher can construct HostSession and publish the loopback RPC endpoint.".to_string()
+    std::env::var("AIRP_HOST_ADDR").map_err(|_| {
+        "AIRP_HOST_ADDR is unset. Start the desktop shell with npm run desktop so the Node launcher can construct HostSession and publish the loopback RPC endpoint.".to_string()
     })
 }
 

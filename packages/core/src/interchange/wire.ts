@@ -7,7 +7,7 @@
 // reference advocate speaks the format every provider already speaks and carries the AIRP
 // additions in places an unmodified server ignores:
 //
-//   outbound  AIRP-Exchange-Id, X-AIDP-Version, X-AIDP-Attestations
+//   outbound  AIRP-Exchange-Id, X-AIRP-Version, X-AIRP-Attestations
 //             Cache-Control: no-store (when an exchange id is present)
 //   inbound   AIRP-Seal                            (response header, base64url JSON)
 //             AIDP-Seal, X-AIDP-Seal               (legacy, accepted on read only)
@@ -22,10 +22,10 @@ import type { AttestationPackage, ProvenanceSeal } from '../types.js';
 import type { SealFieldName } from '../crypto/seal.js';
 import { parseJsonNoDuplicates } from './json-strict.js';
 
-export const AIDP_VERSION = '0.1';
+export const AIRP_VERSION = '0.1';
 
-export const HEADER_VERSION = 'x-aidp-version';
-export const HEADER_ATTESTATIONS = 'x-aidp-attestations';
+export const HEADER_VERSION = 'x-airp-version';
+export const HEADER_ATTESTATIONS = 'x-airp-attestations';
 export const HEADER_EXCHANGE_ID = 'airp-exchange-id';
 
 /**

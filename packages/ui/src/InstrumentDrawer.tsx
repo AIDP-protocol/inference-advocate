@@ -8,7 +8,7 @@ import type { AdvocateState } from './types';
 import { MonitorPanel } from './MonitorPanel';
 import { ExportView } from './ExportView';
 import { SCENARIO_STEPS } from './scenario-steps';
-import { IconAidp } from './icons';
+import { IconAirp } from './icons';
 
 export type DrawerTab = 'monitor' | 'scenario' | 'export' | 'gaps' | 'attrs';
 
@@ -45,7 +45,7 @@ export function InstrumentDrawer(props: {
     return (
       <div className="instrument-drawer shut">
         <button type="button" className="drawer-strip" onClick={onOpen}>
-          <IconAidp className="drawer-strip-icon" />
+          <IconAirp className="drawer-strip-icon" />
           <span className="label">▲ Instruments</span>
           <span className="aside">demonstration only · not part of the client</span>
           <span className="chips">

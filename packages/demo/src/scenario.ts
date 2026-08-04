@@ -66,7 +66,7 @@ function truncate(s: string, n: number): string {
 }
 
 async function main(): Promise<void> {
-  const runDir = mkdtempSync(join(tmpdir(), 'aidp-demo-'));
+  const runDir = mkdtempSync(join(tmpdir(), 'airp-demo-'));
   const servers: RunningMockProvider[] = [];
 
   try {

@@ -17,7 +17,7 @@ import {
   generateExchangeId,
 } from '../crypto/seal.js';
 import {
-  AIDP_VERSION,
+  AIRP_VERSION,
   HEADER_ATTESTATIONS,
   HEADER_EXCHANGE_ID,
   HEADER_VERSION,
@@ -89,7 +89,7 @@ export async function send(provider: ProviderConfig, opts: SendOptions): Promise
 
   const headers: Record<string, string> = {
     'content-type': 'application/json',
-    [HEADER_VERSION]: AIDP_VERSION,
+    [HEADER_VERSION]: AIRP_VERSION,
     [HEADER_EXCHANGE_ID]: exchangeId,
     'cache-control': 'no-store',
     ...(provider.headers ?? {}),

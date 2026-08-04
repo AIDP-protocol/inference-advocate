@@ -17,13 +17,13 @@ import { listenHostRpc } from '../dist/host-rpc.js';
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..', '..');
 
-test('packagingWarnings is empty without AIDP_DESKTOP', () => {
+test('packagingWarnings is empty without AIRP_DESKTOP', () => {
   assert.deepEqual(packagingWarnings({}), []);
-  assert.deepEqual(packagingWarnings({ AIDP_DESKTOP: '0' }), []);
+  assert.deepEqual(packagingWarnings({ AIRP_DESKTOP: '0' }), []);
 });
 
-test('packagingWarnings names the Node-launcher gap when AIDP_DESKTOP=1', () => {
-  const w = packagingWarnings({ AIDP_DESKTOP: '1' });
+test('packagingWarnings names the Node-launcher gap when AIRP_DESKTOP=1', () => {
+  const w = packagingWarnings({ AIRP_DESKTOP: '1' });
   assert.equal(w.length, 1);
   assert.match(w[0], /Node launcher/);
   assert.match(w[0], /not embedded inside the Tauri binary/);
@@ -33,9 +33,9 @@ test('packagingWarnings names the Node-launcher gap when AIDP_DESKTOP=1', () => 
 });
 
 test('listenHostRpc answers state over loopback without HTTP or a stdio child', async () => {
-  const runDir = mkdtempSync(join(tmpdir(), 'aidp-rpc-'));
-  const prevDesktop = process.env['AIDP_DESKTOP'];
-  process.env['AIDP_DESKTOP'] = '1';
+  const runDir = mkdtempSync(join(tmpdir(), 'airp-rpc-'));
+  const prevDesktop = process.env['AIRP_DESKTOP'];
+  process.env['AIRP_DESKTOP'] = '1';
   try {
     writeFileSync(join(runDir, 'providers.json'), JSON.stringify({ version: 1, providers: [] }));
     const host = new HostSession({
@@ -98,8 +98,8 @@ test('listenHostRpc answers state over loopback without HTTP or a stdio child', 
     rl.close();
     await rpc.close();
   } finally {
-    if (prevDesktop === undefined) delete process.env['AIDP_DESKTOP'];
-    else process.env['AIDP_DESKTOP'] = prevDesktop;
+    if (prevDesktop === undefined) delete process.env['AIRP_DESKTOP'];
+    else process.env['AIRP_DESKTOP'] = prevDesktop;
     rmSync(runDir, { recursive: true, force: true });
   }
 });

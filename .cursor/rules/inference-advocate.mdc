@@ -7,7 +7,7 @@ alwaysApply: true
 # Working agreements
 
 This repository is the reference implementation of the client side of the Accountable Inference
-Delivery Protocol (AIDP), described in a paper by Justin Philip Flores. The code exists to be an
+Delivery Protocol (AIRP), described in a paper by Justin Philip Flores. The code exists to be an
 existence proof and to be read. Optimize for legibility over cleverness.
 
 Read `ARCHITECTURE.md` before making structural changes. It maps every module to the paper
@@ -46,10 +46,10 @@ and restart it so the live site updates:
 ```bash
 npm run build:ui          # when packages/ui changed
 # also rebuild/restart if packages/daemon or core packages the daemon loads changed
-pm2 restart aidp-daemon
+pm2 restart airp-daemon
 ```
 
-The daemon (`aidp-daemon` under PM2) serves `packages/ui/dist` from `.advocate-public` on
+The daemon (`airp-daemon` under PM2) serves `packages/ui/dist` from `.advocate-public` on
 127.0.0.1:8790. Do not leave the user staring at a stale build.
 
 ## Structural boundaries

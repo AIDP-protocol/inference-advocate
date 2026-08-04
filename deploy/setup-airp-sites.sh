@@ -254,10 +254,10 @@ verify_existing_demo() {
   # Legacy name kept as an alias during the rename.
   code="$(curl -s -o /dev/null -w '%{http_code}' https://tryaidp.com/)"
   [[ "$code" == "200" ]] || die "tryaidp.com (legacy alias) returned HTTP $code"
-  if ! "$PM2_BIN" describe aidp-daemon 2>/dev/null | grep -q 'status.*online'; then
-    die 'aidp-daemon is not online under PM2'
+  if ! "$PM2_BIN" describe airp-daemon 2>/dev/null | grep -q 'status.*online'; then
+    die 'airp-daemon is not online under PM2'
   fi
-  log 'advocate demo (tryairp.com / aidp-daemon) still healthy'
+  log 'advocate demo (tryairp.com / airp-daemon) still healthy'
 }
 
 print_verification_curls() {

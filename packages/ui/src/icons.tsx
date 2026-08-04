@@ -1,4 +1,4 @@
-// AIDP icon family. Paper: presentation of the apparatus (steps 1, 12) and the named
+// AIRP icon family. Paper: presentation of the apparatus (steps 1, 12) and the named
 // components that sit around the fourteen-step path (register, policy, taxonomy,
 // jurisdiction, evaluator). Marks are currentColor so they follow the surface they sit on.
 // Source SVGs live beside this file under icons/; keep the two in register.
@@ -18,7 +18,7 @@ const base = {
   'aria-hidden': true as const,
 };
 
-export function IconAidp({ title = 'AIRP', ...props }: IconProps) {
+export function IconAirp({ title = 'AIRP', ...props }: IconProps) {
   return (
     <svg {...base} {...props}>
       {title ? <title>{title}</title> : null}

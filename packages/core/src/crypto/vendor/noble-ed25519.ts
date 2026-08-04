@@ -1,6 +1,6 @@
 // @ts-nocheck
 /*! noble-ed25519 - MIT License (c) 2019 Paul Miller (paulmillr.com) */
-// Vendored into AIDP core so Ed25519 seal sign/verify stays synchronous and free of
+// Vendored into AIRP core so Ed25519 seal sign/verify stays synchronous and free of
 // node:crypto and of an npm runtime dependency. Upstream: @noble/ed25519@2.2.3.
 // @ts-nocheck: upstream is not written for this repo's strict settings; do not restyle
 // the body. LICENSE.noble-ed25519 sits beside this file.

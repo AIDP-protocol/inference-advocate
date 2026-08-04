@@ -115,7 +115,7 @@ const register = {
 };
 
 const standing = {
-  aidpStandingVersion: '0.1',
+  airpStandingVersion: '0.1',
   body: { id: 'demo-standing-body', publicKeyPem: standingBody.publicKeyPem },
   issuedAt: '2026-07-01T00:00:00.000Z',
   thresholds: { warnRate: 0.05, exclusionRate: 0.15, minimumQuorumSources: 25 },

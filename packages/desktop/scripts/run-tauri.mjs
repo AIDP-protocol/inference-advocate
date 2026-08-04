@@ -4,7 +4,7 @@
 // Paper: steps 1 and 12.
 //
 // Retires the Node stdio IPC child: HostSession is constructed here as a library, listenHostRpc
-// publishes it on 127.0.0.1, and Tauri dials AIDP_HOST_ADDR. AIDP_DESKTOP=1 still reports that
+// publishes it on 127.0.0.1, and Tauri dials AIRP_HOST_ADDR. AIRP_DESKTOP=1 still reports that
 // the advocate is not embedded inside the Rust binary.
 
 import { spawn, spawnSync } from 'node:child_process';
@@ -37,8 +37,8 @@ function spawnTauri(extraEnv) {
     env: {
       ...process.env,
       PATH: pathParts.join(process.platform === 'win32' ? ';' : ':'),
-      AIDP_REPO_ROOT: repoRoot,
-      AIDP_DESKTOP: '1',
+      AIRP_REPO_ROOT: repoRoot,
+      AIRP_DESKTOP: '1',
       ...extraEnv,
     },
     stdio: 'inherit',
@@ -55,10 +55,10 @@ if (mode === 'build') {
   const { HostSession } = await import('../../daemon/dist/host.js');
   const { listenHostRpc } = await import('../../daemon/dist/host-rpc.js');
 
-  const runDir = process.env['AIDP_RUN_DIR'] ?? join(repoRoot, '.advocate');
-  const dataDir = process.env['AIDP_DATA_DIR'] ?? join(repoRoot, 'data');
-  process.env['AIDP_DESKTOP'] = '1';
-  process.env['AIDP_REPO_ROOT'] = repoRoot;
+  const runDir = process.env['AIRP_RUN_DIR'] ?? join(repoRoot, '.advocate');
+  const dataDir = process.env['AIRP_DATA_DIR'] ?? join(repoRoot, 'data');
+  process.env['AIRP_DESKTOP'] = '1';
+  process.env['AIRP_REPO_ROOT'] = repoRoot;
 
   const host = new HostSession({
     dataDir,
@@ -66,7 +66,7 @@ if (mode === 'build') {
     providersPath: join(runDir, 'providers.json'),
     storePath: join(runDir, 'advocate.sqlite'),
     devKeyfile: join(runDir, 'dev.key'),
-    jurisdictionId: process.env['AIDP_JURISDICTION'] ?? 'us-ny',
+    jurisdictionId: process.env['AIRP_JURISDICTION'] ?? 'us-ny',
   });
 
   const rpc = await listenHostRpc(host);
@@ -78,9 +78,9 @@ if (mode === 'build') {
   for (const w of host.warnings) console.error(`  warning      ${w}`);
 
   const child = spawnTauri({
-    AIDP_HOST_ADDR: rpc.endpoint,
-    AIDP_RUN_DIR: runDir,
-    AIDP_DATA_DIR: dataDir,
+    AIRP_HOST_ADDR: rpc.endpoint,
+    AIRP_RUN_DIR: runDir,
+    AIRP_DATA_DIR: dataDir,
   });
 
   async function shutdown(code) {

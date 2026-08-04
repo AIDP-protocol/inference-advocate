@@ -35,7 +35,7 @@ interface RawVerdict {
 }
 
 export class ModelEvaluator implements Evaluator {
-  readonly id = 'aidp-model-evaluator';
+  readonly id = 'airp-model-evaluator';
   readonly version: string;
   readonly #taxonomy: Taxonomy;
   readonly #opts: ModelEvaluatorOptions;

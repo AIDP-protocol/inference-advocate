@@ -16,10 +16,10 @@ import { fileURLToPath } from 'node:url';
 import { dispatchHostMethod, HostSession } from './host.js';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
-const dataDir = process.env['AIDP_DATA_DIR'] ?? join(repoRoot, 'data');
-const runDir = process.env['AIDP_RUN_DIR'] ?? join(repoRoot, '.advocate');
+const dataDir = process.env['AIRP_DATA_DIR'] ?? join(repoRoot, 'data');
+const runDir = process.env['AIRP_RUN_DIR'] ?? join(repoRoot, '.advocate');
 const uiDist = join(repoRoot, 'packages', 'ui', 'dist');
-const PORT = Number(process.env['AIDP_PORT'] ?? 8790);
+const PORT = Number(process.env['AIRP_PORT'] ?? 8790);
 
 const host = new HostSession({
   dataDir,
@@ -27,7 +27,7 @@ const host = new HostSession({
   providersPath: join(runDir, 'providers.json'),
   storePath: join(runDir, 'advocate.sqlite'),
   devKeyfile: join(runDir, 'dev.key'),
-  jurisdictionId: process.env['AIDP_JURISDICTION'] ?? 'us-ny',
+  jurisdictionId: process.env['AIRP_JURISDICTION'] ?? 'us-ny',
 });
 
 const MIME: Record<string, string> = {

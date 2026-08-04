@@ -21,7 +21,7 @@ export interface ProviderRates {
 }
 
 export interface TelemetryBatch {
-  aidpTelemetryVersion: string;
+  airpTelemetryVersion: string;
   /** Anonymous but unique. Hardware attestation backing is disclosed in the provisional and not built here. */
   instanceCredential: string;
   trafficClass: string;
@@ -80,7 +80,7 @@ export function canonicalBatch(batch: TelemetryBatch): Buffer {
     }));
   return Buffer.from(
     JSON.stringify({
-      aidpTelemetryVersion: batch.aidpTelemetryVersion,
+      airpTelemetryVersion: batch.airpTelemetryVersion,
       instanceCredential: batch.instanceCredential,
       trafficClass: batch.trafficClass,
       windowStart: batch.windowStart,

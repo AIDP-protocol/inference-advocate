@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url';
 import {
   HEADER_EXCHANGE_ID,
   HEADER_VERSION,
-  AIDP_VERSION,
+  AIRP_VERSION,
   SSE_CHAT_DELTA_V1,
   ServingRegister,
   accumulateStream,
@@ -74,7 +74,7 @@ const res = await fetch(url, {
   headers: {
     'content-type': 'application/json',
     'cache-control': 'no-store',
-    [HEADER_VERSION]: AIDP_VERSION,
+    [HEADER_VERSION]: AIRP_VERSION,
     [HEADER_EXCHANGE_ID]: exchangeId,
   },
   body: bodyText,

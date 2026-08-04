@@ -62,7 +62,7 @@ test('vendored custody crypto matches node:crypto scrypt and HKDF', () => {
   // Same master bytes yield the same store key as node hkdfSync with empty salt.
   const ikm = Buffer.alloc(32, 7);
   const nodeDerived = Buffer.from(
-    hkdfSync('sha256', ikm, Buffer.alloc(0), 'aidp/advocate/store/transcript', 32),
+    hkdfSync('sha256', ikm, Buffer.alloc(0), 'airp/advocate/store/transcript', 32),
   );
   const portable = MasterSecret.fromBytes(ikm).deriveStoreKey('transcript');
   const probe = new StoreKey('transcript', nodeDerived);

@@ -255,7 +255,7 @@ test('a sealed response passes the deterministic layer and a substituted one doe
 test('an excluded provider is refused before the request is sent', async () => {
   const standing = new StandingRegistry(
     {
-      aidpStandingVersion: '0.1',
+      airpStandingVersion: '0.1',
       body: { id: 'test', publicKeyPem: '' },
       issuedAt: '2026-07-01T00:00:00.000Z',
       thresholds: { warnRate: 0.05, exclusionRate: 0.15, minimumQuorumSources: 25 },
@@ -280,7 +280,7 @@ test('an excluded provider is refused before the request is sent', async () => {
 });
 
 test('openAdvocate loads the shipped documents and reports its own gaps', () => {
-  const dir = mkdtempSync(join(tmpdir(), 'aidp-'));
+  const dir = mkdtempSync(join(tmpdir(), 'airp-'));
   try {
     const opened = openAdvocate({
       dataDir: dataPath(),

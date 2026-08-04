@@ -52,7 +52,7 @@ structurally unable to transmit content. Provisional Section 2.2." \
 
 commit "feat(core): the pipe, Interchange bootstrap and provider config (phase 1)
 
-OpenAI-compatible wire format as the Interchange bootstrap, with the AIDP
+OpenAI-compatible wire format as the Interchange bootstrap, with the AIRP
 additions carried in headers an unmodified server ignores. Paper steps 3
 and 6." \
   packages/core/src/interchange

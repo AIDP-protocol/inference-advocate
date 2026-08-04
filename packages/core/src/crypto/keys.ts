@@ -23,7 +23,7 @@ export type StoreName = 'transcript' | 'preference' | 'ledger' | 'attestation' |
 const KEY_BYTES = 32;
 const SALT_BYTES = 16;
 const IV_BYTES = 12;
-const INFO_PREFIX = 'aidp/advocate/store/';
+const INFO_PREFIX = 'airp/advocate/store/';
 
 /** CSPRNG bytes via Web Crypto. Available on Node 19+ without importing node:crypto. */
 function randomBytes(n: number): Buffer {

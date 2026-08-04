@@ -28,7 +28,7 @@ Required keys are documented in `deploy/local.env.example`.
 | `api.cheapai.win` | Reverse proxy to mock provider on `127.0.0.1:8822` |
 | `honestmodel.win`, `cheapai.win` | Static holding pages under `$AIRP_SITES_ROOT/<domain>` |
 
-It does **not** replace the `aidp-daemon` PM2 process. The advocate UI is served at
+It does **not** replace the `airp-daemon` PM2 process. The advocate UI is served at
 `tryairp.com` (with legacy `tryaidp.com` / `dev.tryaidp.com` aliases) by reverse-proxying
 that daemon.
 

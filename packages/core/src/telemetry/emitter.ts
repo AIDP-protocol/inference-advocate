@@ -59,7 +59,7 @@ export class TelemetryEmitter {
       granularityFloor: this.#opts.granularityFloor,
     });
     const batch: TelemetryBatch = {
-      aidpTelemetryVersion: '0.1',
+      airpTelemetryVersion: '0.1',
       instanceCredential: this.#instanceCredential,
       trafficClass: this.#opts.trafficClass,
       windowStart,

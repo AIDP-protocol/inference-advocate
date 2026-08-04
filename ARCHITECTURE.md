@@ -5,7 +5,7 @@ repository states the paper section and step it implements at the top of its fil
 index of those statements, plus an honest list of what the reference implementation does not
 do.
 
-The paper is *Accountable Inference Delivery Protocol (AIDP): An Advocate for AI Users and a
+The paper is *Accountable Inference Delivery Protocol (AIRP): An Advocate for AI Users and a
 Surface for Policy Implementation* (Justin Philip Flores, 2026). The on-the-wire name is now
 AIRP; the paper title is unchanged. Section 4 follows a single response through fourteen
 steps. That path is the spine of this repository. The public demo is at `https://tryairp.com`.
@@ -39,7 +39,7 @@ in-process in the Node launcher and reaches it from Tauri over loopback RPC
 (`packages/daemon/src/host-rpc.ts`), with Tauri commands as the UI bridge. There is no Node
 stdio IPC child. The browser-tab path still uses the loopback HTTP listener. HostSession is
 still not inside the Rust binary; embedding it there needs an in-process JS runtime or a Rust
-port of the host and store. `AIDP_DESKTOP=1` makes the advocate say so at startup.
+port of the host and store. `AIRP_DESKTOP=1` makes the advocate say so at startup.
 
 The trust artifacts are data files with detached signatures and pinned public keys, not
 hardcoded constants. The Serving Register, the Standing document, the flag taxonomy, the
@@ -84,7 +84,7 @@ The provisional patent application's four mechanisms map on top of the same file
 **The Interchange bootstraps on the OpenAI-compatible wire format.** A wire standard nobody
 serves is not an existence proof. The advocate speaks the format every provider already speaks
 and carries the AIRP additions in headers an unmodified server ignores: `AIRP-Exchange-Id` and
-`X-AIDP-Attestations` outbound, `AIRP-Seal` inbound (with `AIDP-Seal` / `X-AIDP-Seal` still
+`X-AIRP-Attestations` outbound, `AIRP-Seal` inbound (with `AIDP-Seal` / `X-AIDP-Seal` still
 accepted on read). A provider that has never heard of AIRP still answers, and its
 responses arrive unsealed, which is a finding rather than an error. That is the migration path.
 
@@ -113,7 +113,7 @@ would have. A demo that quietly used a frontier model to police frontier models 
 arguing against its own paper.
 
 The evaluator is chosen by configuration rather than by code: an evaluator config file, or the
-`AIDP_EVALUATOR_CONFIG` environment variable, selects between the rule evaluator and any
+`AIRP_EVALUATOR_CONFIG` environment variable, selects between the rule evaluator and any
 OpenAI-compatible endpoint. `packages/core/src/monitor/evaluator-config.ts` is where the two
 costs of that choice are made visible rather than buried. A hosted evaluator receives response
 content, so its origin appears in the export view as an outbound content path and the advocate
@@ -250,7 +250,7 @@ and calls `HostSession` through Tauri commands over loopback RPC into a HostSess
 launcher constructed in-process (`packages/daemon/src/host-rpc.ts`). There is no HTTP listener
 for advocate operations in the desktop path, and no Node stdio IPC child. The browser-tab path
 still uses the loopback daemon. HostSession is not embedded inside the Tauri binary;
-`AIDP_DESKTOP=1` reports that gap at startup. Bundled installers (`bundle.active`) are off.
+`AIRP_DESKTOP=1` reports that gap at startup. Bundled installers (`bundle.active`) are off.
 App icons under `packages/desktop/src-tauri/icons/` and the web favicon set under
 `packages/ui/public/` use the Inference Advocate mark. Building the shell needs Rust and
 Tauri 2 system libraries (webkit2gtk 4.1 on Linux). See `packages/desktop/README.md`.

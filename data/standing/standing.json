@@ -1,5 +1,5 @@
 {
-  "aidpStandingVersion": "0.1",
+  "airpStandingVersion": "0.1",
   "body": {
     "id": "demo-standing-body",
     "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAugiENxTOqZclimo1onMYfDvgX13nDsZuoQzEPPY2hjY=\n-----END PUBLIC KEY-----\n"

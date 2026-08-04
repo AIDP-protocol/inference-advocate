@@ -15,9 +15,9 @@ import { fileURLToPath } from 'node:url';
 import { openAdvocate } from '@airp/store-sqlite';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
-const dataDir = process.env['AIDP_DATA_DIR'] ?? join(repoRoot, 'data');
-const runDir = process.env['AIDP_RUN_DIR'] ?? join(repoRoot, '.advocate');
-const scratch = mkdtempSync(join(tmpdir(), 'aidp-doctor-'));
+const dataDir = process.env['AIRP_DATA_DIR'] ?? join(repoRoot, 'data');
+const runDir = process.env['AIRP_RUN_DIR'] ?? join(repoRoot, '.advocate');
+const scratch = mkdtempSync(join(tmpdir(), 'airp-doctor-'));
 
 function line(label: string, value: string): void {
   console.log(`  ${label.padEnd(24)} ${value}`);
@@ -38,13 +38,13 @@ line(
 
 console.log('');
 console.log('environment');
-const evaluatorEnv = process.env['AIDP_EVALUATOR_CONFIG'];
-line('AIDP_EVALUATOR_CONFIG', evaluatorEnv ? evaluatorEnv : 'not set, so the rule evaluator is used');
+const evaluatorEnv = process.env['AIRP_EVALUATOR_CONFIG'];
+line('AIRP_EVALUATOR_CONFIG', evaluatorEnv ? evaluatorEnv : 'not set, so the rule evaluator is used');
 if (evaluatorEnv) {
   line('  that path exists', existsSync(evaluatorEnv) ? 'yes' : 'NO, the advocate will fall back to the rule evaluator');
 }
-line('AIDP_JURISDICTION', process.env['AIDP_JURISDICTION'] ?? 'not set, the daemon defaults to us-ny');
-for (const name of Object.keys(process.env).filter((k) => k.startsWith('AIDP_') && k.endsWith('_API_KEY'))) {
+line('AIRP_JURISDICTION', process.env['AIRP_JURISDICTION'] ?? 'not set, the daemon defaults to us-ny');
+for (const name of Object.keys(process.env).filter((k) => k.startsWith('AIRP_') && k.endsWith('_API_KEY'))) {
   line(name, process.env[name] ? 'set' : 'empty');
 }
 
@@ -53,7 +53,7 @@ try {
     dataDir,
     storePath: join(scratch, 'probe.sqlite'),
     ...(existsSync(join(runDir, 'providers.json')) ? { providersPath: join(runDir, 'providers.json') } : {}),
-    jurisdictionId: process.env['AIDP_JURISDICTION'] ?? 'us-ny',
+    jurisdictionId: process.env['AIRP_JURISDICTION'] ?? 'us-ny',
   });
 
   console.log('');

@@ -4,7 +4,7 @@ Reference implementation of the client side of the **Accountable Inference Deliv
 Protocol**, now published on the wire as **AIRP** (see
 [`draft-flores-airp-provenance`](https://datatracker.ietf.org/doc/draft-flores-aidp-provenance/)).
 The architecture paper that this client implements was released under the earlier name
-[*Accountable Inference Delivery Protocol (AIDP): An Advocate for AI Users and a Surface for
+[*Accountable Inference Delivery Protocol (AIRP): An Advocate for AI Users and a Surface for
 Policy Implementation*](https://doi.org/10.5281/zenodo.21610185) (Justin Philip Flores, 2026).
 
 Live public demo: **[https://tryairp.com](https://tryairp.com)** (legacy hostnames under
@@ -92,8 +92,8 @@ To run a real evaluator, point the advocate at any OpenAI-compatible endpoint:
 
 ```bash
 cp data/evaluator.example.json .advocate/evaluator.json   # then edit it
-export AIDP_EVALUATOR_API_KEY=...                          # only if the endpoint needs a key
-export AIDP_EVALUATOR_CONFIG=.advocate/evaluator.json
+export AIRP_EVALUATOR_API_KEY=...                          # only if the endpoint needs a key
+export AIRP_EVALUATOR_CONFIG=.advocate/evaluator.json
 npm run demo                                               # or npm run daemon
 ```
 
@@ -101,8 +101,8 @@ In PowerShell:
 
 ```powershell
 Copy-Item data\evaluator.example.json .advocate\evaluator.json
-$env:AIDP_EVALUATOR_API_KEY = "..."
-$env:AIDP_EVALUATOR_CONFIG = ".advocate\evaluator.json"
+$env:AIRP_EVALUATOR_API_KEY = "..."
+$env:AIRP_EVALUATOR_CONFIG = ".advocate\evaluator.json"
 npm run demo
 ```
 

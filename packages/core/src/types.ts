@@ -44,7 +44,7 @@ export interface AttestationPackage {
   issuer?: string;
 }
 
-/** The Provenance Seal. Paper step 5, ancestry DKIM. */
+/** The Provenance Seal. Paper step 5, ancestry DKIM. Spec §3. */
 export interface ProvenanceSeal {
   /** Register entry the signing key belongs to. */
   registerEntryId: string;
@@ -54,6 +54,10 @@ export interface ProvenanceSeal {
   model: string;
   /** Provider identity as registered. */
   providerIdentity: string;
+  /** Echo of AIRP-Exchange-Id. Required on AIRP seals. Spec §3.8.1. */
+  exchangeId?: string;
+  /** Request body digest. Required on AIRP seals. Spec §3.4. */
+  requestDigest?: string;
   /** RFC3339 timestamp of signing. */
   signedAt: string;
   /** Algorithm. Only ed25519 at reference stage. */
@@ -62,13 +66,33 @@ export interface ProvenanceSeal {
   signature: string;
 }
 
-/** What the adapter hands back from a provider call. Paper step 6. */
+/** Header field that carried the seal. Selects the payload reconstruction path. Spec §7.1. */
+export type SealHeaderField = 'airp-seal' | 'aidp-seal' | 'x-aidp-seal';
+
+/** What the adapter hands back from a provider call. Paper step 6. Spec §3.8. */
 export interface ProviderResponse {
   providerId: string;
-  /** The assistant text as served. */
+  /** The assistant text extracted for delivery and semantic evaluation. */
   content: string;
+  /**
+   * Octets the seal covers: decompressed response body (non-streamed) or binding-extracted
+   * stream bytes. Spec §3.8.2 / §3.8.3.
+   */
+  sealedContent: Uint8Array;
   /** Present only if the provider sealed. Absence is a finding, not an error. Paper step 7. */
   seal?: ProvenanceSeal;
+  /** Which response header carried the seal, when present. Spec §7.1. */
+  sealFieldName?: SealHeaderField;
+  /** True when more than one AIRP-Seal header field was present. Spec §3.8.3. */
+  multipleSeals?: boolean;
+  /** Seal header was present but could not be decoded (malformed or duplicate JSON member). */
+  sealDecodeFailed?: boolean;
+  /** True when decode failed specifically because of a duplicate JSON member name. Spec §3.8. */
+  sealDuplicateMember?: boolean;
+  /** Exchange id the client sent on this request. Spec §3.8.1. */
+  exchangeId: string;
+  /** Digest of the request body the client retained. Spec §3.4 / §6.11. */
+  requestDigest: string;
   /** Endpoint actually contacted, checked against the register at step 7. */
   servedFrom: string;
   /** Model name the wire response reported. */
@@ -77,6 +101,11 @@ export interface ProviderResponse {
   receivedAt: string;
   /** Raw latency in milliseconds, for the UI. */
   latencyMs: number;
+  /**
+   * DNS / key-set confirmation qualifier. Spec §4.8 / §6.3. Distinct from findings: an
+   * attribution without a confirming digest must still be distinguishable in reporting.
+   */
+  entryUnconfirmed?: boolean;
 }
 
 /** Flag types of taxonomy v0. Paper, Definitions and step 8. */
@@ -103,7 +132,7 @@ export interface EvidenceSpan {
   text: string;
 }
 
-/** The deterministic pass result. Paper step 7. */
+/** The deterministic pass result. Paper step 7. Spec §6. */
 export interface DeterministicVerdict {
   /** True when nothing in the deterministic layer refused the response. */
   passed: boolean;
@@ -114,6 +143,8 @@ export interface DeterministicVerdict {
   findings: DeterministicFinding[];
   /** Register entry resolved, if any. */
   registerEntryId?: string;
+  /** Whether DNS key-set digest confirmed the entry. Spec §4.8. */
+  attribution: AttributionQualifier;
 }
 
 export type DeterministicFindingCode =
@@ -121,9 +152,19 @@ export type DeterministicFindingCode =
   | 'seal_malformed'
   | 'seal_signature_invalid'
   | 'seal_key_unknown'
+  | 'seal_key_compromised'
+  | 'seal_key_retired'
   | 'seal_model_mismatch'
+  | 'seal_provider_mismatch'
   | 'seal_entry_mismatch'
   | 'seal_not_fresh'
+  | 'seal_multiple'
+  | 'seal_duplicate_json_member'
+  | 'request_modified'
+  | 'exchange_id_mismatch'
+  | 'content_after_terminal_seal'
+  | 'unknown_content_binding'
+  | 'key_set_digest_mismatch'
   | 'endpoint_not_authorized'
   | 'register_entry_unknown'
   | 'register_entry_revoked';
@@ -134,6 +175,12 @@ export interface DeterministicFinding {
   /** Refusing findings end evaluation without a semantic pass. Paper step 7. */
   refuses: boolean;
 }
+
+/**
+ * Reporting qualifier on an otherwise attributable verdict. Spec §4.8: an entry taken from
+ * a register document alone, without a confirming key set digest, is unconfirmed.
+ */
+export type AttributionQualifier = 'confirmed' | 'unconfirmed' | 'none';
 
 /** The semantic pass result. Paper step 8. */
 export interface SemanticVerdict {

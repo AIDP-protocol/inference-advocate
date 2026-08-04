@@ -8,12 +8,20 @@ export * from './types.js';
 export { MasterSecret, StoreKey, type StoreName } from './crypto/keys.js';
 export {
   canonicalSealPayload,
+  canonicalAirpSealPayload,
+  canonicalAirpPresealPayload,
+  canonicalAidpSealPayload,
+  computeRequestDigest,
+  generateExchangeId,
   generateSealKeypair,
   signSeal,
+  signAidpSeal,
   verifySeal,
   signDocument,
   verifyDocument,
+  pemSpkiBody,
   type SealSubject,
+  type SealFieldName,
 } from './crypto/seal.js';
 
 export {
@@ -39,12 +47,14 @@ export { sha256Hex } from './crypto/sha256.js';
 export { sha512 } from './crypto/sha512.js';
 
 export * from './interchange/wire.js';
+export { parseJsonNoDuplicates, DuplicateJsonMemberError } from './interchange/json-strict.js';
 export { send, resolveApiKey, ProviderError, type SendOptions } from './interchange/openai-adapter.js';
 export { ProviderRegistry, type ProvidersFile } from './interchange/providers.js';
 
 export {
   ServingRegister,
   endpointMatches,
+  computeKeySetDigest,
   type RegisterDocument,
   type RegisterEntry,
   type RegisterKey,
@@ -55,7 +65,27 @@ export {
   runDeterministicPass,
   MAX_SEAL_AGE_MS,
   MAX_SEAL_FUTURE_SKEW_MS,
+  type DeterministicPassOptions,
 } from './monitor/deterministic.js';
+export {
+  ContentBindingRegistry,
+  defaultContentBindings,
+  accumulateBoundContent,
+  accumulateStream,
+  SSE_CHAT_DELTA_V1,
+  SSE_CONTENT_BLOCK_DELTA_V1,
+  type ContentBinding,
+  type StreamSealEvent,
+} from './monitor/content-bindings.js';
+export {
+  parseAirpTxt,
+  selectAirpTxtRecords,
+  lookupAirpBinding,
+  isForbiddenAutoFetchHost,
+  type AirpDnsBinding,
+  type AirpDnsLookupResult,
+  type ResolveTxtFn,
+} from './monitor/dns-binding.js';
 export { Taxonomy, type TaxonomyDocument, type FlagDefinition, type Criterion } from './monitor/taxonomy.js';
 export { SemanticMonitor, type Evaluator, type EvaluationRequest } from './monitor/semantic.js';
 export { RuleEvaluator } from './monitor/evaluators/rule-evaluator.js';

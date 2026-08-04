@@ -45,7 +45,7 @@ writeFileSync(join(dataDir, 'demo-keys', 'provider-aligned-private.pem'), aligne
 writeFileSync(join(dataDir, 'demo-keys', 'provider-companion-private.pem'), companion.privateKeyPem);
 
 const register = {
-  aidpRegisterVersion: '1',
+  airpRegisterVersion: '1',
   issuedAt: '2026-07-01T00:00:00.000Z',
   registrar: { id: 'demo-registrar', publicKeyPem: registrar.publicKeyPem },
   entries: [

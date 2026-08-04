@@ -1,6 +1,7 @@
 // Provenance Seal signing and verification.
 //
 // Paper: step 5 (the provider signs) and step 7 (the advocate verifies). Ancestry: DKIM.
+// Spec: draft-flores-airp-provenance-00 §§3.4–3.6, §3.8, §6.7.
 //
 // The advocate only ever verifies. The signing half lives here too because the reference
 // repository ships a mock provider that seals, and because a register of public keys is
@@ -8,6 +9,10 @@
 //
 // Ed25519 is pure TypeScript (ed25519.ts / vendored noble), so this module does not import
 // node:crypto. PEM encode/decode is fixed-size SPKI and PKCS8 for Ed25519 only.
+//
+// Canonical construction is octets: UTF-8 header block, then content bytes appended without
+// re-encoding. AIRP and legacy AIDP payloads are built on separate paths so a token from one
+// family can never be substituted into the other.
 
 import type { ProvenanceSeal } from '../types.js';
 import {
@@ -16,20 +21,30 @@ import {
   ed25519Sign,
   ed25519Verify,
 } from './ed25519.js';
+import { sha256 } from './vendor/noble-hashes/sha2.js';
 
 /** SPKI prefix for a 32-byte Ed25519 public key (RFC 8410). */
 const SPKI_PREFIX = Buffer.from('302a300506032b6570032100', 'hex');
 /** PKCS8 prefix for a 32-byte Ed25519 seed (RFC 8410). */
 const PKCS8_PREFIX = Buffer.from('302e020100300506032b657004220420', 'hex');
 
+const utf8 = new TextEncoder();
+
+/** Header field that carried the seal. Selects which payload reconstruction path to use. */
+export type SealFieldName = 'airp-seal' | 'aidp-seal' | 'x-aidp-seal';
+
 export interface SealSubject {
   registerEntryId: string;
   selector: string;
   model: string;
   providerIdentity: string;
+  /** Base64url unpadded exchange identifier, or empty where the request carried none. */
+  exchangeId: string;
+  /** `sha-256=` + base64url unpadded digest of the request body. */
+  requestDigest: string;
   signedAt: string;
-  /** The served response text. */
-  content: string;
+  /** Sealed content octets (decompressed body, or binding-extracted stream bytes). */
+  content: Uint8Array;
 }
 
 /**
@@ -44,29 +59,114 @@ function assertNoLineBreak(field: string, value: string): void {
   }
 }
 
+function concatOctets(parts: Uint8Array[]): Uint8Array {
+  let len = 0;
+  for (const p of parts) len += p.length;
+  const out = new Uint8Array(len);
+  let off = 0;
+  for (const p of parts) {
+    out.set(p, off);
+    off += p.length;
+  }
+  return out;
+}
+
 /**
- * Canonical bytes over which the signature is computed. Field order is fixed here rather
- * than taken from object iteration order, so that two implementations agree.
+ * AIRP terminal-seal payload. Spec §3.6. Separate from the pre-seal and legacy builders on
+ * purpose: do not factor the version token into a shared parameterized builder.
  */
-export function canonicalSealPayload(s: SealSubject): Buffer {
+export function canonicalAirpSealPayload(s: SealSubject): Uint8Array {
+  assertNoLineBreak('register-entry', s.registerEntryId);
+  assertNoLineBreak('selector', s.selector);
+  assertNoLineBreak('model', s.model);
+  assertNoLineBreak('provider', s.providerIdentity);
+  assertNoLineBreak('exchange-id', s.exchangeId);
+  assertNoLineBreak('request-digest', s.requestDigest);
+  assertNoLineBreak('signed-at', s.signedAt);
+
+  const header =
+    'airp-seal/v1\n' +
+    `register-entry:${s.registerEntryId}\n` +
+    `selector:${s.selector}\n` +
+    `model:${s.model}\n` +
+    `provider:${s.providerIdentity}\n` +
+    `exchange-id:${s.exchangeId}\n` +
+    `request-digest:${s.requestDigest}\n` +
+    `signed-at:${s.signedAt}\n` +
+    `content-length:${s.content.byteLength}\n` +
+    '\n';
+  return concatOctets([utf8.encode(header), s.content]);
+}
+
+/** AIRP pre-seal payload. Spec §3.6. */
+export function canonicalAirpPresealPayload(s: SealSubject): Uint8Array {
+  assertNoLineBreak('register-entry', s.registerEntryId);
+  assertNoLineBreak('selector', s.selector);
+  assertNoLineBreak('model', s.model);
+  assertNoLineBreak('provider', s.providerIdentity);
+  assertNoLineBreak('exchange-id', s.exchangeId);
+  assertNoLineBreak('request-digest', s.requestDigest);
+  assertNoLineBreak('signed-at', s.signedAt);
+
+  const header =
+    'airp-preseal/v1\n' +
+    `register-entry:${s.registerEntryId}\n` +
+    `selector:${s.selector}\n` +
+    `model:${s.model}\n` +
+    `provider:${s.providerIdentity}\n` +
+    `exchange-id:${s.exchangeId}\n` +
+    `request-digest:${s.requestDigest}\n` +
+    `signed-at:${s.signedAt}\n` +
+    `content-length:${s.content.byteLength}\n` +
+    '\n';
+  return concatOctets([utf8.encode(header), s.content]);
+}
+
+/**
+ * Legacy AIDP terminal-seal payload. Used only when verifying a seal that arrived under
+ * AIDP-Seal or X-AIDP-Seal. Field set matches the pre-AIRP wire (no exchange-id / request-digest).
+ */
+export function canonicalAidpSealPayload(s: {
+  registerEntryId: string;
+  selector: string;
+  model: string;
+  providerIdentity: string;
+  signedAt: string;
+  content: Uint8Array;
+}): Uint8Array {
   assertNoLineBreak('register-entry', s.registerEntryId);
   assertNoLineBreak('selector', s.selector);
   assertNoLineBreak('model', s.model);
   assertNoLineBreak('provider', s.providerIdentity);
   assertNoLineBreak('signed-at', s.signedAt);
 
-  const lines = [
-    'aidp-seal/v1',
-    `register-entry:${s.registerEntryId}`,
-    `selector:${s.selector}`,
-    `model:${s.model}`,
-    `provider:${s.providerIdentity}`,
-    `signed-at:${s.signedAt}`,
-    `content-length:${Buffer.byteLength(s.content, 'utf8')}`,
-    '',
-    s.content,
-  ];
-  return Buffer.from(lines.join('\n'), 'utf8');
+  const header =
+    'aidp-seal/v1\n' +
+    `register-entry:${s.registerEntryId}\n` +
+    `selector:${s.selector}\n` +
+    `model:${s.model}\n` +
+    `provider:${s.providerIdentity}\n` +
+    `signed-at:${s.signedAt}\n` +
+    `content-length:${s.content.byteLength}\n` +
+    '\n';
+  return concatOctets([utf8.encode(header), s.content]);
+}
+
+/** Default canonical payload for newly minted seals (AIRP terminal). */
+export function canonicalSealPayload(s: SealSubject): Uint8Array {
+  return canonicalAirpSealPayload(s);
+}
+
+/** `sha-256=` + base64url unpadded SHA-256 of the request body. Spec §3.4. */
+export function computeRequestDigest(requestBody: Uint8Array): string {
+  return `sha-256=${Buffer.from(sha256(requestBody)).toString('base64url')}`;
+}
+
+/** At least 128 bits from a CSPRNG, base64url unpadded. Spec §3.8.1. */
+export function generateExchangeId(): string {
+  const bytes = new Uint8Array(16);
+  globalThis.crypto.getRandomValues(bytes);
+  return Buffer.from(bytes).toString('base64url');
 }
 
 function toPem(label: string, der: Buffer): string {
@@ -109,6 +209,11 @@ function decodePrivateKeyPem(pem: string): Uint8Array {
   return new Uint8Array(der.subarray(PKCS8_PREFIX.length));
 }
 
+/** PEM body with armor and whitespace removed (DER SubjectPublicKeyInfo base64). Spec §4.8. */
+export function pemSpkiBody(publicKeyPem: string): string {
+  return fromPem(publicKeyPem, 'PUBLIC KEY').toString('base64');
+}
+
 export function generateSealKeypair(): { publicKeyPem: string; privateKeyPem: string } {
   const seed = ed25519RandomSeed();
   const publicKey = ed25519PublicKeyFromSeed(seed);
@@ -120,7 +225,72 @@ export function generateSealKeypair(): { publicKeyPem: string; privateKeyPem: st
 
 export function signSeal(subject: SealSubject, privateKeyPem: string): ProvenanceSeal {
   const seed = decodePrivateKeyPem(privateKeyPem);
-  const signature = ed25519Sign(canonicalSealPayload(subject), seed);
+  const signature = ed25519Sign(canonicalAirpSealPayload(subject), seed);
+  return {
+    registerEntryId: subject.registerEntryId,
+    selector: subject.selector,
+    model: subject.model,
+    providerIdentity: subject.providerIdentity,
+    exchangeId: subject.exchangeId,
+    requestDigest: subject.requestDigest,
+    signedAt: subject.signedAt,
+    alg: 'ed25519',
+    signature: Buffer.from(signature).toString('base64url'),
+  };
+}
+
+/**
+ * Verify a seal under the reconstruction path dictated by the header field that carried it.
+ * Spec §7.1 / item 1 of the AIRP delta: never validate one family's token as the other.
+ */
+export function verifySeal(
+  seal: ProvenanceSeal,
+  content: Uint8Array,
+  publicKeyPem: string,
+  fieldName: SealFieldName = 'airp-seal',
+): boolean {
+  if (seal.alg !== 'ed25519') return false;
+  try {
+    const payload =
+      fieldName === 'airp-seal'
+        ? canonicalAirpSealPayload({
+            registerEntryId: seal.registerEntryId,
+            selector: seal.selector,
+            model: seal.model,
+            providerIdentity: seal.providerIdentity,
+            exchangeId: seal.exchangeId ?? '',
+            requestDigest: seal.requestDigest ?? '',
+            signedAt: seal.signedAt,
+            content,
+          })
+        : canonicalAidpSealPayload({
+            registerEntryId: seal.registerEntryId,
+            selector: seal.selector,
+            model: seal.model,
+            providerIdentity: seal.providerIdentity,
+            signedAt: seal.signedAt,
+            content,
+          });
+    return ed25519Verify(Buffer.from(seal.signature, 'base64url'), payload, decodePublicKeyPem(publicKeyPem));
+  } catch {
+    return false;
+  }
+}
+
+/** Sign a legacy AIDP payload. Test and migration support only; nothing emits this on the wire. */
+export function signAidpSeal(
+  subject: {
+    registerEntryId: string;
+    selector: string;
+    model: string;
+    providerIdentity: string;
+    signedAt: string;
+    content: Uint8Array;
+  },
+  privateKeyPem: string,
+): ProvenanceSeal {
+  const seed = decodePrivateKeyPem(privateKeyPem);
+  const signature = ed25519Sign(canonicalAidpSealPayload(subject), seed);
   return {
     registerEntryId: subject.registerEntryId,
     selector: subject.selector,
@@ -130,26 +300,6 @@ export function signSeal(subject: SealSubject, privateKeyPem: string): Provenanc
     alg: 'ed25519',
     signature: Buffer.from(signature).toString('base64url'),
   };
-}
-
-export function verifySeal(seal: ProvenanceSeal, content: string, publicKeyPem: string): boolean {
-  if (seal.alg !== 'ed25519') return false;
-  try {
-    return ed25519Verify(
-      Buffer.from(seal.signature, 'base64url'),
-      canonicalSealPayload({
-        registerEntryId: seal.registerEntryId,
-        selector: seal.selector,
-        model: seal.model,
-        providerIdentity: seal.providerIdentity,
-        signedAt: seal.signedAt,
-        content,
-      }),
-      decodePublicKeyPem(publicKeyPem),
-    );
-  } catch {
-    return false;
-  }
 }
 
 /** Detached signature over an arbitrary document, used for the register and standing files. */

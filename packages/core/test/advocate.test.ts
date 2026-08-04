@@ -7,6 +7,7 @@ import { openSqliteStore, openAdvocate } from '@aidp/store-sqlite';
 import { dataPath } from './helpers.js';
 import {
   Advocate,
+  computeRequestDigest,
   decodeAttestations,
   DeliveryPolicy,
   encodeSeal,
@@ -36,6 +37,14 @@ function scriptedProvider(script: string[], keys?: { privateKeyPem: string; entr
     i += 1;
     const headers = new Headers(init?.headers as Record<string, string> | undefined);
     seen.push({ headers: Object.fromEntries(headers.entries()) });
+    const requestBody = typeof init?.body === 'string' ? init.body : '';
+    const exchangeId = headers.get('airp-exchange-id') ?? '';
+    const requestDigest = computeRequestDigest(new TextEncoder().encode(requestBody));
+    const body = JSON.stringify({
+      model: keys?.model ?? 'test-model',
+      choices: [{ message: { role: 'assistant', content } }],
+    });
+    const bodyBytes = new TextEncoder().encode(body);
     const outHeaders: Record<string, string> = { 'content-type': 'application/json' };
     if (keys) {
       const seal = signSeal(
@@ -44,19 +53,18 @@ function scriptedProvider(script: string[], keys?: { privateKeyPem: string; entr
           selector: 's1',
           model: keys.model,
           providerIdentity: 'test',
+          exchangeId,
+          requestDigest,
           // Sealed at serving time. A fixed timestamp here would be stale against the
           // response's real receipt time and would trip the freshness rule.
           signedAt: new Date().toISOString(),
-          content,
+          content: bodyBytes,
         },
         keys.privateKeyPem,
       );
       outHeaders[HEADER_SEAL] = encodeSeal(seal);
     }
-    return new Response(
-      JSON.stringify({ model: keys?.model ?? 'test-model', choices: [{ message: { role: 'assistant', content } }] }),
-      { status: 200, headers: outHeaders },
-    );
+    return new Response(bodyBytes, { status: 200, headers: outHeaders });
   }) as unknown as typeof fetch;
   return { fetchImpl, seen };
 }
@@ -70,7 +78,7 @@ function build(opts: {
 }) {
   const keys = generateSealKeypair();
   const register = ServingRegister.fromDocument({
-    aidpRegisterVersion: '1',
+    airpRegisterVersion: '1',
     issuedAt: '2026-07-01T00:00:00.000Z',
     registrar: { id: 'test', publicKeyPem: 'unused' },
     entries: [
@@ -293,6 +301,7 @@ test('openAdvocate loads the shipped documents and reports its own gaps', () => 
       'startup warnings must not publish absolute home or drive paths',
     );
     assert.ok(opened.warnings.some((w) => w.includes('attestations are locally asserted')));
+    assert.ok(opened.warnings.some((w) => w.includes('DNS binding') && w.includes('unconfirmed')));
     assert.ok(
       opened.warnings.some((w) => w.includes('pending') && w.includes('not applied as law')),
       'pending jurisdiction provisions must be named at startup',

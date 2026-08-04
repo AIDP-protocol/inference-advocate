@@ -43,6 +43,7 @@ const passed: DeterministicVerdict = {
   sealValid: true,
   endpointAuthorized: true,
   findings: [],
+  attribution: 'unconfirmed',
 };
 
 const unsealed: DeterministicVerdict = {
@@ -51,6 +52,7 @@ const unsealed: DeterministicVerdict = {
   sealValid: false,
   endpointAuthorized: true,
   findings: [{ code: 'seal_absent', detail: 'no seal', refuses: false }],
+  attribution: 'none',
 };
 
 function flag(type: string, severity: number): Flag {
@@ -116,6 +118,7 @@ test('a deterministic refusal ends the exchange without reaching the score', () 
       sealValid: false,
       endpointAuthorized: true,
       findings: [{ code: 'seal_signature_invalid', detail: 'bad', refuses: true }],
+      attribution: 'none',
     },
   });
   assert.equal(r.decision.kind, 'refuse');

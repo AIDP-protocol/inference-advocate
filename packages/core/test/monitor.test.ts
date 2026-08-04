@@ -155,10 +155,14 @@ test('the model evaluator rejects flag types outside the published taxonomy', ()
 
 // Deterministic pass.
 
+const utf8 = new TextEncoder();
+const EXCHANGE = 'AAAAAAAAAAAAAAAAAAAAAA';
+const DIGEST = 'sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+
 const registerFixture = () => {
   const provider = generateSealKeypair();
   const register = ServingRegister.fromDocument({
-    aidpRegisterVersion: '1',
+    airpRegisterVersion: '1',
     issuedAt: '2026-07-01T00:00:00.000Z',
     registrar: { id: 'test', publicKeyPem: 'unused' },
     entries: [
@@ -185,14 +189,35 @@ const registerFixture = () => {
   return { register, provider };
 };
 
-const baseResponse = (over: Partial<ProviderResponse> = {}): ProviderResponse => ({
-  providerId: 'p',
-  content: 'hello',
-  servedFrom: 'http://127.0.0.1:8811/v1/chat/completions',
-  receivedAt: '2026-07-28T00:00:00.000Z',
-  latencyMs: 1,
-  ...over,
-});
+const baseResponse = (over: Partial<ProviderResponse> = {}): ProviderResponse => {
+  const content = over.content ?? 'hello';
+  const sealedContent = over.sealedContent ?? utf8.encode(content);
+  return {
+    providerId: 'p',
+    servedFrom: 'http://127.0.0.1:8811/v1/chat/completions',
+    receivedAt: '2026-07-28T00:00:00.000Z',
+    latencyMs: 1,
+    sealFieldName: 'airp-seal',
+    exchangeId: EXCHANGE,
+    requestDigest: DIGEST,
+    ...over,
+    content,
+    sealedContent,
+  };
+};
+
+function sealSubject(content: string, over: { signedAt?: string } = {}) {
+  return {
+    registerEntryId: 'e.sealed',
+    selector: 's1',
+    model: 'm1',
+    providerIdentity: 'Sealed Co',
+    exchangeId: EXCHANGE,
+    requestDigest: DIGEST,
+    signedAt: over.signedAt ?? '2026-07-28T00:00:00.000Z',
+    content: utf8.encode(content),
+  };
+}
 
 test('an unsealed response from a provider that seals nothing is labeled, not refused', () => {
   const { register } = registerFixture();
@@ -231,17 +256,7 @@ test('an unsealed response from a provider that declares it seals everything is 
 test('a valid seal from an authorized endpoint passes', () => {
   const { register, provider: keys } = registerFixture();
   const content = 'a sealed answer';
-  const seal = signSeal(
-    {
-      registerEntryId: 'e.sealed',
-      selector: 's1',
-      model: 'm1',
-      providerIdentity: 'Sealed Co',
-      signedAt: '2026-07-28T00:00:00.000Z',
-      content,
-    },
-    keys.privateKeyPem,
-  );
+  const seal = signSeal(sealSubject(content), keys.privateKeyPem);
   const verdict = runDeterministicPass(
     { id: 'p', label: 'p', baseUrl: 'http://127.0.0.1:8811/v1', model: 'm1', registerEntryId: 'e.sealed' },
     baseResponse({ content, seal }),
@@ -255,17 +270,7 @@ test('a valid seal from an authorized endpoint passes', () => {
 test('a valid seal served from an unregistered endpoint is refused', () => {
   const { register, provider: keys } = registerFixture();
   const content = 'a sealed answer';
-  const seal = signSeal(
-    {
-      registerEntryId: 'e.sealed',
-      selector: 's1',
-      model: 'm1',
-      providerIdentity: 'Sealed Co',
-      signedAt: '2026-07-28T00:00:00.000Z',
-      content,
-    },
-    keys.privateKeyPem,
-  );
+  const seal = signSeal(sealSubject(content), keys.privateKeyPem);
   const verdict = runDeterministicPass(
     { id: 'p', label: 'p', baseUrl: 'http://10.0.0.9/v1', model: 'm1', registerEntryId: 'e.sealed' },
     baseResponse({ content, seal, servedFrom: 'http://10.0.0.9/v1/chat/completions' }),
@@ -277,17 +282,7 @@ test('a valid seal served from an unregistered endpoint is refused', () => {
 
 test('a tampered response body invalidates the seal', () => {
   const { register, provider: keys } = registerFixture();
-  const seal = signSeal(
-    {
-      registerEntryId: 'e.sealed',
-      selector: 's1',
-      model: 'm1',
-      providerIdentity: 'Sealed Co',
-      signedAt: '2026-07-28T00:00:00.000Z',
-      content: 'the original answer',
-    },
-    keys.privateKeyPem,
-  );
+  const seal = signSeal(sealSubject('the original answer'), keys.privateKeyPem);
   const verdict = runDeterministicPass(
     { id: 'p', label: 'p', baseUrl: 'http://127.0.0.1:8811/v1', model: 'm1', registerEntryId: 'e.sealed' },
     baseResponse({ content: 'the substituted answer', seal }),

@@ -150,6 +150,11 @@ export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
     );
   }
 
+  warnings.push(
+    'DNS binding (_airp) and key set digest confirmation are implemented but unused on the demo path: ' +
+      'register entries have no identityDomain, so attributions stay unconfirmed by DNS. Spec §4.7 / §4.8',
+  );
+
   const advocate = new Advocate({
     store,
     master,

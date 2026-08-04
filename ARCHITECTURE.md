@@ -81,8 +81,9 @@ The provisional patent application's four mechanisms map on top of the same file
 
 **The Interchange bootstraps on the OpenAI-compatible wire format.** A wire standard nobody
 serves is not an existence proof. The advocate speaks the format every provider already speaks
-and carries the AIDP additions in headers an unmodified server ignores: `X-AIDP-Attestations`
-outbound, `X-AIDP-Seal` inbound. A provider that has never heard of AIDP still answers, and its
+and carries the AIRP additions in headers an unmodified server ignores: `AIRP-Exchange-Id` and
+`X-AIDP-Attestations` outbound, `AIRP-Seal` inbound (with `AIDP-Seal` / `X-AIDP-Seal` still
+accepted on read). A provider that has never heard of AIRP still answers, and its
 responses arrive unsealed, which is a finding rather than an error. That is the migration path.
 
 **Deferral is fully blocking.** Nothing streams to the user before evaluation completes. The
@@ -202,10 +203,13 @@ The batch format is defined, and the granularity floor and the traffic-class den
 implemented, because those two are properties of computing the rate honestly rather than of
 defending it.
 
-**DNS deployment.** Section 4.1 of the paper puts the register binding, seal-key distribution,
-the sealed-policy bit, and standing checks on DNS, with the register itself served over HTTPS
-behind a pointer. The local documents here are shaped so that becomes a transport change.
-Not built, and out of scope for the reference stage.
+**DNS deployment.** draft-flores-airp-provenance §4.7 puts entry selection on `_airp` TXT
+records beneath the provider identity domain, with a key set digest (`k`) confirming the
+selected entry. The reference client parses those records, refuses unsafe `r` auto-fetch
+targets, and computes the key set digest, but the demo trust fabric still loads a local signed
+register file and treats entries as unconfirmed when DNS is absent. Full deployment (encrypted
+DNS transport, TTL-cached live lookups driving every exchange, HTTPS fetch of `r`) is not the
+demo path.
 
 **Real thresholds.** Every number in `data/policy/delivery-policy.json` is demonstration scale
 and labeled as such in three places. Calibration is an open question in the paper and it stays

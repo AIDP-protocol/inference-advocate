@@ -44,6 +44,7 @@ export interface ExchangeResult {
     sealValid: boolean;
     endpointAuthorized: boolean;
     findings: Array<{ code: string; detail: string; refuses: boolean }>;
+    attribution?: 'confirmed' | 'unconfirmed' | 'none';
   };
   semantic: { flags: Flag[]; evaluatorId: string; evaluatorVersion: string; taxonomyVersion: string };
   delivered: string | null;

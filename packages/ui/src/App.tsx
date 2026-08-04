@@ -519,14 +519,23 @@ function noticeKicker(source: Notice['source']): string {
 }
 
 function provenanceLine(result: ExchangeResult): string {
+  const modified = result.deterministic.findings.some((f) => f.code === 'request_modified');
   const seal = result.deterministic.sealPresent
     ? result.deterministic.sealValid
-      ? 'sealed and verified against the Serving Register'
+      ? modified
+        ? 'sealed and verified, but the request was modified in transit'
+        : 'sealed and verified against the Serving Register'
       : 'seal present and invalid'
     : 'unsealed';
   const endpoint = result.deterministic.endpointAuthorized
     ? 'endpoint authorized'
     : 'endpoint NOT authorized';
-  return `${seal}, ${endpoint}`;
+  const attribution =
+    result.deterministic.attribution === 'confirmed'
+      ? 'DNS-confirmed'
+      : result.deterministic.attribution === 'unconfirmed'
+        ? 'register-only (DNS unconfirmed)'
+        : null;
+  return attribution ? `${seal}, ${endpoint}, ${attribution}` : `${seal}, ${endpoint}`;
 }
 

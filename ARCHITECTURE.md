@@ -6,8 +6,9 @@ index of those statements, plus an honest list of what the reference implementat
 do.
 
 The paper is *Accountable Inference Delivery Protocol (AIDP): An Advocate for AI Users and a
-Surface for Policy Implementation* (Justin Philip Flores, 2026). Section 4 follows a single
-response through fourteen steps. That path is the spine of this repository.
+Surface for Policy Implementation* (Justin Philip Flores, 2026). The on-the-wire name is now
+AIRP; the paper title is unchanged. Section 4 follows a single response through fourteen
+steps. That path is the spine of this repository. The public demo is at `https://tryairp.com`.
 
 ## Shape of the repository
 
@@ -216,7 +217,7 @@ targets, and computes the key set digest. Public demo DNS and Apache publish
 (`deploy/`), including a detached `.sig` alongside the document. The client still loads a
 local signed register file rather than fetching `r` over HTTPS with `maxAge` caching, and
 DNS `k` is not published yet. Entries without `identityDomain` (the `demo.*` fixtures behind
-`tryaidp.com`) stay unconfirmed by DNS.
+`tryairp.com`) stay unconfirmed by DNS.
 
 **Real thresholds.** Every number in `data/policy/delivery-policy.json` is demonstration scale
 and labeled as such in three places. Calibration is an open question in the paper and it stays

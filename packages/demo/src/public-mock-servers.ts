@@ -3,7 +3,7 @@
 // Paper: steps 4 and 5.
 // Spec: draft-flores-airp-provenance-00 §3.8 / §4.
 //
-// Separate from mock-servers.ts so the tryaidp.com loopback mocks stay untouched.
+// Separate from mock-servers.ts so the tryairp.com loopback mocks stay untouched.
 // Listens on 127.0.0.1 only; Apache reverse-proxies the public API hostnames here.
 
 import { readFileSync } from 'node:fs';

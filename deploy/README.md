@@ -22,13 +22,15 @@ Required keys are documented in `deploy/local.env.example`.
 
 | Hostname | Role |
 | --- | --- |
+| `tryairp.com` | Advocate UI + API (proxy to `127.0.0.1:8790`; legacy `tryaidp.com` / `dev.tryaidp.com` aliases) |
 | `airegister.uk`, `www.airegister.uk` | Serving register document via Alias into the repo |
 | `api.honestmodel.win` | Reverse proxy to mock provider on `127.0.0.1:8821` |
 | `api.cheapai.win` | Reverse proxy to mock provider on `127.0.0.1:8822` |
 | `honestmodel.win`, `cheapai.win` | Static holding pages under `$AIRP_SITES_ROOT/<domain>` |
 
-It does **not** touch `tryaidp.com`, `tryairp.com`, `dev.tryaidp.com`, or the
-`aidp-daemon` PM2 process.
+It does **not** replace the `aidp-daemon` PM2 process. The advocate UI is served at
+`tryairp.com` (with legacy `tryaidp.com` / `dev.tryaidp.com` aliases) by reverse-proxying
+that daemon.
 
 ## Register Alias (no copy)
 

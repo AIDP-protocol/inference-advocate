@@ -1,8 +1,16 @@
 # Inference Advocate
 
-Reference implementation of the client side of the **Accountable Inference Delivery Protocol (AIDP)**, as described in the paper [*Accountable Inference Delivery Protocol (AIDP): An Advocate for AI Users and a Surface for Policy Implementation*](https://doi.org/10.5281/zenodo.21610185) (Justin Philip Flores, 2026).
+Reference implementation of the client side of the **Accountable Inference Delivery
+Protocol**, now published on the wire as **AIRP** (see
+[`draft-flores-airp-provenance`](https://datatracker.ietf.org/doc/draft-flores-aidp-provenance/)).
+The architecture paper that this client implements was released under the earlier name
+[*Accountable Inference Delivery Protocol (AIDP): An Advocate for AI Users and a Surface for
+Policy Implementation*](https://doi.org/10.5281/zenodo.21610185) (Justin Philip Flores, 2026).
 
-An inference advocate is an independent layer between AI model providers and the person using them, with its duties running to the person. This repository is the reference design: the protocol's client half, small enough to read, built so anyone can implement, inspect, or improve on it. It is the reference client named in [*We can pace the frontier today. Here's how.*](https://logosanalog.com/p/we-can-pace-the-frontier-today-heres), which argues for AIDP as a concrete answer to what pacing would require as instrumentation rather than a pause.
+Live public demo: **[https://tryairp.com](https://tryairp.com)** (legacy hostnames under
+`tryaidp.com` still resolve during the rename).
+
+An inference advocate is an independent layer between AI model providers and the person using them, with its duties running to the person. This repository is the reference design: the protocol's client half, small enough to read, built so anyone can implement, inspect, or improve on it. It is the reference client named in [*We can pace the frontier today. Here's how.*](https://logosanalog.com/p/we-can-pace-the-frontier-today-heres), which argues for this protocol as a concrete answer to what pacing would require as instrumentation rather than a pause.
 
 ## The problem
 
@@ -14,7 +22,7 @@ Survey work behind this project found that every component a user-loyal layer ne
 
 The paper follows a single response through the architecture in fourteen steps. This client implements the client-side portion of that path:
 
-- **Speaks the AIDP Interchange.** An open client-to-provider wire standard, bootstrapped here on the OpenAI-compatible de facto format. Any certified advocate can front any registered provider; interchangeable advocates are what keep this layer from becoming anyone's moat.
+- **Speaks the AIRP Interchange.** An open client-to-provider wire standard, bootstrapped here on the OpenAI-compatible de facto format. Any certified advocate can front any registered provider; interchangeable advocates are what keep this layer from becoming anyone's moat.
 - **Holds everything locally.** Transcripts, the per-provider ledger, configuration, and keys live on the user's device in a single local store. Nothing aggregates anywhere. A breach's blast radius is one device. A subpoena's honest answer is that no operator possesses anything responsive.
 - **Runs the monitor in two passes.** A deterministic pass verifies the Provenance Seal against the Serving Register: valid seal, authorized endpoint, decidable by arithmetic, no model involved. A semantic pass evaluates response content against a versioned, published flag taxonomy (the paper's formation flags, plus a reference harm set: profanity, self-harm, sexual content, child sexual exploitation, violence, hate, criminal assistance).
 - **Keeps the ledger.** Flags append to a per-provider ledger held locally: one user's accumulated experience of one provider, for them.

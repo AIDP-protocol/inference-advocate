@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Idempotent deploy of the AIRP public demo surfaces.
 #
-# Brings up airegister.uk (register document), api.honestmodel.win / api.cheapai.win
-# (mock providers behind Apache), and apex holding pages. Leaves tryaidp.com /
-# tryairp.com / dev.tryaidp.com and aidp-daemon untouched.
+# Brings up tryairp.com (advocate UI via the local daemon), airegister.uk (register
+# document), api.honestmodel.win / api.cheapai.win (mock providers behind Apache),
+# and apex holding pages. Legacy tryaidp.com hostnames stay as aliases.
 #
 # Host-specific paths and emails live in deploy/local.env (gitignored). Copy
 # deploy/local.env.example and fill it in before the first run.
@@ -17,9 +17,9 @@ DEPLOY="$ROOT/deploy"
 APACHE_SRC="$DEPLOY/apache"
 LOCAL_ENV="$DEPLOY/local.env"
 
-SITE_NAMES=(airegister.uk honestmodel.win cheapai.win)
-HTTP_SITES=(airegister.uk.conf honestmodel.win.conf cheapai.win.conf)
-SSL_SITES=(airegister.uk-le-ssl.conf honestmodel.win-le-ssl.conf cheapai.win-le-ssl.conf)
+SITE_NAMES=(tryairp.com airegister.uk honestmodel.win cheapai.win)
+HTTP_SITES=(tryairp.com.conf airegister.uk.conf honestmodel.win.conf cheapai.win.conf)
+SSL_SITES=(tryairp.com-le-ssl.conf airegister.uk-le-ssl.conf honestmodel.win-le-ssl.conf cheapai.win-le-ssl.conf)
 
 log() { printf '==> %s\n' "$*"; }
 die() { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
@@ -97,8 +97,21 @@ ensure_site_dirs() {
 <body><p>AIRP serving register: <a href="/airp/register.json">/airp/register.json</a></p></body></html>
 HTML
       fi
+    elif [[ "$name" == "tryairp.com" ]]; then
+      # DocumentRoot exists for ACME only; / is proxied to the daemon.
+      mkdir -p "$dir/.well-known/acme-challenge"
     else
       cp -f "$DEPLOY/holding/index.html" "$dir/index.html"
+    fi
+  done
+}
+
+retire_legacy_tryaidp_site_names() {
+  # Old enabled filenames from before tryairp.com was the primary name.
+  for f in dev.tryaidp.com.conf dev.tryaidp.com-le-ssl.conf; do
+    if [[ -e "/etc/apache2/sites-enabled/$f" ]]; then
+      log "disabling legacy site $f"
+      sudo a2dissite "$f" >/dev/null || true
     fi
   done
 }
@@ -129,6 +142,7 @@ cert_exists() {
 ensure_certs() {
   need_cmd certbot
   local pairs=(
+    "tryairp.com|${AIRP_SITES_ROOT}/tryairp.com|tryairp.com,tryaidp.com,dev.tryaidp.com"
     "airegister.uk|${AIRP_SITES_ROOT}/airegister.uk|airegister.uk,www.airegister.uk"
     "honestmodel.win|${AIRP_SITES_ROOT}/honestmodel.win|honestmodel.win,api.honestmodel.win"
     "cheapai.win|${AIRP_SITES_ROOT}/cheapai.win|cheapai.win,api.cheapai.win"
@@ -140,7 +154,12 @@ ensure_certs() {
       log "certificate present for $name"
       continue
     fi
-    log "requesting certificate for $domains"
+    # tryairp.com may already exist under the legacy cert name from before the rename.
+    if [[ "$name" == "tryairp.com" ]] && cert_exists "dev.tryaidp.com"; then
+      log "issuing tryairp.com certificate (replacing legacy dev.tryaidp.com name coverage)"
+    else
+      log "requesting certificate for $domains"
+    fi
     domain_args=()
     IFS=',' read -ra ds <<<"$domains"
     for d in "${ds[@]}"; do
@@ -157,6 +176,9 @@ ensure_certs() {
   for f in "${SSL_SITES[@]}"; do
     sudo a2ensite "$f" >/dev/null
   done
+
+  # Drop the old filenames only after the tryairp.com cert and SSL vhost are in place.
+  retire_legacy_tryaidp_site_names
 
   if systemctl is-enabled certbot.timer >/dev/null 2>&1; then
     log 'certbot.timer is enabled'
@@ -227,14 +249,15 @@ verify_seal_through_proxy() {
 
 verify_existing_demo() {
   local code
-  code="$(curl -s -o /dev/null -w '%{http_code}' https://dev.tryaidp.com/)"
-  [[ "$code" == "200" ]] || die "dev.tryaidp.com returned HTTP $code"
+  code="$(curl -s -o /dev/null -w '%{http_code}' https://tryairp.com/)"
+  [[ "$code" == "200" ]] || die "tryairp.com returned HTTP $code"
+  # Legacy name kept as an alias during the rename.
   code="$(curl -s -o /dev/null -w '%{http_code}' https://tryaidp.com/)"
-  [[ "$code" == "200" ]] || die "tryaidp.com returned HTTP $code"
+  [[ "$code" == "200" ]] || die "tryaidp.com (legacy alias) returned HTTP $code"
   if ! "$PM2_BIN" describe aidp-daemon 2>/dev/null | grep -q 'status.*online'; then
     die 'aidp-daemon is not online under PM2'
   fi
-  log 'existing demo (tryaidp / aidp-daemon) still healthy'
+  log 'advocate demo (tryairp.com / aidp-daemon) still healthy'
 }
 
 print_verification_curls() {

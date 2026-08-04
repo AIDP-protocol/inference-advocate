@@ -18,7 +18,7 @@ const base = {
   'aria-hidden': true as const,
 };
 
-export function IconAidp({ title = 'AIDP', ...props }: IconProps) {
+export function IconAidp({ title = 'AIRP', ...props }: IconProps) {
   return (
     <svg {...base} {...props}>
       {title ? <title>{title}</title> : null}

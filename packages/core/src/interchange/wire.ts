@@ -22,13 +22,13 @@ export const AIDP_VERSION = '0.1';
 export const HEADER_VERSION = 'x-aidp-version';
 export const HEADER_ATTESTATIONS = 'x-aidp-attestations';
 /**
- * The registered response field name. draft-flores-aidp-provenance Section 6.1 registers
+ * The registered response field name. draft-flores-airp-provenance Section 7.1 registers
  * AIDP-Seal and leaves the X- form unregistered per RFC 6648.
  */
 export const HEADER_SEAL = 'aidp-seal';
 
 /**
- * The name earlier builds emitted. Section 6.1 permits a verifier to accept it for
+ * The name earlier builds emitted. Section 7.1 permits a verifier to accept it for
  * compatibility and requires preferring the registered name where both are present.
  * Read only: nothing in this repository emits it.
  */

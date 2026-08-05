@@ -91,6 +91,7 @@ function subject(over: {
   return {
     registerEntryId: over.registerEntryId ?? 'e.sealed',
     selector: 's1',
+    alg: 'ed25519',
     model: over.model ?? 'm1',
     providerIdentity: over.providerIdentity ?? 'Sealed Co',
     exchangeId: over.exchangeId ?? EXCHANGE,

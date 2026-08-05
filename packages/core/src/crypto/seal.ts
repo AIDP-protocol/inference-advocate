@@ -36,6 +36,15 @@ export type SealFieldName = 'airp-seal';
 export interface SealSubject {
   registerEntryId: string;
   selector: string;
+  /**
+   * Declared signature algorithm. Signed rather than merely carried, so an algorithm
+   * substitution is not a free edit on an otherwise valid seal. Spec §6.7 has a verifier take
+   * the algorithm from the key rather than from this field, and this is the other half of
+   * that: the field a verifier does not follow is still a field a signer cannot change
+   * unnoticed. Typed as a string because a canonicalizer serializes whatever arrived;
+   * `signSeal` and `verifySeal` accept ed25519 only.
+   */
+  alg: string;
   model: string;
   providerIdentity: string;
   /** Base64url unpadded exchange identifier, or empty where the request carried none. */
@@ -78,6 +87,7 @@ function concatOctets(parts: Uint8Array[]): Uint8Array {
 export function canonicalAirpSealPayload(s: SealSubject): Uint8Array {
   assertNoLineBreak('register-entry', s.registerEntryId);
   assertNoLineBreak('selector', s.selector);
+  assertNoLineBreak('alg', s.alg);
   assertNoLineBreak('model', s.model);
   assertNoLineBreak('provider', s.providerIdentity);
   assertNoLineBreak('exchange-id', s.exchangeId);
@@ -88,6 +98,7 @@ export function canonicalAirpSealPayload(s: SealSubject): Uint8Array {
     'airp-seal/v1\n' +
     `register-entry:${s.registerEntryId}\n` +
     `selector:${s.selector}\n` +
+    `alg:${s.alg}\n` +
     `model:${s.model}\n` +
     `provider:${s.providerIdentity}\n` +
     `exchange-id:${s.exchangeId}\n` +
@@ -102,6 +113,7 @@ export function canonicalAirpSealPayload(s: SealSubject): Uint8Array {
 export function canonicalAirpPresealPayload(s: SealSubject): Uint8Array {
   assertNoLineBreak('register-entry', s.registerEntryId);
   assertNoLineBreak('selector', s.selector);
+  assertNoLineBreak('alg', s.alg);
   assertNoLineBreak('model', s.model);
   assertNoLineBreak('provider', s.providerIdentity);
   assertNoLineBreak('exchange-id', s.exchangeId);
@@ -112,6 +124,7 @@ export function canonicalAirpPresealPayload(s: SealSubject): Uint8Array {
     'airp-preseal/v1\n' +
     `register-entry:${s.registerEntryId}\n` +
     `selector:${s.selector}\n` +
+    `alg:${s.alg}\n` +
     `model:${s.model}\n` +
     `provider:${s.providerIdentity}\n` +
     `exchange-id:${s.exchangeId}\n` +
@@ -194,6 +207,12 @@ export function generateSealKeypair(): { publicKeyPem: string; privateKeyPem: st
 }
 
 export function signSeal(subject: SealSubject, privateKeyPem: string): ProvenanceSeal {
+  // The payload binds the declared algorithm, so refuse rather than sign one value and
+  // publish another. Only Ed25519 exists at reference stage.
+  const alg = subject.alg;
+  if (alg !== 'ed25519') {
+    throw new Error(`seal algorithm ${alg} is not supported: this build signs ed25519 only`);
+  }
   const seed = decodePrivateKeyPem(privateKeyPem);
   const signature = ed25519Sign(canonicalAirpSealPayload(subject), seed);
   return {
@@ -204,7 +223,7 @@ export function signSeal(subject: SealSubject, privateKeyPem: string): Provenanc
     exchangeId: subject.exchangeId,
     requestDigest: subject.requestDigest,
     signedAt: subject.signedAt,
-    alg: 'ed25519',
+    alg,
     signature: Buffer.from(signature).toString('base64url'),
   };
 }
@@ -220,6 +239,7 @@ export function verifySeal(
     const payload = canonicalAirpSealPayload({
       registerEntryId: seal.registerEntryId,
       selector: seal.selector,
+      alg: seal.alg,
       model: seal.model,
       providerIdentity: seal.providerIdentity,
       exchangeId: seal.exchangeId ?? '',

@@ -128,6 +128,7 @@ export function startMockProvider(opts: MockProviderOptions): Promise<RunningMoc
                 {
                   registerEntryId: opts.seal.registerEntryId,
                   selector: opts.seal.selector,
+                  alg: 'ed25519',
                   model: sealedModel,
                   providerIdentity: opts.seal.providerIdentity,
                   exchangeId,
@@ -188,6 +189,7 @@ export function startMockProvider(opts: MockProviderOptions): Promise<RunningMoc
               {
                 registerEntryId: opts.seal.registerEntryId,
                 selector: opts.seal.selector,
+                alg: 'ed25519',
                 model: sealedModel,
                 providerIdentity: opts.seal.providerIdentity,
                 exchangeId,

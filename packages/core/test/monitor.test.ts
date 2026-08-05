@@ -210,6 +210,7 @@ function sealSubject(content: string, over: { signedAt?: string } = {}) {
   return {
     registerEntryId: 'e.sealed',
     selector: 's1',
+    alg: 'ed25519',
     model: 'm1',
     providerIdentity: 'Sealed Co',
     exchangeId: EXCHANGE,

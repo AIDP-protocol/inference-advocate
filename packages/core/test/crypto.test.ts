@@ -100,6 +100,7 @@ test('a provenance seal verifies over the exact content and fails on a single ch
     {
       registerEntryId: 'demo.aligned',
       selector: 's1',
+      alg: 'ed25519',
       model: 'aligned-1',
       providerIdentity: 'Aligned Reference Models (demo)',
       exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
@@ -122,6 +123,7 @@ test('a seal does not verify under another provider key', () => {
     {
       registerEntryId: 'demo.aligned',
       selector: 's1',
+      alg: 'ed25519',
       model: 'aligned-1',
       providerIdentity: 'x',
       exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
@@ -141,6 +143,7 @@ test('canonical payload appends content octets without re-encoding', () => {
   const subject = {
     registerEntryId: 'demo.aligned',
     selector: 's1',
+    alg: 'ed25519',
     model: 'aligned-1',
     providerIdentity: 'x',
     exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
@@ -155,6 +158,79 @@ test('canonical payload appends content octets without re-encoding', () => {
   const header = new TextDecoder().decode(payload.slice(0, payload.byteLength - content.byteLength));
   assert.ok(header.startsWith('airp-seal/v1\n'));
   assert.ok(header.endsWith(`content-length:${content.byteLength}\n\n`));
+});
+
+test('the terminal-seal payload is byte exact against the draft layout', () => {
+  // Written from draft-flores-airp-provenance-00 Section 3.6 rather than from the builder:
+  // version token, the eight header fields in order, content-length, an empty line, then the
+  // content octets. A payload assembled from the code would only assert the code agrees with
+  // itself, which is how the missing alg line survived signer and verifier sharing a builder.
+  const content = new TextEncoder().encode('forty two');
+  const payload = canonicalAirpSealPayload({
+    registerEntryId: 'demo.aligned',
+    selector: 's1',
+    alg: 'ed25519',
+    model: 'aligned-1',
+    providerIdentity: 'Aligned Reference Models (demo)',
+    exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
+    requestDigest: 'sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    signedAt: '2026-07-28T00:00:00.000Z',
+    content,
+  });
+
+  const expected = Buffer.concat([
+    Buffer.from(
+      'airp-seal/v1\n' +
+        'register-entry:demo.aligned\n' +
+        'selector:s1\n' +
+        'alg:ed25519\n' +
+        'model:aligned-1\n' +
+        'provider:Aligned Reference Models (demo)\n' +
+        'exchange-id:AAAAAAAAAAAAAAAAAAAAAA\n' +
+        'request-digest:sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n' +
+        'signed-at:2026-07-28T00:00:00.000Z\n' +
+        'content-length:9\n' +
+        '\n',
+      'utf8',
+    ),
+    Buffer.from(content),
+  ]);
+  assert.deepEqual(Buffer.from(payload), expected);
+});
+
+test('an alg substitution changes the payload and invalidates the signature', () => {
+  const { publicKeyPem, privateKeyPem } = generateSealKeypair();
+  const content = new TextEncoder().encode('the answer');
+  const fields = {
+    registerEntryId: 'demo.aligned',
+    selector: 's1',
+    model: 'aligned-1',
+    providerIdentity: 'Aligned Reference Models (demo)',
+    exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
+    requestDigest: 'sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    signedAt: '2026-07-28T00:00:00.000Z',
+  };
+
+  const declared = canonicalAirpSealPayload({ ...fields, alg: 'ed25519', content });
+  const substituted = canonicalAirpSealPayload({ ...fields, alg: 'ed25519-ph', content });
+  assert.notDeepEqual(Buffer.from(declared), Buffer.from(substituted));
+
+  // signDocument is a raw Ed25519 signer over bytes, so this stands in for a provider that
+  // signed one algorithm's payload and published another in the field a verifier reads.
+  const substitutedSignature = signDocument(Buffer.from(substituted), privateKeyPem);
+  assert.equal(
+    verifySeal({ ...fields, alg: 'ed25519', signature: substitutedSignature }, content, publicKeyPem),
+    false,
+  );
+
+  const honestSignature = signDocument(Buffer.from(declared), privateKeyPem);
+  assert.equal(
+    verifySeal({ ...fields, alg: 'ed25519', signature: honestSignature }, content, publicKeyPem),
+    true,
+  );
+
+  // And the signer refuses to mint one, so the divergence cannot originate here either.
+  assert.throws(() => signSeal({ ...fields, alg: 'ed25519-ph', content }, privateKeyPem), /ed25519 only/);
 });
 
 test('detached document signatures detect a rewritten register', () => {
@@ -173,6 +249,7 @@ test('vendored Ed25519 verifies seals and documents produced by node:crypto', ()
   const subject = {
     registerEntryId: 'demo.aligned',
     selector: 's1',
+    alg: 'ed25519' as const,
     model: 'aligned-1',
     providerIdentity: 'node',
     exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
@@ -184,6 +261,7 @@ test('vendored Ed25519 verifies seals and documents produced by node:crypto', ()
     'airp-seal/v1\n' +
     `register-entry:${subject.registerEntryId}\n` +
     `selector:${subject.selector}\n` +
+    `alg:${subject.alg}\n` +
     `model:${subject.model}\n` +
     `provider:${subject.providerIdentity}\n` +
     `exchange-id:${subject.exchangeId}\n` +
@@ -203,7 +281,7 @@ test('vendored Ed25519 verifies seals and documents produced by node:crypto', ()
         exchangeId: subject.exchangeId,
         requestDigest: subject.requestDigest,
         signedAt: subject.signedAt,
-        alg: 'ed25519',
+        alg: subject.alg,
         signature: nodeSealSig,
       },
       content,
@@ -224,6 +302,7 @@ test('node:crypto verifies seals and documents produced by vendored Ed25519', ()
     {
       registerEntryId: 'demo.aligned',
       selector: 's1',
+      alg: 'ed25519',
       model: 'aligned-1',
       providerIdentity: 'advocate',
       exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
@@ -237,6 +316,7 @@ test('node:crypto verifies seals and documents produced by vendored Ed25519', ()
     'airp-seal/v1\n' +
     `register-entry:${seal.registerEntryId}\n` +
     `selector:${seal.selector}\n` +
+    `alg:${seal.alg}\n` +
     `model:${seal.model}\n` +
     `provider:${seal.providerIdentity}\n` +
     `exchange-id:${seal.exchangeId}\n` +

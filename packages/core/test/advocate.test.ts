@@ -51,6 +51,7 @@ function scriptedProvider(script: string[], keys?: { privateKeyPem: string; entr
         {
           registerEntryId: keys.entryId,
           selector: 's1',
+          alg: 'ed25519',
           model: keys.model,
           providerIdentity: 'test',
           exchangeId,

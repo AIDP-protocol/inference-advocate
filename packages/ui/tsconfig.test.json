@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "outDir": "dist-test",
+    "rootDir": ".",
+    "types": ["node"],
+    "declaration": false
+  },
+  "include": ["src/trail-state.ts", "src/bubbles.ts", "src/compose-activity.ts", "src/stages.ts", "src/types.ts", "test/**/*.ts"]
+}

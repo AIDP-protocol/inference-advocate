@@ -1,7 +1,8 @@
-/* Client shell (light) and instrument drawer (dark). Values transcribed from
-   reference/Inference Advocate Client.dc.html. Do not invent replacements. */
+/* Client shell (light / warm dark) and instrument drawer (separate cool dark).
+   Shell tokens flip with [data-theme]. Drawer tokens stay put: that panel is always dark. */
 
 :root {
+  color-scheme: light;
   --font-ui: system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
 
@@ -15,18 +16,43 @@
   --text-secondary: oklch(0.42 0.008 70);
   --text-tertiary: oklch(0.62 0.006 70);
   --accent: oklch(0.48 0.09 250);
+  --on-accent: oklch(1 0 0);
+  --bubble-user: oklch(0.945 0.004 70);
+  --sidebar-hover: oklch(0.94 0.004 70);
+  --sidebar-active: oklch(0.915 0.004 70);
+  --control-hover: oklch(0.96 0.003 70);
+  --placeholder: oklch(0.64 0.006 70);
+  --menu-bg: oklch(1 0 0);
+  --shadow: oklch(0.2 0 0 / 0.05);
+  --link-border: oklch(0.86 0.03 250);
+  --link-hover: oklch(0.38 0.10 250);
+  --link-hover-border: oklch(0.70 0.06 250);
   --advocate-bg: oklch(0.983 0.006 250);
   --advocate-border: oklch(0.90 0.010 250);
+  --advocate-text: oklch(0.34 0.010 250);
+  --advocate-kicker: oklch(0.52 0.07 250);
   --withheld-bg: oklch(0.978 0.012 25);
   --withheld-border: oklch(0.86 0.045 25);
+  --withheld-text: oklch(0.30 0.030 25);
+  --withheld-muted: oklch(0.48 0.030 25);
   --notice-bg: oklch(0.985 0.012 68);
   --notice-edge: oklch(0.72 0.10 68);
+  --notice-text: oklch(0.36 0.04 68);
+  --notice-kicker: oklch(0.50 0.09 68);
   --not-built: oklch(0.44 0.09 155);
   --not-built-border: oklch(0.68 0.08 155);
   --sight-fill: oklch(0.965 0.006 70);
   --sight-fill-flowing: oklch(0.955 0.020 250);
+  --sight-fill-out-flowing: oklch(0.96 0.02 310);
   --sight-edge: oklch(0.87 0.006 70);
-  --sight-impeller: oklch(0.62 0.010 70);
+  --trail-pending: oklch(0.80 0.005 70);
+  --trail-active: oklch(0.34 0.008 70);
+  --trail-done: oklch(0.52 0.15 250);
+  --trail-skipped: oklch(0.72 0.07 85);
+  --trail-stopped: oklch(0.52 0.19 25);
+  --trail-bubble: oklch(0.52 0.15 250);
+  --trail-bubble-out: oklch(0.62 0.11 310);
+  --trail-wander: oklch(0.62 0.008 70);
 
   --drawer: oklch(0.245 0.010 255);
   --drawer-inset: oklch(0.215 0.010 255);
@@ -46,6 +72,59 @@
   --strip-hover: oklch(0.855 0.010 255);
 }
 
+/* Warm dark shell: almost neutral gray with a whisper of warmth (hue ~55, chroma ~0.004).
+   Higher chroma at this lightness reads brown or olive; keep it subtle. Not near-black. */
+[data-theme='dark'] {
+  color-scheme: dark;
+  --canvas: oklch(0.30 0.004 55);
+  --sidebar: oklch(0.26 0.005 55);
+  --panel: oklch(0.34 0.004 55);
+  --hairline: oklch(0.40 0.004 55);
+  --border: oklch(0.44 0.004 55);
+  --text: oklch(0.90 0.003 55);
+  --text-body: oklch(0.88 0.003 55);
+  --text-secondary: oklch(0.72 0.004 55);
+  --text-tertiary: oklch(0.58 0.004 55);
+  --accent: oklch(0.72 0.10 250);
+  --on-accent: oklch(0.22 0.004 55);
+  --bubble-user: oklch(0.36 0.005 55);
+  --sidebar-hover: oklch(0.32 0.004 55);
+  --sidebar-active: oklch(0.38 0.005 55);
+  --control-hover: oklch(0.34 0.004 55);
+  --placeholder: oklch(0.55 0.004 55);
+  --menu-bg: oklch(0.32 0.004 55);
+  --shadow: oklch(0.15 0.004 55 / 0.45);
+  --link-border: oklch(0.50 0.06 250);
+  --link-hover: oklch(0.80 0.10 250);
+  --link-hover-border: oklch(0.60 0.08 250);
+  --advocate-bg: oklch(0.30 0.018 250);
+  --advocate-border: oklch(0.42 0.022 250);
+  --advocate-text: oklch(0.84 0.020 250);
+  --advocate-kicker: oklch(0.72 0.06 250);
+  --withheld-bg: oklch(0.30 0.024 25);
+  --withheld-border: oklch(0.48 0.06 25);
+  --withheld-text: oklch(0.84 0.035 25);
+  --withheld-muted: oklch(0.70 0.030 25);
+  --notice-bg: oklch(0.32 0.022 68);
+  --notice-edge: oklch(0.72 0.10 68);
+  --notice-text: oklch(0.84 0.035 68);
+  --notice-kicker: oklch(0.72 0.08 68);
+  --not-built: oklch(0.72 0.10 155);
+  --not-built-border: oklch(0.50 0.08 155);
+  --sight-fill: oklch(0.34 0.004 55);
+  --sight-fill-flowing: oklch(0.36 0.022 250);
+  --sight-fill-out-flowing: oklch(0.36 0.020 310);
+  --sight-edge: oklch(0.44 0.004 55);
+  --trail-pending: oklch(0.48 0.004 55);
+  --trail-active: oklch(0.88 0.003 55);
+  --trail-done: oklch(0.72 0.12 250);
+  --trail-skipped: oklch(0.78 0.07 85);
+  --trail-stopped: oklch(0.70 0.16 25);
+  --trail-bubble: oklch(0.70 0.12 250);
+  --trail-bubble-out: oklch(0.74 0.10 310);
+  --trail-wander: oklch(0.62 0.004 55);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -56,7 +135,7 @@ body,
   margin: 0;
   padding: 0;
   height: 100%;
-  background: oklch(0.98 0.002 70);
+  background: var(--canvas);
 }
 
 body {
@@ -78,12 +157,12 @@ button {
 a {
   color: var(--accent);
   text-decoration: none;
-  border-bottom: 1px solid oklch(0.86 0.03 250);
+  border-bottom: 1px solid var(--link-border);
 }
 
 a:hover {
-  color: oklch(0.38 0.10 250);
-  border-bottom-color: oklch(0.70 0.06 250);
+  color: var(--link-hover);
+  border-bottom-color: var(--link-hover-border);
 }
 
 /* —— App shell —— */
@@ -160,8 +239,8 @@ a:hover {
 }
 
 .btn-new-session:hover {
-  background: oklch(0.99 0.002 70);
-  border-color: oklch(0.80 0.004 70);
+  background: var(--control-hover);
+  border-color: var(--border);
 }
 
 .session-list {
@@ -209,16 +288,16 @@ button.session-item {
 }
 
 .session-item.active {
-  background: oklch(0.915 0.004 70);
-  color: oklch(0.26 0.008 70);
+  background: var(--sidebar-active);
+  color: var(--text-body);
 }
 
 button.session-item:not(.active):hover {
-  background: oklch(0.94 0.004 70);
+  background: var(--sidebar-hover);
 }
 
 .session-item.muted {
-  color: oklch(0.60 0.008 70);
+  color: var(--text-tertiary);
   cursor: default;
 }
 
@@ -243,15 +322,15 @@ button.session-item:not(.active):hover {
   border-radius: 6px;
   border: none;
   background: transparent;
-  color: oklch(0.34 0.008 70);
+  color: var(--text-body);
 }
 
 .nav-row:hover {
-  background: oklch(0.93 0.004 70);
+  background: var(--sidebar-hover);
 }
 
 .nav-row.on {
-  background: oklch(0.93 0.004 70);
+  background: var(--sidebar-active);
 }
 
 .nav-row.between {
@@ -259,7 +338,7 @@ button.session-item:not(.active):hover {
 }
 
 .nav-row .chevron {
-  color: oklch(0.66 0.006 70);
+  color: var(--text-tertiary);
 }
 
 .nav-child {
@@ -272,7 +351,7 @@ button.session-item:not(.active):hover {
   border-radius: 6px;
   border: none;
   background: transparent;
-  color: oklch(0.44 0.008 70);
+  color: var(--text-secondary);
 }
 
 .nav-child.with-icon {
@@ -290,16 +369,16 @@ button.session-item:not(.active):hover {
 }
 
 .nav-child:hover {
-  background: oklch(0.93 0.004 70);
+  background: var(--sidebar-hover);
 }
 
 .nav-child.on {
-  background: oklch(0.93 0.004 70);
-  color: oklch(0.34 0.008 70);
+  background: var(--sidebar-active);
+  color: var(--text-body);
 }
 
 .nav-child.muted {
-  color: oklch(0.60 0.008 70);
+  color: var(--text-tertiary);
   cursor: default;
 }
 
@@ -324,14 +403,14 @@ button.session-item:not(.active):hover {
   font-size: 12.5px;
   padding: 6px 11px;
   border-radius: 6px;
-  color: oklch(0.36 0.008 70);
+  color: var(--text-secondary);
 }
 
 .account-avatar {
   width: 22px;
   height: 22px;
   border-radius: 5px;
-  background: oklch(0.88 0.004 70);
+  background: var(--border);
   display: inline-block;
 }
 
@@ -356,12 +435,12 @@ button.session-item:not(.active):hover {
   gap: 12px;
   padding: 11px 14px;
   border-bottom: 1px solid var(--hairline);
-  background: oklch(0.98 0.002 70);
+  background: var(--canvas);
 }
 
 .narrow-header .icon {
   font-size: 16px;
-  color: oklch(0.44 0.008 70);
+  color: var(--text-secondary);
   background: none;
   border: none;
   padding: 0;
@@ -436,7 +515,7 @@ button.session-item:not(.active):hover {
 }
 
 .pinned-notice + .pinned-notice {
-  border-top: 1px solid oklch(0.93 0.008 250);
+  border-top: 1px solid var(--advocate-border);
 }
 
 .pinned-kicker {
@@ -444,7 +523,7 @@ button.session-item:not(.active):hover {
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.12em;
-  color: oklch(0.52 0.07 250);
+  color: var(--advocate-kicker);
   flex: none;
   padding-top: 2px;
 }
@@ -452,20 +531,25 @@ button.session-item:not(.active):hover {
 .pinned-body {
   font-size: 12.5px;
   line-height: 1.5;
-  color: oklch(0.34 0.010 250);
+  color: var(--advocate-text);
   text-wrap: pretty;
+}
+
+.turn-response {
+  scroll-margin-top: 12px;
 }
 
 .turn-user {
   display: flex;
   justify-content: flex-end;
+  scroll-margin-top: 12px;
 }
 
 .bubble-user {
   max-width: 76%;
   padding: 10px 14px;
   border-radius: 14px 14px 4px 14px;
-  background: oklch(0.945 0.004 70);
+  background: var(--bubble-user);
   font-size: 14.5px;
   line-height: 1.55;
   white-space: pre-wrap;
@@ -475,6 +559,7 @@ button.session-item:not(.active):hover {
   display: flex;
   flex-direction: column;
   gap: 9px;
+  scroll-margin-top: 12px;
 }
 
 .assistant-body {
@@ -503,21 +588,21 @@ button.session-item:not(.active):hover {
 }
 
 .why-link {
-  color: oklch(0.56 0.008 70);
-  border-bottom: 1px solid oklch(0.85 0.004 70);
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--hairline);
 }
 
 .why-link:hover {
-  color: oklch(0.34 0.008 70);
+  color: var(--text-body);
 }
 
 .why-link.open {
-  color: oklch(0.42 0.008 70);
-  border-bottom-color: oklch(0.80 0.004 70);
+  color: var(--text-secondary);
+  border-bottom-color: var(--border);
 }
 
 .copy-link {
-  color: oklch(0.62 0.008 70);
+  color: var(--text-tertiary);
 }
 
 .delivery-notice {
@@ -534,7 +619,7 @@ button.session-item:not(.active):hover {
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.12em;
-  color: oklch(0.50 0.09 68);
+  color: var(--notice-kicker);
   flex: none;
   padding-top: 2px;
 }
@@ -542,7 +627,7 @@ button.session-item:not(.active):hover {
 .delivery-notice .body {
   font-size: 12.5px;
   line-height: 1.5;
-  color: oklch(0.36 0.04 68);
+  color: var(--notice-text);
   text-wrap: pretty;
 }
 
@@ -560,7 +645,7 @@ button.session-item:not(.active):hover {
   margin: 0;
   font-size: 14px;
   line-height: 1.6;
-  color: oklch(0.30 0.030 25);
+  color: var(--withheld-text);
   text-wrap: pretty;
 }
 
@@ -571,7 +656,7 @@ button.session-item:not(.active):hover {
 .withheld-authority {
   font-family: var(--font-mono);
   font-size: 11.5px;
-  color: oklch(0.48 0.030 25);
+  color: var(--withheld-muted);
 }
 
 .withheld-actions {
@@ -585,23 +670,23 @@ button.session-item:not(.active):hover {
   font-size: 13px;
   padding: 7px 13px;
   border-radius: 6px;
-  border: 1px solid oklch(0.80 0.06 25);
+  border: 1px solid var(--withheld-border);
   background: var(--canvas);
-  color: oklch(0.36 0.09 25);
+  color: var(--withheld-text);
 }
 
 .btn-release:hover {
-  background: oklch(0.97 0.02 25);
+  background: var(--control-hover);
 }
 
 .btn-release.secondary {
-  border-color: oklch(0.88 0.02 25);
+  border-color: var(--withheld-border);
   background: transparent;
-  color: oklch(0.50 0.03 25);
+  color: var(--withheld-muted);
 }
 
 .btn-release.secondary:hover {
-  border-color: oklch(0.80 0.04 25);
+  border-color: var(--withheld-muted);
 }
 
 .refused {
@@ -611,11 +696,11 @@ button.session-item:not(.active):hover {
   padding: 14px 15px;
   font-size: 14px;
   line-height: 1.6;
-  color: oklch(0.30 0.030 25);
+  color: var(--withheld-text);
 }
 
 .why-panel {
-  border: 1px solid oklch(0.90 0.004 70);
+  border: 1px solid var(--hairline);
   border-radius: 9px;
   background: var(--panel);
   overflow: hidden;
@@ -629,7 +714,7 @@ button.session-item:not(.active):hover {
 .why-label,
 .why-value {
   padding: 11px 14px;
-  border-bottom: 1px solid oklch(0.925 0.004 70);
+  border-bottom: 1px solid var(--hairline);
 }
 
 .why-grid > :nth-last-child(-n + 2) {
@@ -638,7 +723,7 @@ button.session-item:not(.active):hover {
 
 .why-label {
   font-size: 11.5px;
-  color: oklch(0.55 0.008 70);
+  color: var(--text-tertiary);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -685,15 +770,15 @@ button.session-item:not(.active):hover {
 
 .flag-basis {
   font-size: 12px;
-  color: oklch(0.55 0.008 70);
+  color: var(--text-tertiary);
 }
 
 .flag-evidence {
-  border-left: 2px solid oklch(0.88 0.004 70);
+  border-left: 2px solid var(--hairline);
   padding-left: 9px;
   font-size: 12.5px;
   line-height: 1.55;
-  color: oklch(0.38 0.008 70);
+  color: var(--text-secondary);
 }
 
 .rationale-list {
@@ -702,7 +787,7 @@ button.session-item:not(.active):hover {
   gap: 5px;
   font-size: 12.5px;
   line-height: 1.5;
-  color: oklch(0.34 0.008 70);
+  color: var(--text-body);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -715,94 +800,543 @@ button.session-item:not(.active):hover {
 }
 
 .error {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin: 0;
   padding: 10px 13px;
   border-radius: 8px;
-  border: 1px solid oklch(0.86 0.045 25);
+  border: 1px solid var(--withheld-border);
   background: var(--withheld-bg);
-  color: oklch(0.30 0.030 25);
+  color: var(--withheld-text);
   font-size: 13px;
 }
 
-/* The sight glass. Inline, where the response will appear, so the text replaces it in place.
-   Warm neutral with the existing accent while flow is happening: this is content being held for
-   the user by their own client, not content withheld from them by an authority, and the palette
-   should not suggest otherwise. The argument is in SightGlass.tsx. */
-.sight {
+.error-message {
+  flex: 1;
+  min-width: 0;
+}
+
+.error .btn-release {
+  flex-shrink: 0;
+}
+
+/* Exchange status trail. Inline where the response will appear. Settled stages are dots;
+   only the live or halted stage is a full mark. Presentation is out of scope per §1.1; the
+   argument lives in ExchangeTrail.tsx. */
+.exchange-trail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 4px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+.exchange-trail-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0;
-  color: var(--text-tertiary);
-  font-size: 13px;
 }
 
-.sight-glass,
-.sight-held {
+.exchange-trail-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 20px;
+}
+
+.exchange-trail-label {
+  color: var(--text-tertiary);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.exchange-trail-record {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 22px;
+  margin: 0 0 6px;
+  padding: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--panel);
+  cursor: pointer;
+  color: var(--trail-done);
+}
+
+.exchange-trail-record:hover {
+  border-color: var(--trail-done);
+}
+
+.exchange-trail-collapse {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.status-trail {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+}
+
+.status-trail-slot {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+}
+
+.status-trail-dot-hit {
+  width: 4px;
+  height: 4px;
+  cursor: default;
+}
+
+.status-trail-dot {
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--trail-pending);
+}
+
+.status-trail-dot-done {
+  background: var(--trail-done);
+}
+
+.status-trail-dot-skipped {
+  background: var(--trail-skipped);
+}
+
+.status-trail-dot-pending {
+  background: var(--trail-pending);
+}
+
+.status-trail-pending {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 2px;
+}
+
+.status-trail-dot-in {
+  animation: trail-dot-in 0.22s ease-out;
+}
+
+.status-trail-mark-in {
+  animation: trail-mark-in 0.3s cubic-bezier(0.34, 1.32, 0.64, 1);
+}
+
+@keyframes trail-dot-in {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes trail-mark-in {
+  0% {
+    transform: scale(0.35);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.stage-mark {
+  display: block;
+  stroke: var(--trail-active);
+}
+
+.stage-mark-active {
+  stroke: var(--trail-active);
+}
+
+.stage-mark-done {
+  stroke: var(--trail-done);
+}
+
+.stage-mark-skipped {
+  stroke: var(--trail-skipped);
+}
+
+.stage-mark-stopped {
+  stroke: var(--trail-stopped);
+}
+
+.stage-mark-pulse {
+  animation: trail-mark-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes trail-mark-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.38;
+  }
+}
+
+/* Shared motion swatch (~30×20). */
+.trail-swatch {
   flex: none;
   width: 34px;
   height: 18px;
-}
-
-.sight-glass {
-  display: inline-flex;
-}
-
-.sight-glass svg {
-  width: 34px;
-  height: 18px;
-}
-
-.sight-glass-window {
-  fill: var(--sight-fill);
-  stroke: var(--sight-edge);
-  stroke-width: 1;
-  transition: fill 220ms ease-out;
-}
-
-.sight-glass.flowing .sight-glass-window {
-  fill: var(--sight-fill-flowing);
-}
-
-.sight-glass-impeller line {
-  stroke: var(--sight-impeller);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  opacity: calc(0.32 + var(--sight-activity, 0) * 0.58);
-  transition: opacity 160ms linear;
-}
-
-.sight-glass.flowing .sight-glass-impeller line {
-  stroke: var(--accent);
-}
-
-/* Held transport: nothing is arriving, so nothing moves. A still bar reads as a state rather
-   than as measurement, which is the point. Motion driven by a timer here would mimic a
-   measurement this mode is not making. */
-.sight-held {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--sight-edge);
-  border-radius: 9px;
-  background: var(--sight-fill);
-  padding: 0 5px;
-  box-sizing: border-box;
+  justify-content: center;
 }
 
-.sight-held-bar {
+.trail-swatch-still .trail-hairline {
   display: block;
-  width: 100%;
-  height: 2px;
-  border-radius: 1px;
-  background: var(--sight-impeller);
-  opacity: 0.5;
+  width: 22px;
+  height: 1px;
+  background: var(--hairline);
 }
 
-.sight-held-meta {
-  color: var(--text-tertiary);
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  font-variant-numeric: tabular-nums;
+.trail-swatch-glass .trail-glass-window {
+  position: relative;
+  width: 34px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid var(--sight-edge);
+  background: var(--sight-fill);
+  overflow: hidden;
+  box-sizing: border-box;
+  transition: background 220ms ease-out;
+}
+
+.trail-swatch-glass.flowing .trail-glass-window {
+  background: var(--sight-fill-flowing);
+}
+
+.trail-swatch-work .trail-glass-window,
+.trail-swatch-wait .trail-glass-window {
+  background: var(--sight-fill);
+}
+
+.trail-bubble {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 999px;
+  background: var(--trail-bubble);
+  opacity: 0;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.trail-bubble-0 {
+  animation-name: trail-bub-0;
+}
+.trail-bubble-1 {
+  animation-name: trail-bub-1;
+}
+.trail-bubble-2 {
+  animation-name: trail-bub-2;
+}
+.trail-bubble-3 {
+  animation-name: trail-bub-3;
+}
+
+.trail-swatch-out .trail-bubble {
+  background: var(--trail-bubble-out);
+}
+
+.trail-swatch-out.flowing .trail-glass-window {
+  background: var(--sight-fill-out-flowing);
+}
+
+.trail-swatch-out .trail-bubble-0 {
+  animation-name: trail-bub-out-0;
+}
+.trail-swatch-out .trail-bubble-1 {
+  animation-name: trail-bub-out-1;
+}
+.trail-swatch-out .trail-bubble-2 {
+  animation-name: trail-bub-out-2;
+}
+.trail-swatch-out .trail-bubble-3 {
+  animation-name: trail-bub-out-3;
+}
+
+.trail-bubble-frozen {
+  animation: none !important;
+  opacity: 0.55;
+  transform: translate(var(--bubble-freeze-x, 10px), var(--bubble-freeze-y, 6px));
+}
+
+/* Hidden but still animating: raising density reveals chips already in flight. */
+.trail-bubble-latent {
+  opacity: 0 !important;
+}
+
+/* Inbound: left to right (content arriving). */
+@keyframes trail-bub-0 {
+  0% {
+    transform: translate(-5px, 8.5px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  45% {
+    transform: translate(9px, 10.2px);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(33px, 8px);
+    opacity: 0;
+  }
+}
+@keyframes trail-bub-1 {
+  0% {
+    transform: translate(-5px, 5px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  52% {
+    transform: translate(12px, 3.4px);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(33px, 5.4px);
+    opacity: 0;
+  }
+}
+@keyframes trail-bub-2 {
+  0% {
+    transform: translate(-5px, 12.5px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  48% {
+    transform: translate(11px, 14px);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(33px, 12px);
+    opacity: 0;
+  }
+}
+@keyframes trail-bub-3 {
+  0% {
+    transform: translate(-5px, 10px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  56% {
+    transform: translate(14px, 8.2px);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(33px, 10.4px);
+    opacity: 0;
+  }
+}
+
+/* Outbound compose: right to left (thought leaving toward the machine). */
+@keyframes trail-bub-out-0 {
+  0% {
+    transform: translate(33px, 8.5px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  45% {
+    transform: translate(18px, 10.2px);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-5px, 8px);
+    opacity: 0;
+  }
+}
+@keyframes trail-bub-out-1 {
+  0% {
+    transform: translate(33px, 5px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  52% {
+    transform: translate(16px, 3.4px);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-5px, 5.4px);
+    opacity: 0;
+  }
+}
+@keyframes trail-bub-out-2 {
+  0% {
+    transform: translate(33px, 12.5px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  48% {
+    transform: translate(17px, 14px);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-5px, 12px);
+    opacity: 0;
+  }
+}
+@keyframes trail-bub-out-3 {
+  0% {
+    transform: translate(33px, 10px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  56% {
+    transform: translate(14px, 8.2px);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-5px, 10.4px);
+    opacity: 0;
+  }
+}
+
+.trail-wander {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 999px;
+  background: var(--trail-wander);
+  animation: trail-wander 6.4s linear infinite;
+}
+
+.trail-wander.trail-frozen {
+  animation: none;
+  transform: translate(12px, 8px);
+  opacity: 0.7;
+}
+
+@keyframes trail-wander {
+  0% {
+    transform: translate(5px, 12px);
+  }
+  24% {
+    transform: translate(15px, 5px);
+  }
+  47% {
+    transform: translate(22px, 12px);
+  }
+  71% {
+    transform: translate(12px, 15px);
+  }
+  100% {
+    transform: translate(5px, 12px);
+  }
+}
+
+.trail-escapement {
+  position: absolute;
+  left: 16px;
+  bottom: 4px;
+  width: 1.6px;
+  height: 10px;
+  border-radius: 1px;
+  background: var(--trail-active);
+  transform-origin: bottom center;
+  animation: trail-rock 1.15s ease-in-out infinite alternate;
+}
+
+.trail-escapement-pivot {
+  position: absolute;
+  left: 15px;
+  bottom: 2.5px;
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--trail-active);
+}
+
+.trail-escapement.trail-frozen {
+  animation: none;
+  transform: rotate(-14deg);
+  opacity: 0.85;
+}
+
+@keyframes trail-rock {
+  from {
+    transform: rotate(-24deg);
+  }
+  to {
+    transform: rotate(24deg);
+  }
+}
+
+.compose-glass {
+  flex: none;
+  align-self: flex-start;
+  width: 34px;
+  height: 18px;
+  margin-top: 8px;
+  margin-right: 2px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.trail-swatch-out-idle {
+  width: 34px;
+  height: 18px;
 }
 
 @keyframes resolved-in {
@@ -816,30 +1350,21 @@ button.session-item:not(.active):hover {
   }
 }
 
-/* The outcome takes the place of the glass. This animates content that has already been
+/* The outcome takes the place of the trail. This animates content that has already been
    released, so it adds no dwell to the wait. */
 .turn-assistant.resolved-in {
   animation: resolved-in 180ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* Static, and still distinguishing flowing from settled: the glass fills and the impeller
-     takes the accent while data is arriving, and both go pale when it stops. */
-  .turn-assistant.resolved-in {
-    animation: none;
-  }
-
-  .sight-glass-window,
-  .sight-glass-impeller line {
-    transition: none;
-  }
-
-  .sight-glass.flowing .sight-glass-impeller line {
-    opacity: 0.9;
-  }
-
-  .sight-glass.settled .sight-glass-impeller line {
-    opacity: 0.3;
+  .turn-assistant.resolved-in,
+  .status-trail-dot-in,
+  .status-trail-mark-in,
+  .stage-mark-pulse,
+  .trail-bubble,
+  .trail-wander,
+  .trail-escapement {
+    animation: none !important;
   }
 
   .instrument-drawer.open {
@@ -979,7 +1504,7 @@ button.session-item:not(.active):hover {
 }
 
 .transport-error {
-  color: oklch(0.45 0.14 25);
+  color: var(--withheld-text);
 }
 
 .transport-detail {
@@ -1026,14 +1551,15 @@ button.session-item:not(.active):hover {
 }
 
 .composer {
+  position: relative;
   display: flex;
   align-items: flex-end;
-  gap: 10px;
+  gap: 8px;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--canvas);
-  padding: 10px 10px 10px 15px;
-  box-shadow: 0 1px 2px oklch(0.2 0 0 / 0.05);
+  padding: 10px 10px 10px 12px;
+  box-shadow: 0 1px 2px var(--shadow);
 }
 
 .composer textarea {
@@ -1051,7 +1577,7 @@ button.session-item:not(.active):hover {
 }
 
 .composer textarea::placeholder {
-  color: oklch(0.64 0.006 70);
+  color: var(--placeholder);
 }
 
 .composer-provider {
@@ -1061,12 +1587,12 @@ button.session-item:not(.active):hover {
   border-radius: 8px;
   border: none;
   background: transparent;
-  color: oklch(0.46 0.008 70);
+  color: var(--text-secondary);
   max-width: 220px;
 }
 
 .composer-provider:hover {
-  background: oklch(0.96 0.003 70);
+  background: var(--control-hover);
 }
 
 .provider-picker {
@@ -1084,13 +1610,13 @@ button.session-item:not(.active):hover {
   border-radius: 8px;
   border: none;
   background: transparent;
-  color: oklch(0.46 0.008 70);
+  color: var(--text-secondary);
   max-width: 200px;
 }
 
 .provider-picker-trigger:hover,
 .provider-picker.open .provider-picker-trigger {
-  background: oklch(0.96 0.003 70);
+  background: var(--control-hover);
 }
 
 .provider-picker-primary {
@@ -1101,7 +1627,7 @@ button.session-item:not(.active):hover {
 }
 
 .provider-picker-chevron {
-  color: oklch(0.68 0.006 70);
+  color: var(--text-tertiary);
   flex: none;
 }
 
@@ -1115,10 +1641,10 @@ button.session-item:not(.active):hover {
   list-style: none;
   min-width: 240px;
   max-width: min(360px, 80vw);
-  border: 1px solid oklch(0.90 0.004 70);
+  border: 1px solid var(--hairline);
   border-radius: 10px;
-  background: oklch(1 0 0);
-  box-shadow: 0 8px 24px oklch(0.2 0 0 / 0.10);
+  background: var(--menu-bg);
+  box-shadow: 0 8px 24px var(--shadow);
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -1134,14 +1660,14 @@ button.session-item:not(.active):hover {
   border: none;
   border-radius: 7px;
   background: transparent;
-  color: oklch(0.34 0.008 70);
+  color: var(--text-body);
   font-size: 12.5px;
   cursor: pointer;
 }
 
 .provider-picker-option:hover,
 .provider-picker-option.on {
-  background: oklch(0.96 0.003 70);
+  background: var(--control-hover);
 }
 
 .provider-model-pill {
@@ -1152,9 +1678,9 @@ button.session-item:not(.active):hover {
   letter-spacing: 0.01em;
   padding: 2px 7px;
   border-radius: 999px;
-  background: oklch(0.955 0.003 70);
-  border: 1px solid oklch(0.90 0.004 70);
-  color: oklch(0.52 0.008 70);
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  color: var(--text-tertiary);
 }
 
 .provider-name {
@@ -1164,7 +1690,7 @@ button.session-item:not(.active):hover {
 .provider-name .provider-model {
   font-size: 0.82em;
   font-weight: 400;
-  color: oklch(0.62 0.008 70);
+  color: var(--trail-wander);
 }
 
 .monitor-card .provider-model {
@@ -1183,7 +1709,7 @@ button.session-item:not(.active):hover {
   border-radius: 9px;
   border: none;
   background: var(--accent);
-  color: var(--canvas);
+  color: var(--on-accent);
   font-size: 14px;
 }
 
@@ -1194,7 +1720,7 @@ button.session-item:not(.active):hover {
 
 .composer-hint {
   font-size: 11px;
-  color: oklch(0.68 0.006 70);
+  color: var(--text-tertiary);
   text-align: center;
 }
 
@@ -1228,7 +1754,7 @@ button.session-item:not(.active):hover {
   font-size: 11px;
   letter-spacing: 0.10em;
   text-transform: uppercase;
-  color: oklch(0.60 0.008 70);
+  color: var(--text-tertiary);
 }
 
 .policy-header h1 {
@@ -1245,14 +1771,14 @@ button.session-item:not(.active):hover {
   width: 22px;
   height: 22px;
   flex: none;
-  color: oklch(0.40 0.04 250);
+  color: var(--accent);
 }
 
 .policy-deck {
   margin: 0;
   font-size: 13.5px;
   line-height: 1.6;
-  color: oklch(0.48 0.008 70);
+  color: var(--text-secondary);
   text-wrap: pretty;
 }
 
@@ -1268,9 +1794,9 @@ button.session-item:not(.active):hover {
   font-size: 11px;
   padding: 4px 9px;
   border-radius: 5px;
-  background: oklch(0.955 0.003 70);
-  border: 1px solid oklch(0.90 0.004 70);
-  color: oklch(0.42 0.008 70);
+  background: var(--panel);
+  border: 1px solid var(--hairline);
+  color: var(--text-secondary);
 }
 
 .jurisdiction-card {
@@ -1289,7 +1815,7 @@ button.session-item:not(.active):hover {
   align-items: flex-start;
   font-size: 13px;
   line-height: 1.6;
-  color: oklch(0.32 0.012 250);
+  color: var(--advocate-text);
   text-wrap: pretty;
 }
 
@@ -1298,7 +1824,7 @@ button.session-item:not(.active):hover {
   height: 16px;
   flex: none;
   margin-top: 2px;
-  color: oklch(0.42 0.06 250);
+  color: var(--accent);
 }
 
 .jurisdiction-card .lead strong {
@@ -1310,7 +1836,7 @@ button.session-item:not(.active):hover {
   flex-direction: column;
   gap: 6px;
   padding-top: 11px;
-  border-top: 1px solid oklch(0.93 0.008 250);
+  border-top: 1px solid var(--advocate-border);
 }
 
 .jurisdiction-section.citations {
@@ -1321,7 +1847,7 @@ button.session-item:not(.active):hover {
   margin: 0;
   font-size: 12px;
   font-weight: 600;
-  color: oklch(0.34 0.012 250);
+  color: var(--advocate-text);
 }
 
 .jurisdiction-section p,
@@ -1329,7 +1855,7 @@ button.session-item:not(.active):hover {
   margin: 0;
   font-size: 12.5px;
   line-height: 1.55;
-  color: oklch(0.40 0.010 250);
+  color: var(--advocate-text);
   text-wrap: pretty;
 }
 
@@ -1342,20 +1868,20 @@ button.session-item:not(.active):hover {
   font-family: var(--font-mono);
   font-size: 11px;
   line-height: 1.65;
-  color: oklch(0.42 0.030 250);
+  color: var(--advocate-kicker);
   text-wrap: pretty;
 }
 
 .policy-markdown {
   margin: 0;
-  border: 1px solid oklch(0.90 0.004 70);
+  border: 1px solid var(--hairline);
   border-radius: 8px;
   background: var(--panel);
   padding: 16px 18px;
   font-family: var(--font-mono);
   font-size: 12px;
   line-height: 1.75;
-  color: oklch(0.34 0.008 70);
+  color: var(--text-body);
   white-space: pre-wrap;
   overflow-x: auto;
 }
@@ -1379,11 +1905,11 @@ button.session-item:not(.active):hover {
   width: 16px;
   height: 16px;
   flex: none;
-  color: oklch(0.42 0.04 70);
+  color: var(--text-secondary);
 }
 
 .taxonomy-table {
-  border: 1px solid oklch(0.90 0.004 70);
+  border: 1px solid var(--hairline);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -1395,8 +1921,8 @@ button.session-item:not(.active):hover {
 }
 
 .taxonomy-head {
-  background: oklch(0.955 0.003 70);
-  border-bottom: 1px solid oklch(0.90 0.004 70);
+  background: var(--panel);
+  border-bottom: 1px solid var(--hairline);
 }
 
 .taxonomy-head span {
@@ -1404,11 +1930,11 @@ button.session-item:not(.active):hover {
   font-size: 11px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: oklch(0.52 0.008 70);
+  color: var(--text-tertiary);
 }
 
 .taxonomy-row {
-  border-bottom: 1px solid oklch(0.935 0.004 70);
+  border-bottom: 1px solid var(--hairline);
 }
 
 .taxonomy-row:last-child {
@@ -1431,13 +1957,13 @@ button.session-item:not(.active):hover {
   padding: 10px 13px;
   font-size: 12.5px;
   line-height: 1.5;
-  color: oklch(0.40 0.008 70);
+  color: var(--text-secondary);
   text-wrap: pretty;
 }
 
 .taxonomy-note {
   font-size: 11.5px;
-  color: oklch(0.56 0.008 70);
+  color: var(--text-tertiary);
 }
 
 @media (max-width: 640px) {
@@ -1449,6 +1975,71 @@ button.session-item:not(.active):hover {
   .why-grid {
     grid-template-columns: 1fr;
   }
+}
+
+
+/* —— Theme setting —— */
+
+.theme-setting {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 15px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.theme-head {
+  display: flex;
+  align-items: center;
+}
+
+.theme-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-body);
+}
+
+.theme-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.theme-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  text-align: left;
+  padding: 10px 11px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--canvas);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.theme-option:hover {
+  background: var(--control-hover);
+}
+
+.theme-option.on {
+  border-color: var(--accent);
+  color: var(--text-body);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.theme-option-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.theme-option-hint {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-tertiary);
 }
 
 /* —— Instrument drawer —— */

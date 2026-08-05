@@ -1,5 +1,6 @@
 node_modules/
 dist/
+dist-test/
 build/
 target/
 packages/desktop/src-tauri/target/

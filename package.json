@@ -20,7 +20,7 @@
     "build": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/daemon && npm run build --workspace @airp/demo",
     "build:ui": "npm run build --workspace @airp/ui",
     "typecheck": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run typecheck --workspaces --if-present",
-    "test": "npm run build && npm run test --workspace @airp/core && npm run test --workspace @airp/store-sqlite && npm run test --workspace @airp/daemon",
+    "test": "npm run build && npm run test --workspace @airp/core && npm run test --workspace @airp/store-sqlite && npm run test --workspace @airp/daemon && npm run test --workspace @airp/ui",
     "demo": "npm run build && node packages/demo/dist/scenario.js",
     "daemon": "npm run build && node packages/daemon/dist/server.js",
     "desktop": "npm run dev --workspace @airp/desktop",

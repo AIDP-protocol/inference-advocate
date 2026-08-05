@@ -11,8 +11,9 @@
 // node:crypto. PEM encode/decode is fixed-size SPKI and PKCS8 for Ed25519 only.
 //
 // Canonical construction is octets: UTF-8 header block, then content bytes appended without
-// re-encoding. Terminal-seal and pre-seal payloads are built on separate paths so a token
-// from one cannot be substituted into the other.
+// re-encoding. Terminal-seal and pre-seal payloads are built on separate paths so a token from
+// one cannot be substituted into the other, and they no longer share a shape: a pre-seal ends
+// after signed-at and covers no content, so the two differ by more than their version token.
 
 import type { ProvenanceSeal } from '../types.js';
 import {
@@ -33,7 +34,15 @@ const utf8 = new TextEncoder();
 /** Header field that carried the seal. Spec §7.1 registers AIRP-Seal only. */
 export type SealFieldName = 'airp-seal';
 
-export interface SealSubject {
+/**
+ * The eight header fields both payloads sign. Spec §3.6.
+ *
+ * A pre-seal signs these and stops. A terminal seal adds the content it covers, which is what
+ * `SealSubject` is for. Keeping the two types apart is what stops the pre-seal builder from
+ * being handed content again: with content in both, the version token would be the only thing
+ * separating a pre-seal from a terminal seal over the same bytes.
+ */
+export interface SealHeaderFields {
   registerEntryId: string;
   selector: string;
   /**
@@ -52,6 +61,10 @@ export interface SealSubject {
   /** `sha-256=` + base64url unpadded digest of the request body. */
   requestDigest: string;
   signedAt: string;
+}
+
+/** A terminal seal's subject: the header fields plus the octets the seal covers. Spec §3.6. */
+export interface SealSubject extends SealHeaderFields {
   /** Sealed content octets (decompressed body, or binding-extracted stream bytes). */
   content: Uint8Array;
 }
@@ -109,8 +122,14 @@ export function canonicalAirpSealPayload(s: SealSubject): Uint8Array {
   return concatOctets([utf8.encode(header), s.content]);
 }
 
-/** AIRP pre-seal payload. Spec §3.6. */
-export function canonicalAirpPresealPayload(s: SealSubject): Uint8Array {
+/**
+ * AIRP pre-seal payload. Spec §3.6.
+ *
+ * Ends with the LF that terminates `signed-at`. No content-length, no empty line, and no
+ * content: a pre-seal commits to the fields of an exchange before there is a response to
+ * cover. Takes only the header fields so there is nothing here to append.
+ */
+export function canonicalAirpPresealPayload(s: SealHeaderFields): Uint8Array {
   assertNoLineBreak('register-entry', s.registerEntryId);
   assertNoLineBreak('selector', s.selector);
   assertNoLineBreak('alg', s.alg);
@@ -129,10 +148,8 @@ export function canonicalAirpPresealPayload(s: SealSubject): Uint8Array {
     `provider:${s.providerIdentity}\n` +
     `exchange-id:${s.exchangeId}\n` +
     `request-digest:${s.requestDigest}\n` +
-    `signed-at:${s.signedAt}\n` +
-    `content-length:${s.content.byteLength}\n` +
-    '\n';
-  return concatOctets([utf8.encode(header), s.content]);
+    `signed-at:${s.signedAt}\n`;
+  return utf8.encode(header);
 }
 
 /** Default canonical payload for newly minted seals (AIRP terminal). */

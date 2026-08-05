@@ -209,6 +209,14 @@ The batch format is defined, and the granularity floor and the traffic-class den
 implemented, because those two are properties of computing the rate honestly rather than of
 defending it.
 
+**Pre-seals.** draft-flores-airp-provenance §3.6 defines a pre-seal payload alongside the
+terminal one, and `canonicalAirpPresealPayload` builds it byte for byte, ending after
+`signed-at` with no content. Nothing in this build signs or verifies one. The SSE parser
+recognizes an `airp-preseal` event and skips it, and the deterministic pass has no rule
+comparing a pre-seal to the terminal seal that follows it. The builder is here so that the
+payload the spec defines exists in one place and is under test, not because the mechanism is
+wired up.
+
 **DNS deployment.** draft-flores-airp-provenance §4.7 puts entry selection on `_airp` TXT
 records beneath the provider identity domain, with a key set digest (`k`) confirming the
 selected entry. The reference client parses those records, refuses unsafe `r` auto-fetch

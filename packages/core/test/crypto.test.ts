@@ -13,6 +13,7 @@ import {
 } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import {
+  canonicalAirpPresealPayload,
   canonicalAirpSealPayload,
   generateSealKeypair,
   MasterSecret,
@@ -196,6 +197,64 @@ test('the terminal-seal payload is byte exact against the draft layout', () => {
     Buffer.from(content),
   ]);
   assert.deepEqual(Buffer.from(payload), expected);
+});
+
+test('the pre-seal payload is byte exact against the draft layout and ends after signed-at', () => {
+  // Written from draft-flores-airp-provenance-00 Section 3.6: the same eight header fields as a
+  // terminal seal, and then nothing. No content-length line, no empty line, no content.
+  const payload = canonicalAirpPresealPayload({
+    registerEntryId: 'demo.aligned',
+    selector: 's1',
+    alg: 'ed25519',
+    model: 'aligned-1',
+    providerIdentity: 'Aligned Reference Models (demo)',
+    exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
+    requestDigest: 'sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    signedAt: '2026-07-28T00:00:00.000Z',
+  });
+
+  const expected = Buffer.from(
+    'airp-preseal/v1\n' +
+      'register-entry:demo.aligned\n' +
+      'selector:s1\n' +
+      'alg:ed25519\n' +
+      'model:aligned-1\n' +
+      'provider:Aligned Reference Models (demo)\n' +
+      'exchange-id:AAAAAAAAAAAAAAAAAAAAAA\n' +
+      'request-digest:sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n' +
+      'signed-at:2026-07-28T00:00:00.000Z\n',
+    'utf8',
+  );
+  assert.deepEqual(Buffer.from(payload), expected);
+
+  const text = new TextDecoder().decode(payload);
+  assert.ok(text.endsWith('signed-at:2026-07-28T00:00:00.000Z\n'));
+  assert.equal(text.includes('content-length:'), false);
+  assert.equal(text.includes('\n\n'), false);
+});
+
+test('a pre-seal payload is not a terminal payload over the same fields', () => {
+  const fields = {
+    registerEntryId: 'demo.aligned',
+    selector: 's1',
+    alg: 'ed25519',
+    model: 'aligned-1',
+    providerIdentity: 'Aligned Reference Models (demo)',
+    exchangeId: 'AAAAAAAAAAAAAAAAAAAAAA',
+    requestDigest: 'sha-256=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    signedAt: '2026-07-28T00:00:00.000Z',
+  };
+  // Empty content is the case where the two payloads would come closest, so it is the one
+  // worth pinning: a pre-seal is shorter by the content-length line and the empty line, not
+  // merely different in its version token.
+  const preseal = canonicalAirpPresealPayload(fields);
+  const terminal = canonicalAirpSealPayload({ ...fields, content: new Uint8Array() });
+  assert.notDeepEqual(Buffer.from(preseal), Buffer.from(terminal));
+  assert.equal(
+    new TextDecoder().decode(terminal),
+    new TextDecoder().decode(preseal).replace('airp-preseal/v1', 'airp-seal/v1') +
+      'content-length:0\n\n',
+  );
 });
 
 test('an alg substitution changes the payload and invalidates the signature', () => {

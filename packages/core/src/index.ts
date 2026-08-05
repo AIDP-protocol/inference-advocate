@@ -18,6 +18,7 @@ export {
   signDocument,
   verifyDocument,
   pemSpkiBody,
+  type SealHeaderFields,
   type SealSubject,
   type SealFieldName,
 } from './crypto/seal.js';

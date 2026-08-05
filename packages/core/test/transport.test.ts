@@ -30,7 +30,9 @@ import {
   send,
   signSeal,
   verifySeal,
+  type ExchangeStage,
   type ProviderConfig,
+  type TransportPolicyConfig,
 } from '@airp/core';
 
 const taxonomy = Taxonomy.loadFromFile(dataPath('taxonomy', 'flags.v0.json'));
@@ -238,6 +240,7 @@ function buildAdvocate(opts: {
   script: string[];
   contentBinding?: string;
   trailingContent?: string;
+  transportPolicy?: TransportPolicyConfig;
 }) {
   const keys = generateSealKeypair();
   const { fetchImpl, seen } = streamingProvider({
@@ -251,7 +254,9 @@ function buildAdvocate(opts: {
     providers: new ProviderRegistry([{ ...PROVIDER, id: 'test' }]),
     register: registerFor(keys.publicKeyPem, opts.contentBinding),
     standing: StandingRegistry.empty(),
-    policy,
+    policy: opts.transportPolicy
+      ? new DeliveryPolicy({ ...policy.document, transport: opts.transportPolicy })
+      : policy,
     jurisdiction: Jurisdiction.none(),
     monitor: new SemanticMonitor(new RuleEvaluator(taxonomy), taxonomy),
     attestations: { isAdult: true, jurisdiction: 'none', issuer: 'test' },
@@ -471,6 +476,127 @@ test('the non-streamed mode selected deliberately delivers through the whole pip
   assert.equal(result.decision.kind, 'deliver');
   assert.equal(result.delivered, ANSWER);
   assert.equal(result.deterministic.sealValid, true);
+});
+
+test('the progress hooks carry stage names and a scalar and no content', async () => {
+  const { advocate } = buildAdvocate({ script: [ANSWER], contentBinding: 'sse-chat-delta-v1' });
+  const stages: ExchangeStage[] = [];
+  const arrivals: unknown[] = [];
+  await advocate.ask({
+    providerId: 'test',
+    text: 'What is the capital of Nepal?',
+    onStage: (s) => stages.push(s),
+    onArrival: (a) => arrivals.push(a),
+  });
+
+  // Every stage reported is one the pipeline runs, and the streamed path reports receiving
+  // rather than waiting.
+  const known: ExchangeStage[] = [
+    'checking_standing',
+    'awaiting_response',
+    'receiving',
+    'response_complete',
+    'verifying_seal',
+    'evaluating_content',
+    'resolving_delivery',
+    'recording',
+    'delivering',
+  ];
+  assert.deepEqual(
+    stages,
+    [
+      'checking_standing',
+      'receiving',
+      'response_complete',
+      'verifying_seal',
+      'evaluating_content',
+      'resolving_delivery',
+      'recording',
+      'delivering',
+    ],
+  );
+  for (const stage of stages) assert.ok(known.includes(stage));
+
+  // That the stages are exactly this closed set of compile-time names, and that every arrival is
+  // a number, is the whole content claim for this channel. A substring search for words of the
+  // response would be the weaker test and a misleading one: "response" occurs in a stage name.
+  // If accumulated text could reach the view the delivery gate would be a stylesheet rather than
+  // a fact about data flow, and there is nowhere here for it to travel.
+  for (const value of arrivals) {
+    assert.equal(typeof value, 'number');
+    assert.ok(Number.isFinite(value as number));
+  }
+});
+
+test('the non-streamed transport reports waiting rather than receiving', async () => {
+  const { advocate } = buildAdvocate({
+    script: [ANSWER],
+    contentBinding: 'sse-chat-delta-v1',
+    transportPolicy: { withholdUnverifiedContent: true },
+  });
+  const stages: ExchangeStage[] = [];
+  await advocate.ask({ providerId: 'test', text: 'ask', onStage: (s) => stages.push(s) });
+
+  assert.equal(stages.includes('awaiting_response'), true);
+  assert.equal(stages.includes('receiving'), false);
+});
+
+test('the transport setting selects the mode and persists across exchanges', async () => {
+  const { advocate, seen } = buildAdvocate({ script: [ANSWER], contentBinding: 'sse-chat-delta-v1' });
+  assert.equal(advocate.transportSetting.transport, 'streamed');
+  assert.equal(advocate.transportSetting.locked, false);
+
+  const set = advocate.setWithholdUnverifiedContent(true);
+  assert.equal(set.ok, true);
+  assert.equal(set.setting.transport, 'non_streamed');
+
+  await advocate.ask({ providerId: 'test', text: 'ask' });
+  assert.equal(seen[0]?.body.stream, false);
+
+  advocate.setWithholdUnverifiedContent(false);
+  await advocate.ask({ providerId: 'test', text: 'ask again' });
+  assert.equal(seen[1]?.body.stream, true);
+});
+
+test('a locked transport setting refuses to change and names who set it', async () => {
+  const { advocate, seen } = buildAdvocate({
+    script: [ANSWER],
+    contentBinding: 'sse-chat-delta-v1',
+    transportPolicy: {
+      withholdUnverifiedContent: true,
+      locked: true,
+      lockedBy: 'the profile on this managed device',
+    },
+  });
+
+  const setting = advocate.transportSetting;
+  assert.equal(setting.withholdUnverifiedContent, true);
+  assert.equal(setting.locked, true);
+  assert.equal(setting.lockedBy, 'the profile on this managed device');
+
+  const attempt = advocate.setWithholdUnverifiedContent(false);
+  assert.equal(attempt.ok, false);
+  assert.match(attempt.reason ?? '', /managed device/);
+  assert.equal(attempt.setting.withholdUnverifiedContent, true);
+
+  await advocate.ask({ providerId: 'test', text: 'ask' });
+  assert.equal(seen[0]?.body.stream, false);
+});
+
+test('a typical duration is not claimed before there is history for it', async () => {
+  const { advocate } = buildAdvocate({ script: [ANSWER], contentBinding: 'sse-chat-delta-v1' });
+  assert.equal(advocate.typicalDurationMs('test', 'test-model'), null);
+
+  await advocate.ask({ providerId: 'test', text: 'one' });
+  assert.equal(advocate.typicalDurationMs('test', 'test-model'), null);
+
+  await advocate.ask({ providerId: 'test', text: 'two' });
+  await advocate.ask({ providerId: 'test', text: 'three' });
+  const typical = advocate.typicalDurationMs('test', 'test-model');
+  assert.equal(typeof typical, 'number');
+  assert.ok((typical ?? -1) >= 0);
+  // A different model has its own history, and this one has none.
+  assert.equal(advocate.typicalDurationMs('test', 'other-model'), null);
 });
 
 test('content after the terminal seal refuses and delivers nothing', async () => {

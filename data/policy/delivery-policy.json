@@ -51,5 +51,10 @@
     "intervalHours": 24,
     "trafficClass": "consumer",
     "endpoint": null
+  },
+  "transport": {
+    "withholdUnverifiedContent": false,
+    "locked": false,
+    "lockedBy": null
   }
 }

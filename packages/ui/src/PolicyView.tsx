@@ -9,9 +9,15 @@
 import { useEffect, useState } from 'react';
 import type { AdvocateState } from './types';
 import { hostCall } from './host-client';
+import { TransportSetting } from './TransportSetting';
 import { IconDeliveryPolicy, IconJurisdiction, IconTaxonomy } from './icons';
 
-export function PolicyView({ state }: { state: AdvocateState | null }) {
+export function PolicyView(props: {
+  state: AdvocateState | null;
+  onWithholdUnverified: (withhold: boolean) => void;
+  transportError: string | null;
+}) {
+  const { state, onWithholdUnverified, transportError } = props;
   const [markdown, setMarkdown] = useState<string>('');
 
   useEffect(() => {
@@ -55,6 +61,12 @@ export function PolicyView({ state }: { state: AdvocateState | null }) {
             <span className="fact-chip">jurisdiction {state.jurisdiction.id}</span>
           </div>
         )}
+
+        <TransportSetting
+          transport={state?.transport}
+          onChange={onWithholdUnverified}
+          error={transportError}
+        />
 
         {state && (
           <div className="jurisdiction-card">

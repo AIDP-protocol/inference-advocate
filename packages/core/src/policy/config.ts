@@ -60,6 +60,21 @@ export interface TelemetryConfig {
   endpoint: string | null;
 }
 
+/**
+ * Transport default, and whether the person using the client may change it.
+ *
+ * Optional, so a policy document written before this existed keeps working: absent means
+ * streamed transport and an unlocked control. `lockedBy` names who set it, because a control
+ * that is visibly locked with an attribution describes the arrangement the user is actually in,
+ * and a control that has silently disappeared does not.
+ */
+export interface TransportPolicyConfig {
+  /** True selects non-streamed transport: nothing arrives on the device until it is verified. */
+  withholdUnverifiedContent: boolean;
+  locked?: boolean;
+  lockedBy?: string | null;
+}
+
 export interface DeliveryPolicyDocument {
   policyVersion: string;
   scale: 'demonstration';
@@ -73,6 +88,7 @@ export interface DeliveryPolicyDocument {
   /** Notices the advocate pins regardless of jurisdiction. Paper step 12. */
   notices: Notice[];
   telemetry: TelemetryConfig;
+  transport?: TransportPolicyConfig;
 }
 
 export class DeliveryPolicy {

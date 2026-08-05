@@ -14,6 +14,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { extname, join, normalize, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dispatchHostMethod, HostSession } from './host.js';
+import { encodeProgressFrame } from './progress.js';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 const dataDir = process.env['AIRP_DATA_DIR'] ?? join(repoRoot, 'data');
@@ -59,6 +60,32 @@ async function readBody<T>(req: IncomingMessage): Promise<T> {
   return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}') as T;
 }
 
+/**
+ * Stream progress while one exchange runs, then the result. The response text appears in the
+ * final line and nowhere earlier, which is what makes the delivery gate a fact about data flow
+ * rather than a claim about the stylesheet.
+ */
+async function askWithProgress(
+  res: ServerResponse,
+  body: { providerId: string; text: string },
+): Promise<void> {
+  res.writeHead(200, {
+    'content-type': 'application/x-ndjson; charset=utf-8',
+    'cache-control': 'no-store',
+    'access-control-allow-origin': '*',
+  });
+  try {
+    const result = await host.ask(body.providerId, body.text, {
+      onStage: (stage) => res.write(encodeProgressFrame({ kind: 'stage', stage })),
+      onArrival: (activity) => res.write(encodeProgressFrame({ kind: 'arrival', activity })),
+    });
+    res.write(`${JSON.stringify({ kind: 'result', ...result })}\n`);
+  } catch (err) {
+    res.write(`${JSON.stringify({ kind: 'error', error: (err as Error).message })}\n`);
+  }
+  res.end();
+}
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? '/', `http://127.0.0.1:${PORT}`);
 
@@ -85,7 +112,20 @@ const server = createServer(async (req, res) => {
 
     if (url.pathname === '/api/ask' && req.method === 'POST') {
       const body = await readBody<{ providerId: string; text: string }>(req);
+      // A client that asks for NDJSON gets progress frames while the exchange runs, then the
+      // result as the last line. One that does not gets exactly what it got before. The frames
+      // carry a stage name and an arrival scalar; see progress.ts.
+      if ((req.headers['accept'] ?? '').includes('application/x-ndjson')) {
+        await askWithProgress(res, body);
+        return;
+      }
       json(res, 200, await dispatchHostMethod(host, 'ask', { ...body }));
+      return;
+    }
+
+    if (url.pathname === '/api/transport' && req.method === 'POST') {
+      const body = await readBody<{ withholdUnverifiedContent?: boolean }>(req);
+      json(res, 200, await dispatchHostMethod(host, 'transport.set', { ...body }));
       return;
     }
 

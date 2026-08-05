@@ -67,7 +67,7 @@ it is discussed below.
 | 9 | the ledger | `core/src/store/ledger.ts`, `core/src/store/port.ts`, adapter: `store-sqlite` |
 | 10 | the score | `core/src/policy/score.ts`, `core/src/policy/config.ts` |
 | 11 | the resolution | `core/src/policy/delivery.ts`, `core/src/policy/jurisdiction.ts` |
-| 12 | delivery, with pinned notices | `core/src/policy/notices.ts`, `ui/src/App.tsx`, host: `daemon/src/host.ts` |
+| 12 | delivery, with pinned notices | `core/src/policy/notices.ts`, `ui/src/App.tsx`, `ui/src/SightGlass.tsx`, host: `daemon/src/host.ts` |
 | 13, 14 | telemetry as rates, standing consumed back into step 10 | `core/src/telemetry/rates.ts`, `emitter.ts`, `standing.ts`, `export.ts` |
 
 The provisional patent application's four mechanisms map on top of the same files:
@@ -110,6 +110,27 @@ The client also declines to request a stream where the selected register entry n
 it does not hold, or names none while sealing, because §3.8.3 requires the member of providers
 serving streamed responses and substituting a different extraction would change the octets a
 seal covers. `deploy/verify-public-stream.mjs` proves the streamed path through Apache.
+
+**The wait is a design problem, not a user education problem.** A delivery gate experienced only
+as slowness reads as a defect, and defects get disabled, so `ui/src/SightGlass.tsx` shows that
+data is arriving without showing what is arriving: a fuel pump sight glass, driven by the arrival
+scalar, with the stage of the running check in an `aria-live` region beside it. Presentation is
+out of scope per §1.1, so that file carries the full argument and states plainly that these are
+the reference implementation's choices rather than requirements. No minimum duration is imposed,
+because padding the wait so the animation gets seen would make diligence feel slower than
+negligence. The stage names come from `ExchangeStage` in the core and there is one label per
+stage that actually runs.
+
+**The hold is a conformance property, not a cryptographic one.** Response text is not in the
+document before release: not blurred, clipped or faded, absent, because the only thing the
+progress channel can carry is a stage name and a scalar (`daemon/src/progress.ts`). That is worth
+claiming and it is narrower than it sounds. Plaintext has to exist on the device for evaluation to
+happen at all, so where the party subject to the policy also controls the device, the gate is
+advisory and real enforcement belongs to platform controls or to moving the boundary off the
+device. The non-streamed mode narrows the window; it does not remove the requirement to trust the
+client. The "Withhold Unverified Content" setting is where that trade is made, and where the
+Delivery Policy can lock it, the control renders disabled with a line naming who set it rather
+than disappearing.
 
 **Evidence spans live in the transcript store, not the ledger.** This falls out of the paper
 rather than being invented for the code. Section 5 says telemetry carries no evidence spans,
@@ -230,6 +251,21 @@ recognizes an `airp-preseal` event and skips it, and the deterministic pass has 
 comparing a pre-seal to the terminal seal that follows it. The builder is here so that the
 payload the spec defines exists in one place and is under test, not because the mechanism is
 wired up.
+
+**Progress frames on the desktop RPC bridge.** The browser-tab path gets stage and arrival frames
+because `daemon/src/server.ts` can stream an NDJSON response. The desktop shell reaches
+`HostSession` over the loopback RPC bridge in `daemon/src/host-rpc.ts`, which answers requests and
+does not carry notifications, so the delivery indicator there has no arrival signal to read and
+falls back to the held-transport presentation of elapsed time. That is a gap in the bridge. The
+alternative would have been a timer-driven animation that reads as arrival, which is a small lie
+in the one product where that is expensive.
+
+**Calibrated typical durations.** The held-transport indicator quotes the median of this client's
+own last twenty exchanges with that provider and model, kept in the preference store, and shows
+nothing until there are three of them. It is labeled as a typical duration rather than as a
+prediction about the response in flight, because that is all it is: no per-prompt estimate, no
+model of response length, and no accounting for a hosted evaluator being slower on one exchange
+than another.
 
 **DNS deployment.** draft-flores-airp-provenance §4.7 puts entry selection on `_airp` TXT
 records beneath the provider identity domain, with a key set digest (`k`) confirming the

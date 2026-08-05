@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { createInterface } from 'node:readline';
 import { packagingWarnings, HostSession } from '../dist/host.js';
 import { listenHostRpc } from '../dist/host-rpc.js';
+import { encodeProgressFrame, progressFrame } from '../dist/progress.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(here, '..', '..', '..');
@@ -30,6 +31,27 @@ test('packagingWarnings names the Node-launcher gap when AIRP_DESKTOP=1', () => 
   assert.doesNotMatch(w[0], /stdio IPC/);
   assert.doesNotMatch(w[0], /Node child process/);
   assert.doesNotMatch(w[0], /loopback daemon/);
+});
+
+test('progress frames carry a stage name or a scalar and nothing else', () => {
+  // The frame is rebuilt from its known members, so content cannot ride along on the one channel
+  // that is open while the delivery gate is still holding a response.
+  assert.deepEqual(
+    progressFrame({ kind: 'stage', stage: 'receiving', text: 'the response so far' }),
+    { kind: 'stage', stage: 'receiving' },
+  );
+  assert.deepEqual(
+    progressFrame({ kind: 'arrival', activity: 0.5, content: 'leak', tokens: 12 }),
+    { kind: 'arrival', activity: 0.5 },
+  );
+
+  // An out-of-range activity is a rendering bug, not a signal.
+  assert.equal(progressFrame({ kind: 'arrival', activity: 4 }).activity, 1);
+  assert.equal(progressFrame({ kind: 'arrival', activity: -1 }).activity, 0);
+  assert.equal(progressFrame({ kind: 'arrival', activity: Number.NaN }).activity, 0);
+
+  const line = encodeProgressFrame({ kind: 'arrival', activity: 0.25, content: 'leak' });
+  assert.equal(line, '{"kind":"arrival","activity":0.25}\n');
 });
 
 test('listenHostRpc answers state over loopback without HTTP or a stdio child', async () => {

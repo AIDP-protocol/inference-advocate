@@ -81,6 +81,27 @@ export type SealHeaderField = 'airp-seal';
  */
 export type TransportMode = 'streamed' | 'non_streamed';
 
+/**
+ * Stages of one exchange, in the order `ask` runs them. Reported so a waiting user can be told
+ * which check is running rather than only that something is.
+ *
+ * These are the stages that exist. `checking_standing` is first because standing is consulted
+ * before the request goes out, where it can refuse connection outright, and `receiving` and
+ * `awaiting_response` are alternatives rather than a sequence: which one runs is the transport.
+ * Adding a name here that does not correspond to work the pipeline does would make the label a
+ * decoration, which is worse than no label.
+ */
+export type ExchangeStage =
+  | 'checking_standing'
+  | 'awaiting_response'
+  | 'receiving'
+  | 'response_complete'
+  | 'verifying_seal'
+  | 'evaluating_content'
+  | 'resolving_delivery'
+  | 'recording'
+  | 'delivering';
+
 /** What the adapter hands back from a provider call. Paper step 6. Spec §3.8. */
 export interface ProviderResponse {
   providerId: string;
@@ -335,4 +356,9 @@ export interface ExchangeResult {
   ledgerSeq: number;
   /** Stage timings so the UI can show where deferral latency went. */
   timings: ExchangeTimings;
+  /**
+   * Which transport carried the body. Absent when nothing was sent, as when standing refuses
+   * connection before the request goes out.
+   */
+  transport?: TransportMode;
 }

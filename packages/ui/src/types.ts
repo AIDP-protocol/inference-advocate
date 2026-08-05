@@ -57,12 +57,23 @@ export interface ExchangeResult {
     semanticMs: number;
     resolveMs: number;
   };
+  transport?: 'streamed' | 'non_streamed';
+}
+
+/** The transport control, including who locked it if anyone did. */
+export interface TransportState {
+  withholdUnverifiedContent: boolean;
+  locked: boolean;
+  lockedBy: string | null;
+  transport: 'streamed' | 'non_streamed';
 }
 
 export interface ProviderState {
   id: string;
   label: string;
   model: string;
+  /** Median of this client's own recent exchanges with this model, null without enough history. */
+  typicalMs: number | null;
   registerEntryId: string | null;
   standing: string;
   windowScore: number;
@@ -89,6 +100,7 @@ export interface AdvocateState {
     issuer: string;
   };
   effectiveThresholds: { warn: number; block: number };
+  transport: TransportState;
   jurisdiction: {
     id: string;
     name: string;

@@ -88,6 +88,32 @@ your jurisdiction can require a higher mode, a supervised minor's configuration 
 below enforce, and categories designated for mandatory non-delivery are refused in every mode.
 Observe relaxes the accumulation gate. It never relaxes an absolute floor.
 
+## Withholding unverified content
+
+Nothing is shown to you before the checks finish, in either setting below. What the setting changes
+is whether unverified text ever lands on this machine at all.
+
+**Off.** The response arrives as it is generated and sits unverified in this application's memory,
+hidden from you, until the checks finish. While it arrives you get an indicator driven by the
+arrival itself, so a wait tells you something is happening.
+
+**On.** Nothing reaches this device until the whole response is ready and verified. There is
+elapsed time and the stage of each check, but no measure of arrival, because nothing is arriving
+yet.
+
+The trade is a small amount of exposure for a better wait, and which way to take it depends on who
+set this policy. Off is right where you set your own, because there is nothing to defend against.
+On is stronger where someone else set it, such as a managed device or a profile configured by
+another person, because the checks are then guarding against someone who may have access to this
+machine.
+
+Either way the hold is a property of this client honoring it, not of cryptography. Plaintext has to
+exist here for the checks to run at all. On a device its user controls, this is a setting that
+narrows a window rather than a boundary that cannot be crossed.
+
+A policy can lock this setting. Where it does, the control stays visible, disabled, with a line
+naming who set it.
+
 ## Your jurisdiction
 
 Your advocate loads one jurisdiction ruleset at setup and applies it at delivery. A ruleset can

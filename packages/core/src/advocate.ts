@@ -23,6 +23,7 @@ import { randomUUID } from 'node:crypto';
 import type {
   AttestationPackage,
   ExchangeResult,
+  ExchangeStage,
   LedgerFlag,
   Message,
   ProviderConfig,
@@ -85,6 +86,37 @@ export interface AskOptions {
    * accumulated text does not cross this callback and neither does a count of anything.
    */
   onArrival?: (activity: number) => void;
+  /** Which stage of the exchange is running. A name from a closed set, and nothing else. */
+  onStage?: (stage: ExchangeStage) => void;
+}
+
+/** The transport control as the user sees it, including who took it away if anyone did. */
+export interface TransportSetting {
+  /** True means non-streamed: nothing arrives on this device until it has been verified. */
+  withholdUnverifiedContent: boolean;
+  /** Set by the Delivery Policy document. The user cannot change a locked setting. */
+  locked: boolean;
+  /** Who set it, when locked. Shown next to the disabled control rather than hiding it. */
+  lockedBy: string | null;
+  /** The mode the setting resolves to. */
+  transport: TransportMode;
+}
+
+/** Preference key for the transport choice. Persisted so a restart keeps it. */
+const TRANSPORT_PREFERENCE = 'transport.withholdUnverifiedContent';
+
+/** How many recent exchange durations to keep per provider and model. */
+const DURATION_SAMPLES = 20;
+
+/**
+ * Fewer than this is not a typical anything. A held-transport indicator that quotes a typical
+ * duration off one prior exchange would be presenting noise as history.
+ */
+const DURATION_MINIMUM_SAMPLES = 3;
+
+/** Durations are kept per provider and model, because a different model is a different wait. */
+function durationKey(providerId: string, model: string): string {
+  return `timing.history.${providerId}:${model}`;
 }
 
 export class Advocate {
@@ -151,6 +183,62 @@ export class Advocate {
     return this.#opts.standing.stateFor(provider.registerEntryId, this.#opts.jurisdiction.ruleset.id);
   }
 
+  /**
+   * The transport choice in force. The Delivery Policy document supplies the default and can
+   * lock it; otherwise the user's stored preference wins.
+   */
+  get transportSetting(): TransportSetting {
+    const configured = this.#opts.policy.document.transport;
+    const locked = configured?.locked === true;
+    const fromPolicy = configured?.withholdUnverifiedContent === true;
+    const stored = locked ? undefined : this.preferences.get<boolean>(TRANSPORT_PREFERENCE);
+    const withhold = stored ?? fromPolicy;
+    return {
+      withholdUnverifiedContent: withhold,
+      locked,
+      lockedBy: configured?.lockedBy ?? null,
+      transport: withhold ? 'non_streamed' : 'streamed',
+    };
+  }
+
+  setWithholdUnverifiedContent(value: boolean): {
+    ok: boolean;
+    reason?: string;
+    setting: TransportSetting;
+  } {
+    const current = this.transportSetting;
+    if (current.locked) {
+      return {
+        ok: false,
+        reason: `this setting is set by ${current.lockedBy ?? 'the Delivery Policy'} and cannot be changed here`,
+        setting: current,
+      };
+    }
+    this.preferences.set(TRANSPORT_PREFERENCE, value);
+    return { ok: true, setting: this.transportSetting };
+  }
+
+  /**
+   * Median duration of this client's own recent exchanges with that provider and model, or null
+   * where there is not enough history to call anything typical. Durations only: no content, and
+   * nothing that leaves the device.
+   */
+  typicalDurationMs(providerId: string, model: string): number | null {
+    const samples = this.preferences.get<number[]>(durationKey(providerId, model)) ?? [];
+    if (samples.length < DURATION_MINIMUM_SAMPLES) return null;
+    const sorted = [...samples].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2 === 1
+      ? sorted[mid]!
+      : Math.round((sorted[mid - 1]! + sorted[mid]!) / 2);
+  }
+
+  #recordDuration(providerId: string, model: string, totalMs: number): void {
+    const key = durationKey(providerId, model);
+    const prior = this.preferences.get<number[]>(key) ?? [];
+    this.preferences.set(key, [...prior, Math.round(totalMs)].slice(-DURATION_SAMPLES));
+  }
+
   /** Current attribute attestation package. Paper step 2; issuer is still a local assertion. */
   get attestations(): AttestationPackage {
     return this.#opts.attestations;
@@ -175,6 +263,12 @@ export class Advocate {
     const noticeState = this.#noticeStates.get(sessionId) ?? newNoticeState(this.#now().toISOString());
     this.#noticeStates.set(sessionId, noticeState);
     const responseId = randomUUID();
+    // Stage reporting. Names from a closed set and nothing else: this is what drives the
+    // delivery indicator, and the indicator is not a place content is allowed to appear.
+    const stage = (name: ExchangeStage): void => opts.onStage?.(name);
+
+    // Steps 13 and 14 first: standing is consulted before anything is sent.
+    stage('checking_standing');
     const standing = this.standingFor(provider);
 
     // Step 1: the prompt, recorded locally before anything leaves.
@@ -199,11 +293,12 @@ export class Advocate {
       ? this.#opts.register.entry(provider.registerEntryId)
       : undefined;
     const streamBinding =
-      (opts.transport ?? 'streamed') === 'streamed'
+      (opts.transport ?? this.transportSetting.transport) === 'streamed'
         ? this.#streamBindingFor(configuredEntry)
         : undefined;
     const transport: TransportMode = streamBinding ? 'streamed' : 'non_streamed';
 
+    stage(transport === 'streamed' ? 'receiving' : 'awaiting_response');
     const providerStarted = Date.now();
     const response = await sendToProvider(provider, {
       messages,
@@ -214,6 +309,8 @@ export class Advocate {
       ...(this.#opts.fetchImpl ? { fetchImpl: this.#opts.fetchImpl } : {}),
     });
     const providerMs = Date.now() - providerStarted;
+    stage('response_complete');
+    stage('verifying_seal');
 
     // Step 7: deterministic pass. DNS may confirm the entry and its key set; absence leaves
     // the attribution unconfirmed rather than refused. Spec §4.7 / §6.3.
@@ -251,6 +348,7 @@ export class Advocate {
 
     // Step 8: semantic pass. A response refused by the deterministic layer is not evaluated
     // semantically; the paper is explicit that it is refused without further evaluation.
+    stage('evaluating_content');
     const semanticStarted = Date.now();
     const semantic = deterministic.passed
       ? await this.#opts.monitor.evaluate({
@@ -262,6 +360,7 @@ export class Advocate {
     const semanticMs = Date.now() - semanticStarted;
 
     // Steps 10 and 11: score and resolution.
+    stage('resolving_delivery');
     const resolveStarted = Date.now();
     const { decision, adjustedFlags } = resolveDelivery({
       providerId: provider.id,
@@ -282,6 +381,7 @@ export class Advocate {
     });
 
     // Step 9: evidence goes to the transcript store, the ledger gets the reference.
+    stage('recording');
     const ledgerFlags: LedgerFlag[] = adjustedFlags.map((f) => ({
       type: f.type,
       severity: f.severity,
@@ -329,7 +429,9 @@ export class Advocate {
     }
 
     const resolveMs = Date.now() - resolveStarted;
+    stage('delivering');
     const delivered = decision.kind === 'deliver' || decision.kind === 'deliver_with_notice' ? response.content : null;
+    this.#recordDuration(provider.id, provider.model, Date.now() - askStarted);
     const result: ExchangeResult = {
       responseId,
       providerId: provider.id,
@@ -345,6 +447,7 @@ export class Advocate {
         semanticMs,
         resolveMs,
       },
+      transport: response.transport,
     };
     if (delivered === null) result.withheldContent = response.content;
     return result;

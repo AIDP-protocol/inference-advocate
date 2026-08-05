@@ -108,6 +108,7 @@ export {
 
 export {
   DeliveryPolicy,
+  type TransportPolicyConfig,
   type DeliveryPolicyDocument,
   type WindowConfig,
   type ThresholdConfig,
@@ -130,5 +131,10 @@ export { computeRates, canonicalBatch, type TelemetryBatch, type ProviderRates }
 export { TelemetryEmitter, type EmitterOptions, type EmitResult } from './telemetry/emitter.js';
 export { buildExportView, type ExportView, type ResidencyReport } from './telemetry/export.js';
 
-export { Advocate, type AdvocateOptions, type AskOptions } from './advocate.js';
+export {
+  Advocate,
+  type AdvocateOptions,
+  type AskOptions,
+  type TransportSetting,
+} from './advocate.js';
 export { openAdvocate, type SetupOptions, type OpenedAdvocate } from './setup.js';

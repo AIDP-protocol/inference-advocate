@@ -12,9 +12,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { AdvocateState, ExchangeResult, Notice } from './types';
-import { hostCall } from './host-client';
+import { askWithProgress, hostCall } from './host-client';
 import { PolicyView } from './PolicyView';
-import { WorkingIndicator } from './WorkingIndicator';
+import { SightGlass } from './SightGlass';
+import { isStageId, type StageId } from './stages';
 import { InstrumentDrawer, type DrawerTab } from './InstrumentDrawer';
 import { ProviderPicker } from './ProviderPicker';
 import { IconDeliveryPolicy, IconInferenceAdvocate, IconRuleEvaluator } from './icons';
@@ -35,7 +36,14 @@ export function App() {
   const [input, setInput] = useState('');
   const [provider, setProvider] = useState('');
   const [busy, setBusy] = useState(false);
+  const [stage, setStage] = useState<StageId | null>(null);
+  const [activity, setActivity] = useState(0);
+  const [askStartedAt, setAskStartedAt] = useState(0);
+  // Which turn just resolved, so a refusal can be seen arriving where the glass was rather than
+  // appearing as if it had always been there. Cleared when the next exchange starts.
+  const [resolvedTurn, setResolvedTurn] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [transportError, setTransportError] = useState<string | null>(null);
   const [view, setView] = useState<View>('chat');
   const [detailFor, setDetailFor] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -86,20 +94,28 @@ export function App() {
     setInput('');
     setTurns((t) => [...t, { role: 'user', text }]);
     setBusy(true);
+    setStage(null);
+    setActivity(0);
+    setAskStartedAt(Date.now());
+    setResolvedTurn(null);
     setError(null);
     try {
-      const body = (await hostCall('ask', { providerId: provider, text })) as {
-        result?: ExchangeResult;
-        error?: string;
-      };
+      const body = (await askWithProgress(provider, text, {
+        onStage: (next) => setStage(isStageId(next) ? next : null),
+        onArrival: setActivity,
+      })) as { result?: ExchangeResult; error?: string };
       if (body.error || !body.result) throw new Error(body.error ?? 'no result');
       const result = body.result;
+      // The glass does not fade into text. It is replaced, and the turn it is replaced by is
+      // marked so that a withheld or refused outcome is seen taking its place.
       setTurns((t) => [...t, { role: 'assistant', text: result.delivered ?? '', result }]);
+      setResolvedTurn(result.responseId);
       await refresh();
     } catch (e) {
       setError(String(e));
     } finally {
       setBusy(false);
+      setActivity(0);
     }
   }
 
@@ -137,6 +153,19 @@ export function App() {
       await refresh();
     } catch (e) {
       setError(String(e));
+    }
+  }
+
+  async function setWithholdUnverified(withhold: boolean) {
+    setTransportError(null);
+    try {
+      const body = (await hostCall('transport.set', {
+        withholdUnverifiedContent: withhold,
+      })) as { ok: boolean; reason?: string };
+      if (!body.ok) setTransportError(body.reason ?? 'this setting cannot be changed here');
+      await refresh();
+    } catch (e) {
+      setTransportError(String(e));
     }
   }
 
@@ -284,6 +313,7 @@ export function App() {
                         }
                         onRelease={(actor) => void release(turn.result!, actor)}
                         taxonomy={state?.taxonomy.flags ?? []}
+                        resolved={resolvedTurn === turn.result.responseId}
                       />
                     ) : (
                       <div key={i} className="turn-assistant">
@@ -292,7 +322,17 @@ export function App() {
                     ),
                   )}
 
-                  {busy && <WorkingIndicator />}
+                  {busy && (
+                    <SightGlass
+                      stage={stage}
+                      activity={activity}
+                      startedAt={askStartedAt}
+                      held={state?.transport.withholdUnverifiedContent ?? false}
+                      typicalMs={
+                        state?.providers.find((p) => p.id === provider)?.typicalMs ?? null
+                      }
+                    />
+                  )}
                   {error && <div className="error">{error}</div>}
                   {blocked && !error && turns.length === 0 && <p className="empty">{blocked}</p>}
                 </div>
@@ -336,7 +376,13 @@ export function App() {
             </div>
           )}
 
-          {view === 'policy' && <PolicyView state={state} />}
+          {view === 'policy' && (
+            <PolicyView
+              state={state}
+              onWithholdUnverified={(withhold) => void setWithholdUnverified(withhold)}
+              transportError={transportError}
+            />
+          )}
         </div>
       </div>
 
@@ -363,8 +409,10 @@ function AssistantTurn(props: {
   onToggle: () => void;
   onRelease: (actor: 'self' | 'custodian') => void;
   taxonomy: Array<{ type: string; definition: string }>;
+  /** True for the turn that just replaced the sight glass, so the outcome is seen arriving. */
+  resolved: boolean;
 }) {
-  const { result, text, open, onToggle, onRelease, taxonomy } = props;
+  const { result, text, open, onToggle, onRelease, taxonomy, resolved } = props;
   const kind = result.decision.kind;
   const flagCount = result.semantic.flags.length;
   const whyLabel = `${open ? 'hide' : 'why'} (${flagCount} flag${flagCount === 1 ? '' : 's'}, score ${result.decision.score})`;
@@ -379,7 +427,7 @@ function AssistantTurn(props: {
       : [];
 
   return (
-    <div className="turn-assistant">
+    <div className={`turn-assistant ${resolved ? 'resolved-in' : ''}`}>
       {kind === 'withhold' && (
         <div className="withheld">
           <p className="withheld-body">

@@ -15,6 +15,7 @@ import { join } from 'node:path';
 import {
   ProviderRegistry,
   type ExchangeResult,
+  type ExchangeStage,
   type OpenedAdvocate,
 } from '@airp/core';
 import { openAdvocate } from '@airp/store-sqlite';
@@ -31,6 +32,15 @@ export interface HostPaths {
 export interface PinnedNotice {
   notice: ExchangeResult['decision']['notices'][number];
   raisedAt: string;
+}
+
+/**
+ * Hooks the HTTP daemon uses to drive the delivery indicator while an exchange runs. A stage
+ * name and a scalar: see progress.ts for why this is the entire surface.
+ */
+export interface AskHooks {
+  onStage?: (stage: ExchangeStage) => void;
+  onArrival?: (activity: number) => void;
 }
 
 /**
@@ -77,6 +87,8 @@ export async function dispatchHostMethod(
       return host.newSession();
     case 'attestations.set':
       return host.setIsAdult(Boolean(params['isAdult']));
+    case 'transport.set':
+      return host.setWithholdUnverifiedContent(Boolean(params['withholdUnverifiedContent']));
     case 'reputation.reset': {
       const providerId = params['providerId'];
       return host.resetReputation(
@@ -147,6 +159,9 @@ export class HostSession {
         id: p.id,
         label: p.label,
         model: p.model,
+        // For the held-transport indicator: this client's own history with this model, or null
+        // where there is not enough of it to call anything typical.
+        typicalMs: this.opened.advocate.typicalDurationMs(p.id, p.model),
         registerEntryId: p.registerEntryId ?? null,
         standing: this.opened.advocate.standingFor(p),
         windowScore,
@@ -178,6 +193,7 @@ export class HostSession {
         issuer: attestations.issuer ?? 'unverified-local-assertion',
       },
       effectiveThresholds: thresholds,
+      transport: this.opened.advocate.transportSetting,
       jurisdiction: this.opened.jurisdiction.ruleset,
       pendingProvisions: this.opened.jurisdiction.pendingProvisions(),
       policy: this.opened.policy.document,
@@ -216,8 +232,13 @@ export class HostSession {
     };
   }
 
-  async ask(providerId: string, text: string) {
-    const result = await this.opened.advocate.ask({ providerId, text });
+  async ask(providerId: string, text: string, hooks: AskHooks = {}) {
+    const result = await this.opened.advocate.ask({
+      providerId,
+      text,
+      ...(hooks.onStage ? { onStage: hooks.onStage } : {}),
+      ...(hooks.onArrival ? { onArrival: hooks.onArrival } : {}),
+    });
     const at = new Date().toISOString();
     for (const notice of result.decision.notices) {
       if (!this.pinned.some((p) => p.notice.id === notice.id)) {
@@ -260,6 +281,14 @@ export class HostSession {
         !attestations.isAdult,
       ),
     };
+  }
+
+  /**
+   * The transport choice. A locked setting is reported back unchanged with the reason, so the UI
+   * can render the control disabled with an attribution rather than making it disappear.
+   */
+  setWithholdUnverifiedContent(withhold: boolean) {
+    return this.opened.advocate.setWithholdUnverifiedContent(withhold);
   }
 
   /**

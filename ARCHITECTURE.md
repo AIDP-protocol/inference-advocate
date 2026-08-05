@@ -88,14 +88,28 @@ and carries the AIRP additions in headers an unmodified server ignores: `AIRP-Ex
 answers, and its
 responses arrive unsealed, which is a finding rather than an error. That is the migration path.
 
-**Deferral is fully blocking.** Nothing streams to the user before evaluation completes. The
-provisional discloses pipelined evaluation against a stream as an alternative embodiment. A
-reference implementation should demonstrate the primary claim, not the optimization, and a
-response that has already been rendered cannot be withheld. The public mock providers can
-emit `text/event-stream` with a terminal-seal event when asked (`stream: true`), and
-`deploy/verify-public-stream.mjs` proves that path through Apache. The advocate adapter
-still requests non-streamed completions and evaluates only after the full response is in
-hand.
+**Deferral is fully blocking, and the transport is a separate question from the gate.** Nothing
+reaches the user before evaluation completes. The provisional discloses pipelined evaluation
+against a stream as an alternative embodiment. A reference implementation should demonstrate the
+primary claim, not the optimization, and a response that has already been rendered cannot be
+withheld. What changed is the transport: the client requests `stream: true` by default, reads
+the event stream as it arrives, and accumulates under the binding the register entry names
+(`core/src/monitor/content-bindings.ts`), while delivery stays blocked until step 12. The only
+thing that leaves the accumulator during a stream is a decaying arrival scalar
+(`core/src/interchange/arrival.ts`) with no content, no count and no offset in it.
+
+**Both transport modes are permanent and neither is a fallback.** `TransportMode` is
+`streamed` or `non_streamed`, selected per exchange, and the response content-type decides
+which path actually runs, so a provider that ignores the flag still works. Streamed transport
+buys an arrival indicator and costs a window in which accumulated content sits in the client
+process while the gate holds it. Non-streamed closes that window, because plaintext does not
+exist on the device until the whole response has arrived, and costs the indicator. Where the
+user sets their own delivery policy there is nothing to defend against and streamed is better;
+where the party subject to the policy is not the party who set it, non-streamed is stronger.
+The client also declines to request a stream where the selected register entry names a binding
+it does not hold, or names none while sealing, because §3.8.3 requires the member of providers
+serving streamed responses and substituting a different extraction would change the octets a
+seal covers. `deploy/verify-public-stream.mjs` proves the streamed path through Apache.
 
 **Evidence spans live in the transcript store, not the ledger.** This falls out of the paper
 rather than being invented for the code. Section 5 says telemetry carries no evidence spans,

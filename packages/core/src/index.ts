@@ -48,6 +48,12 @@ export { sha512 } from './crypto/sha512.js';
 export * from './interchange/wire.js';
 export { parseJsonNoDuplicates, DuplicateJsonMemberError } from './interchange/json-strict.js';
 export { send, resolveApiKey, ProviderError, type SendOptions } from './interchange/openai-adapter.js';
+export {
+  ArrivalActivity,
+  ARRIVAL_BUMP,
+  ARRIVAL_HALF_LIFE_MS,
+  ARRIVAL_SAMPLE_MS,
+} from './interchange/arrival.js';
 export { ProviderRegistry, type ProvidersFile } from './interchange/providers.js';
 
 export {
@@ -74,6 +80,7 @@ export {
   SSE_CHAT_DELTA_V1,
   SSE_CONTENT_BLOCK_DELTA_V1,
   parseSseStream,
+  SseStreamParser,
   type ContentBinding,
   type StreamSealEvent,
 } from './monitor/content-bindings.js';

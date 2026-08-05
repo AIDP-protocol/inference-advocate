@@ -27,6 +27,7 @@ import type {
   Message,
   ProviderConfig,
   StandingState,
+  TransportMode,
 } from './types.js';
 import type { StoreBackend } from './store/port.js';
 import { MasterSecret } from './crypto/keys.js';
@@ -35,10 +36,14 @@ import { LedgerStore } from './store/ledger.js';
 import { PreferenceStore } from './store/preferences.js';
 import { ProviderRegistry } from './interchange/providers.js';
 import { send as sendToProvider } from './interchange/openai-adapter.js';
-import { ServingRegister, computeKeySetDigest } from './monitor/register.js';
+import { ServingRegister, computeKeySetDigest, type RegisterEntry } from './monitor/register.js';
 import { runDeterministicPass } from './monitor/deterministic.js';
 import { lookupAirpBinding } from './monitor/dns-binding.js';
-import { defaultContentBindings } from './monitor/content-bindings.js';
+import {
+  SSE_CHAT_DELTA_V1,
+  defaultContentBindings,
+  type ContentBinding,
+} from './monitor/content-bindings.js';
 import { SemanticMonitor } from './monitor/semantic.js';
 import { DeliveryPolicy } from './policy/config.js';
 import { Jurisdiction } from './policy/jurisdiction.js';
@@ -70,6 +75,16 @@ export interface AskOptions {
   text: string;
   sessionId?: string;
   systemPrompt?: string;
+  /**
+   * Transport for this exchange, defaulting to streamed. Downgraded to non-streamed where the
+   * octets a seal would cover could not be reconstructed. See #streamBindingFor.
+   */
+  transport?: TransportMode;
+  /**
+   * Arrival signal while a streamed body is in flight. A decaying scalar and nothing else:
+   * accumulated text does not cross this callback and neither does a count of anything.
+   */
+  onArrival?: (activity: number) => void;
 }
 
 export class Advocate {
@@ -91,6 +106,30 @@ export class Advocate {
 
   #now(): Date {
     return this.#opts.now ? this.#opts.now() : new Date();
+  }
+
+  /**
+   * The binding a stream from this entry could be accumulated under, or undefined to mean the
+   * client should not ask for a stream at all. Spec §3.8.3.
+   *
+   * Where the entry names a binding, it has to be that one. Extracting the same stream a
+   * different way changes the octets the seal covers, so an entry naming a binding this client
+   * does not hold is a reason not to stream rather than a reason to substitute: the
+   * unattributed finding stays available for a provider that streams anyway.
+   *
+   * An entry that names none while sealing is the same situation. §3.8.3 requires the member of
+   * providers serving streamed responses, so a registered provider without it has not told the
+   * client how to reconstruct what it signs, and the client asks for a whole body instead.
+   *
+   * With no register entry at all there is nothing to attribute and no seal to reconstruct, so
+   * the adapter's own wire format is the binding. That exchange is reported as unsealed and
+   * unattributed either way, and the finding that says so does not depend on how the text was
+   * extracted for display.
+   */
+  #streamBindingFor(entry: RegisterEntry | undefined): ContentBinding | undefined {
+    if (!entry) return SSE_CHAT_DELTA_V1;
+    if (!entry.contentBinding) return undefined;
+    return defaultContentBindings.get(entry.contentBinding);
   }
 
   get sessionId(): string {
@@ -154,10 +193,24 @@ export class Advocate {
       ? [{ role: 'system', content: opts.systemPrompt }, ...history]
       : history;
 
+    // The register entry is resolved before the request goes out, because whether a stream can
+    // be verified at all depends on the binding that entry names.
+    const configuredEntry = provider.registerEntryId
+      ? this.#opts.register.entry(provider.registerEntryId)
+      : undefined;
+    const streamBinding =
+      (opts.transport ?? 'streamed') === 'streamed'
+        ? this.#streamBindingFor(configuredEntry)
+        : undefined;
+    const transport: TransportMode = streamBinding ? 'streamed' : 'non_streamed';
+
     const providerStarted = Date.now();
     const response = await sendToProvider(provider, {
       messages,
       attestations: this.#opts.attestations,
+      transport,
+      ...(streamBinding ? { contentBinding: streamBinding } : {}),
+      ...(opts.onArrival ? { onArrival: opts.onArrival } : {}),
       ...(this.#opts.fetchImpl ? { fetchImpl: this.#opts.fetchImpl } : {}),
     });
     const providerMs = Date.now() - providerStarted;
@@ -165,9 +218,6 @@ export class Advocate {
     // Step 7: deterministic pass. DNS may confirm the entry and its key set; absence leaves
     // the attribution unconfirmed rather than refused. Spec §4.7 / §6.3.
     const deterministicStarted = Date.now();
-    const configuredEntry = provider.registerEntryId
-      ? this.#opts.register.entry(provider.registerEntryId)
-      : undefined;
     let effectiveProvider = provider;
     const passOpts: Parameters<typeof runDeterministicPass>[3] = {};
 
@@ -189,6 +239,7 @@ export class Advocate {
     } else if (configuredEntry?.contentBinding && !defaultContentBindings.has(configuredEntry.contentBinding)) {
       passOpts.unknownContentBinding = true;
     }
+    if (response.contentAfterTerminalSeal) passOpts.contentAfterTerminalSeal = true;
 
     const deterministic = runDeterministicPass(
       effectiveProvider,

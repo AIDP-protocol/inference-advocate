@@ -194,3 +194,36 @@ export function parseSseStream(raw: string): StreamSealEvent[] {
   }
   return events;
 }
+
+/**
+ * Incremental front end to parseSseStream, for a body read as it arrives. Spec §3.8.3.
+ *
+ * This finds event boundaries in a growing buffer and hands whole blocks to parseSseStream,
+ * which stays the single definition of how an event is read. Reimplementing the field parsing
+ * here would let the streamed path and the whole-body path drift on what an event is, and a
+ * disagreement about that is a disagreement about which octets a seal covers.
+ */
+export class SseStreamParser {
+  #pending = '';
+
+  /** Feed a decoded text chunk. Returns the events that chunk completed, in served order. */
+  push(text: string): StreamSealEvent[] {
+    this.#pending += text.replace(/\r\n/g, '\n');
+    const events: StreamSealEvent[] = [];
+    for (;;) {
+      const boundary = this.#pending.indexOf('\n\n');
+      if (boundary < 0) break;
+      const block = this.#pending.slice(0, boundary);
+      this.#pending = this.#pending.slice(boundary + 2);
+      events.push(...parseSseStream(block));
+    }
+    return events;
+  }
+
+  /** A final block that arrived without its terminating blank line. */
+  flush(): StreamSealEvent[] {
+    const rest = this.#pending;
+    this.#pending = '';
+    return rest.trim() ? parseSseStream(rest) : [];
+  }
+}

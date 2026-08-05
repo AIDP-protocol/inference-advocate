@@ -160,7 +160,7 @@ export function runDeterministicPass(
   if (response.multipleSeals) {
     findings.push({
       code: 'seal_multiple',
-      detail: 'response carried more than one AIRP-Seal header field',
+      detail: 'response carried more than one seal: an AIRP-Seal header field or a terminal-seal event repeated',
       refuses: true,
     });
   }

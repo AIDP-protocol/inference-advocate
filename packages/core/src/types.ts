@@ -69,6 +69,18 @@ export interface ProvenanceSeal {
 /** Header field that carried the seal. Selects the payload reconstruction path. Spec §7.1. */
 export type SealHeaderField = 'airp-seal';
 
+/**
+ * How the response body was carried. Spec §3.8.2 (non-streamed) and §3.8.3 (streamed).
+ *
+ * Both modes are permanent and both are tested. `streamed` buys an arrival indicator and
+ * costs a window in which accumulated content sits in this process while the gate holds it.
+ * `non_streamed` closes that window, because plaintext does not exist on the device until the
+ * whole response has arrived, and costs the indicator. Where the user sets their own delivery
+ * policy there is nothing to defend against and streamed is better; where the party subject
+ * to the policy is not the party who set it, non-streamed is the stronger of the two.
+ */
+export type TransportMode = 'streamed' | 'non_streamed';
+
 /** What the adapter hands back from a provider call. Paper step 6. Spec §3.8. */
 export interface ProviderResponse {
   providerId: string;
@@ -101,6 +113,13 @@ export interface ProviderResponse {
   receivedAt: string;
   /** Raw latency in milliseconds, for the UI. */
   latencyMs: number;
+  /** Which transport actually carried the body, decided by the response content-type. */
+  transport: TransportMode;
+  /**
+   * Streamed path only: a data event arrived after the terminal-seal event, so unsigned bytes
+   * were served under a sealed response. Refusing at step 7. Spec §3.8.3.
+   */
+  contentAfterTerminalSeal?: boolean;
   /**
    * DNS / key-set confirmation qualifier. Spec §4.8 / §6.3. Distinct from findings: an
    * attribution without a confirming digest must still be distinguishable in reporting.

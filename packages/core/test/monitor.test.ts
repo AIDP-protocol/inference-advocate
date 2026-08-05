@@ -197,6 +197,7 @@ const baseResponse = (over: Partial<ProviderResponse> = {}): ProviderResponse =>
     servedFrom: 'http://127.0.0.1:8811/v1/chat/completions',
     receivedAt: '2026-07-28T00:00:00.000Z',
     latencyMs: 1,
+    transport: 'non_streamed',
     sealFieldName: 'airp-seal',
     exchangeId: EXCHANGE,
     requestDigest: DIGEST,

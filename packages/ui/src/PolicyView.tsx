@@ -10,14 +10,18 @@ import { useEffect, useState } from 'react';
 import type { AdvocateState } from './types';
 import { hostCall } from './host-client';
 import { TransportSetting } from './TransportSetting';
+import { ThemeSetting } from './ThemeSetting';
+import type { ThemePreference } from './theme';
 import { IconDeliveryPolicy, IconJurisdiction, IconTaxonomy } from './icons';
 
 export function PolicyView(props: {
   state: AdvocateState | null;
+  theme: ThemePreference;
+  onThemeChange: (next: ThemePreference) => void;
   onWithholdUnverified: (withhold: boolean) => void;
   transportError: string | null;
 }) {
-  const { state, onWithholdUnverified, transportError } = props;
+  const { state, theme, onThemeChange, onWithholdUnverified, transportError } = props;
   const [markdown, setMarkdown] = useState<string>('');
 
   useEffect(() => {
@@ -48,6 +52,8 @@ export function PolicyView(props: {
             for the screen. If the policy is wrong, it is wrong in both places at once.
           </p>
         </div>
+
+        <ThemeSetting value={theme} onChange={onThemeChange} />
 
         {state && (
           <div className="fact-chips">

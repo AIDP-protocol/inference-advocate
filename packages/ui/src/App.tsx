@@ -10,12 +10,26 @@
 //
 // Layout and styling from reference/Inference Advocate Client.dc.html.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { AdvocateState, ExchangeResult, Notice } from './types';
 import { askWithProgress, hostCall } from './host-client';
 import { PolicyView } from './PolicyView';
-import { SightGlass } from './SightGlass';
+import { ComposeGlass, ExchangeTrail } from './ExchangeTrail';
+import { ComposeActivity, isComposeWordBoundary } from './compose-activity';
 import { isStageId, type StageId } from './stages';
+import {
+  emptyTrail,
+  trailAfterResult,
+  trailAfterStage,
+  trailIsHalted,
+  type TrailMarks,
+} from './trail-state';
+import {
+  applyTheme,
+  readThemePreference,
+  writeThemePreference,
+  type ThemePreference,
+} from './theme';
 import { InstrumentDrawer, type DrawerTab } from './InstrumentDrawer';
 import { ProviderPicker } from './ProviderPicker';
 import { IconDeliveryPolicy, IconInferenceAdvocate, IconRuleEvaluator } from './icons';
@@ -24,6 +38,8 @@ interface Turn {
   role: 'user' | 'assistant';
   text: string;
   result?: ExchangeResult;
+  /** Settled status trail for this assistant turn, when the exchange finished. */
+  trail?: TrailMarks;
 }
 
 type View = 'chat' | 'policy';
@@ -38,11 +54,18 @@ export function App() {
   const [busy, setBusy] = useState(false);
   const [stage, setStage] = useState<StageId | null>(null);
   const [activity, setActivity] = useState(0);
-  const [askStartedAt, setAskStartedAt] = useState(0);
-  // Which turn just resolved, so a refusal can be seen arriving where the glass was rather than
+  const [trail, setTrail] = useState<TrailMarks>(() => emptyTrail());
+  const [composeActivity, setComposeActivity] = useState(0);
+  const composeEngine = useRef(new ComposeActivity());
+  const transcriptRef = useRef<HTMLDivElement | null>(null);
+  const liveExchangeRef = useRef<HTMLDivElement | null>(null);
+  const responseStartRef = useRef<HTMLDivElement | null>(null);
+  // Which turn just resolved, so a refusal can be seen arriving where the trail was rather than
   // appearing as if it had always been there. Cleared when the next exchange starts.
   const [resolvedTurn, setResolvedTurn] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  /** Prompt that failed mid-exchange, so Retry can re-ask without a second user bubble. */
+  const [failedAsk, setFailedAsk] = useState<{ providerId: string; text: string } | null>(null);
   const [transportError, setTransportError] = useState<string | null>(null);
   const [view, setView] = useState<View>('chat');
   const [detailFor, setDetailFor] = useState<string | null>(null);
@@ -52,6 +75,7 @@ export function App() {
   const [narrow, setNarrow] = useState(
     () => (typeof window !== 'undefined' ? window.innerWidth < NARROW_BP : false),
   );
+  const [theme, setTheme] = useState<ThemePreference>(() => readThemePreference());
 
   const refresh = useCallback(async () => {
     const next = (await hostCall('state')) as AdvocateState;
@@ -69,6 +93,61 @@ export function App() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  useEffect(() => {
+    applyTheme(theme);
+    if (theme !== 'system' || typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return;
+    }
+    const query = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = () => applyTheme('system');
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, [theme]);
+
+  // Compose activity decays between keystrokes the same way arrival decays between chunks.
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      const next = composeEngine.current.value();
+      setComposeActivity((prev) => (prev === next ? prev : next));
+    }, 90);
+    return () => window.clearInterval(id);
+  }, []);
+
+  // User just sent: scroll the new user turn to the top of the pane so the status trail under
+  // it is readable rather than clipped under the composer.
+  useEffect(() => {
+    if (!busy) return;
+    const id = window.requestAnimationFrame(() => {
+      const scroller = transcriptRef.current;
+      if (scroller) scroller.scrollTop = scroller.scrollHeight;
+      liveExchangeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [busy]);
+
+  // Response arrived: pin the start of that turn in view (not the bottom of a long body).
+  useEffect(() => {
+    if (!resolvedTurn) return;
+    const id = window.requestAnimationFrame(() => {
+      responseStartRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    return () => window.cancelAnimationFrame(id);
+  }, [resolvedTurn]);
+
+  const bumpCompose = useCallback(
+    (kind: 'char' | 'word' | 'paste', pasteText = '') => {
+      if (busy) return;
+      const next =
+        kind === 'paste'
+          ? composeEngine.current.observePaste(pasteText)
+          : kind === 'word'
+            ? composeEngine.current.observeWord()
+            : composeEngine.current.observeChar();
+      setComposeActivity(next);
+    },
+    [busy],
+  );
+
   const pinnedNotices: Notice[] = useMemo(
     () => (state?.pinned ?? []).map((p) => p.notice),
     [state],
@@ -84,39 +163,76 @@ export function App() {
         ? 'Choose a provider.'
         : null;
 
-  async function send() {
+  async function send(opts?: { text?: string; providerId?: string; appendUser?: boolean }) {
     if (blocked) {
       setError(blocked);
       return;
     }
-    if (!input.trim() || busy) return;
-    const text = input.trim();
-    setInput('');
-    setTurns((t) => [...t, { role: 'user', text }]);
+    const text = (opts?.text ?? input).trim();
+    const providerId = opts?.providerId ?? provider;
+    const appendUser = opts?.appendUser !== false;
+    if (!text || busy) return;
+    if (!opts?.text) {
+      setInput('');
+      composeEngine.current.reset();
+      setComposeActivity(0);
+    }
+    if (appendUser) setTurns((t) => [...t, { role: 'user', text }]);
     setBusy(true);
     setStage(null);
     setActivity(0);
-    setAskStartedAt(Date.now());
+    setTrail(emptyTrail());
     setResolvedTurn(null);
     setError(null);
+    setFailedAsk(null);
+    let liveTrail = emptyTrail();
     try {
-      const body = (await askWithProgress(provider, text, {
-        onStage: (next) => setStage(isStageId(next) ? next : null),
+      const body = (await askWithProgress(providerId, text, {
+        onStage: (next) => {
+          if (!isStageId(next)) {
+            setStage(null);
+            return;
+          }
+          setStage(next);
+          liveTrail = trailAfterStage(liveTrail, next);
+          setTrail(liveTrail);
+        },
         onArrival: setActivity,
       })) as { result?: ExchangeResult; error?: string };
       if (body.error || !body.result) throw new Error(body.error ?? 'no result');
       const result = body.result;
-      // The glass does not fade into text. It is replaced, and the turn it is replaced by is
+      const settled = trailAfterResult(liveTrail, result);
+      // The trail does not fade into text. It is replaced, and the turn it is replaced by is
       // marked so that a withheld or refused outcome is seen taking its place.
-      setTurns((t) => [...t, { role: 'assistant', text: result.delivered ?? '', result }]);
+      setTurns((t) => [
+        ...t,
+        { role: 'assistant', text: result.delivered ?? '', result, trail: settled },
+      ]);
+      setTrail(settled);
       setResolvedTurn(result.responseId);
+      setFailedAsk(null);
       await refresh();
     } catch (e) {
-      setError(String(e));
+      const raw = String(e);
+      setError(raw);
+      setFailedAsk({ providerId, text });
     } finally {
       setBusy(false);
       setActivity(0);
+      setStage(null);
     }
+  }
+
+  function retryFailedAsk() {
+    if (!failedAsk || busy) return;
+    void send({ text: failedAsk.text, providerId: failedAsk.providerId, appendUser: false });
+  }
+
+  function formatAskError(message: string): string {
+    if (/429|Too Many Requests/i.test(message)) {
+      return `Evaluator rate-limited (429). Wait a moment, then retry. (${message})`;
+    }
+    return message;
   }
 
   async function release(result: ExchangeResult, actor: 'self' | 'custodian') {
@@ -141,6 +257,8 @@ export function App() {
     await hostCall('session.new');
     setTurns([]);
     setDetailFor(null);
+    setError(null);
+    setFailedAsk(null);
     setView('chat');
     await refresh();
   }
@@ -275,7 +393,7 @@ export function App() {
 
           {view === 'chat' && (
             <div className="chat-pane">
-              <div className="transcript-scroller">
+              <div className="transcript-scroller" ref={transcriptRef}>
                 <div className="transcript-col">
                   {pinnedNotices.length > 0 && (
                     <section className="pinned-notices" aria-label="Pinned notices">
@@ -297,24 +415,39 @@ export function App() {
 
                   {turns.map((turn, i) =>
                     turn.role === 'user' ? (
-                      <div key={i} className="turn-user">
+                      <div
+                        key={i}
+                        className="turn-user"
+                        ref={
+                          busy && i === turns.length - 1 ? liveExchangeRef : undefined
+                        }
+                      >
                         <div className="bubble-user">{turn.text}</div>
                       </div>
                     ) : turn.result ? (
-                      <AssistantTurn
+                      <div
                         key={i}
-                        result={turn.result}
-                        text={turn.text}
-                        open={detailFor === turn.result.responseId}
-                        onToggle={() =>
-                          setDetailFor((d) =>
-                            d === turn.result!.responseId ? null : turn.result!.responseId,
-                          )
+                        className="turn-response"
+                        ref={
+                          resolvedTurn === turn.result.responseId ? responseStartRef : undefined
                         }
-                        onRelease={(actor) => void release(turn.result!, actor)}
-                        taxonomy={state?.taxonomy.flags ?? []}
-                        resolved={resolvedTurn === turn.result.responseId}
-                      />
+                      >
+                        <AssistantTurn
+                          result={turn.result}
+                          text={turn.text}
+                          trail={turn.trail}
+                          open={detailFor === turn.result.responseId}
+                          onToggle={() =>
+                            setDetailFor((d) =>
+                              d === turn.result!.responseId ? null : turn.result!.responseId,
+                            )
+                          }
+                          onRelease={(actor) => void release(turn.result!, actor)}
+                          taxonomy={state?.taxonomy.flags ?? []}
+                          resolved={resolvedTurn === turn.result.responseId}
+                          heldTransport={state?.transport.withholdUnverifiedContent ?? false}
+                        />
+                      </div>
                     ) : (
                       <div key={i} className="turn-assistant">
                         <p className="assistant-body">{turn.text}</p>
@@ -323,17 +456,31 @@ export function App() {
                   )}
 
                   {busy && (
-                    <SightGlass
-                      stage={stage}
-                      activity={activity}
-                      startedAt={askStartedAt}
-                      held={state?.transport.withholdUnverifiedContent ?? false}
-                      typicalMs={
-                        state?.providers.find((p) => p.id === provider)?.typicalMs ?? null
-                      }
-                    />
+                    <div className="exchange-live">
+                      <ExchangeTrail
+                        marks={trail}
+                        stage={stage}
+                        activity={activity}
+                        held={state?.transport.withholdUnverifiedContent ?? false}
+                        settled={false}
+                      />
+                    </div>
                   )}
-                  {error && <div className="error">{error}</div>}
+                  {error && (
+                    <div className="error">
+                      <span className="error-message">{formatAskError(error)}</span>
+                      {failedAsk && (
+                        <button
+                          type="button"
+                          className="btn-release secondary"
+                          disabled={busy}
+                          onClick={() => retryFailedAsk()}
+                        >
+                          Retry
+                        </button>
+                      )}
+                    </div>
+                  )}
                   {blocked && !error && turns.length === 0 && <p className="empty">{blocked}</p>}
                 </div>
               </div>
@@ -341,6 +488,7 @@ export function App() {
               <div className="composer-wrap">
                 <div className="composer-col">
                   <div className="composer">
+                    <ComposeGlass activity={composeActivity} idle={busy} />
                     <textarea
                       value={input}
                       placeholder="Type a message"
@@ -350,7 +498,19 @@ export function App() {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
                           void send();
+                          return;
                         }
+                        if (e.key === 'Backspace' || e.key === 'Delete') {
+                          bumpCompose('char');
+                          return;
+                        }
+                        if (e.key.length === 1) {
+                          bumpCompose(isComposeWordBoundary(e.key) ? 'word' : 'char');
+                        }
+                      }}
+                      onPaste={(e) => {
+                        const text = e.clipboardData?.getData('text') ?? '';
+                        bumpCompose('paste', text);
                       }}
                     />
                     <ProviderPicker
@@ -379,6 +539,11 @@ export function App() {
           {view === 'policy' && (
             <PolicyView
               state={state}
+              theme={theme}
+              onThemeChange={(next) => {
+                setTheme(next);
+                writeThemePreference(next);
+              }}
               onWithholdUnverified={(withhold) => void setWithholdUnverified(withhold)}
               transportError={transportError}
             />
@@ -405,14 +570,17 @@ export function App() {
 function AssistantTurn(props: {
   result: ExchangeResult;
   text: string;
+  trail?: TrailMarks;
   open: boolean;
   onToggle: () => void;
   onRelease: (actor: 'self' | 'custodian') => void;
   taxonomy: Array<{ type: string; definition: string }>;
-  /** True for the turn that just replaced the sight glass, so the outcome is seen arriving. */
+  /** True for the turn that just replaced the status trail, so the outcome is seen arriving. */
   resolved: boolean;
+  heldTransport: boolean;
 }) {
-  const { result, text, open, onToggle, onRelease, taxonomy, resolved } = props;
+  const { result, text, trail, open, onToggle, onRelease, taxonomy, resolved, heldTransport } =
+    props;
   const kind = result.decision.kind;
   const flagCount = result.semantic.flags.length;
   const whyLabel = `${open ? 'hide' : 'why'} (${flagCount} flag${flagCount === 1 ? '' : 's'}, score ${result.decision.score})`;
@@ -420,6 +588,7 @@ function AssistantTurn(props: {
   const showSelf = authority === 'self_release';
   const showCustodian = authority === 'self_release' || authority === 'custodial_release';
   const showRelease = kind === 'withhold' && authority && authority !== 'non_releasable' && authority !== 'escalating';
+  const halted = trail ? trailIsHalted(trail) : kind === 'withhold' || kind === 'refuse';
 
   const deliveryNotices =
     kind === 'deliver_with_notice'
@@ -428,6 +597,17 @@ function AssistantTurn(props: {
 
   return (
     <div className={`turn-assistant ${resolved ? 'resolved-in' : ''}`}>
+      {trail && (
+        <ExchangeTrail
+          marks={trail}
+          stage={null}
+          activity={0}
+          held={heldTransport || result.transport === 'non_streamed'}
+          settled
+          forceExpanded={halted}
+        />
+      )}
+
       {kind === 'withhold' && (
         <div className="withheld">
           <p className="withheld-body">

@@ -20,6 +20,20 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('airp-theme');
+          var dark =
+            t === 'dark' ||
+            (t !== 'light' &&
+              window.matchMedia &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+          document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

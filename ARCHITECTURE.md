@@ -67,7 +67,7 @@ it is discussed below.
 | 9 | the ledger | `core/src/store/ledger.ts`, `core/src/store/port.ts`, adapter: `store-sqlite` |
 | 10 | the score | `core/src/policy/score.ts`, `core/src/policy/config.ts` |
 | 11 | the resolution | `core/src/policy/delivery.ts`, `core/src/policy/jurisdiction.ts` |
-| 12 | delivery, with pinned notices | `core/src/policy/notices.ts`, `ui/src/App.tsx`, `ui/src/SightGlass.tsx`, host: `daemon/src/host.ts` |
+| 12 | delivery, with pinned notices | `core/src/policy/notices.ts`, `ui/src/App.tsx`, `ui/src/ExchangeTrail.tsx`, host: `daemon/src/host.ts` |
 | 13, 14 | telemetry as rates, standing consumed back into step 10 | `core/src/telemetry/rates.ts`, `emitter.ts`, `standing.ts`, `export.ts` |
 
 The provisional patent application's four mechanisms map on top of the same files:
@@ -112,14 +112,24 @@ serving streamed responses and substituting a different extraction would change 
 seal covers. `deploy/verify-public-stream.mjs` proves the streamed path through Apache.
 
 **The wait is a design problem, not a user education problem.** A delivery gate experienced only
-as slowness reads as a defect, and defects get disabled, so `ui/src/SightGlass.tsx` shows that
-data is arriving without showing what is arriving: a fuel pump sight glass, driven by the arrival
-scalar, with the stage of the running check in an `aria-live` region beside it. Presentation is
-out of scope per §1.1, so that file carries the full argument and states plainly that these are
-the reference implementation's choices rather than requirements. No minimum duration is imposed,
+as slowness reads as a defect, and defects get disabled, so `ui/src/ExchangeTrail.tsx` shows an
+accreting status trail (send through deliver) bound to the real gate stages, with a shared motion
+swatch driven by the arrival scalar while content is streaming, a wandering dot when transport is
+held, and an escapement while checks run. Settled stages shrink to dots; a halt stays expanded on
+the stopped mark. The composer uses the same bubble vocabulary in reverse, driven by composing
+activity (key rate today), so outbound and inbound motion teach the same idea. Presentation is
+out of scope per §1.1, so those files carry the argument and state plainly that these are the
+reference implementation's choices rather than requirements. No minimum duration is imposed,
 because padding the wait so the animation gets seen would make diligence feel slower than
-negligence. The stage names come from `ExchangeStage` in the core and there is one label per
-stage that actually runs.
+negligence. The stage names come from `ExchangeStage` in the core; the trail compresses them into
+six marks without inventing work the pipeline did not do.
+
+**Shell appearance is light or warm dark.** The client shell tokens live under `:root` and
+`[data-theme="dark"]` in `ui/src/styles.css`. Dark is deliberately not near-black: nearly
+neutral gray with a whisper of warmth (hue ~55, chroma ~0.004), so it does not read brown or
+olive. Preference is System / Light / Dark under Settings, stored in `localStorage` as
+`airp-theme`, and applied before first paint. The instrument drawer stays its own cool dark
+panel and does not flip with the shell.
 
 **The hold is a conformance property, not a cryptographic one.** Response text is not in the
 document before release: not blurred, clipped or faded, absent, because the only thing the
@@ -244,6 +254,11 @@ The batch format is defined, and the granularity floor and the traffic-class den
 implemented, because those two are properties of computing the rate honestly rather than of
 defending it.
 
+**Compose activity is key-driven only.** The outbound sight glass varies with keystroke and
+paste rate. There is no microphone or speech-to-text path feeding the same scalar yet, so
+voice composition does not move the bubbles. The decay engine is shared in spirit with arrival
+activity so that wiring can land later without changing the visual contract.
+
 **Pre-seals.** draft-flores-airp-provenance §3.6 defines a pre-seal payload alongside the
 terminal one, and `canonicalAirpPresealPayload` builds it byte for byte, ending after
 `signed-at` with no content. Nothing in this build signs or verifies one. The SSE parser
@@ -255,17 +270,16 @@ wired up.
 **Progress frames on the desktop RPC bridge.** The browser-tab path gets stage and arrival frames
 because `daemon/src/server.ts` can stream an NDJSON response. The desktop shell reaches
 `HostSession` over the loopback RPC bridge in `daemon/src/host-rpc.ts`, which answers requests and
-does not carry notifications, so the delivery indicator there has no arrival signal to read and
-falls back to the held-transport presentation of elapsed time. That is a gap in the bridge. The
-alternative would have been a timer-driven animation that reads as arrival, which is a small lie
-in the one product where that is expensive.
+does not carry notifications, so the status trail there has no arrival signal to drive the
+bubble field and uses the wandering-dot wait presentation instead. That is a gap in the bridge.
+The alternative would have been a timer-driven animation that reads as arrival, which is a small
+lie in the one product where that is expensive.
 
-**Calibrated typical durations.** The held-transport indicator quotes the median of this client's
-own last twenty exchanges with that provider and model, kept in the preference store, and shows
-nothing until there are three of them. It is labeled as a typical duration rather than as a
-prediction about the response in flight, because that is all it is: no per-prompt estimate, no
-model of response length, and no accounting for a hosted evaluator being slower on one exchange
-than another.
+**Calibrated typical durations.** The preference store still keeps the median of this client's
+own last twenty exchanges with that provider and model (nothing until there are three). The
+status trail no longer quotes that median as a wait estimate: the design forbids implying a time
+the client does not have for the response in flight. The figure remains available to other
+surfaces that need a historical typical, not a prediction.
 
 **DNS deployment.** draft-flores-airp-provenance §4.7 puts entry selection on `_airp` TXT
 records beneath the provider identity domain, with a key set digest (`k`) confirming the

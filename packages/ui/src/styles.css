@@ -1090,9 +1090,12 @@ button.session-item:not(.active):hover {
   transform: translate(var(--bubble-freeze-x, 10px), var(--bubble-freeze-y, 6px));
 }
 
-/* Hidden but still animating: raising density reveals chips already in flight. */
+/* Hidden but still animating: raising density reveals chips already in flight.
+   Use visibility, not opacity: the keyframes also drive opacity, and WebKit (Safari)
+   often keeps chips invisible after opacity: 0 !important is removed. Outbound chips
+   never use this class, which is why compose bubbles could work when inbound did not. */
 .trail-bubble-latent {
-  opacity: 0 !important;
+  visibility: hidden;
 }
 
 /* Inbound: left to right (content arriving). */

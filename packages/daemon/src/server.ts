@@ -73,15 +73,24 @@ async function askWithProgress(
     'content-type': 'application/x-ndjson; charset=utf-8',
     'cache-control': 'no-store',
     'access-control-allow-origin': '*',
+    // Hints for proxies and WebKit: do not gather progress frames until the ask ends.
+    'x-accel-buffering': 'no',
   });
+  const writeFrame = (line: string): void => {
+    res.write(line);
+    // Node's compression middleware exposes flush(); raw responses ignore it. Call when
+    // present so a future filter cannot reintroduce mid-ask buffering.
+    const flushable = res as ServerResponse & { flush?: () => void };
+    flushable.flush?.();
+  };
   try {
     const result = await host.ask(body.providerId, body.text, {
-      onStage: (stage) => res.write(encodeProgressFrame({ kind: 'stage', stage })),
-      onArrival: (activity) => res.write(encodeProgressFrame({ kind: 'arrival', activity })),
+      onStage: (stage) => writeFrame(encodeProgressFrame({ kind: 'stage', stage })),
+      onArrival: (activity) => writeFrame(encodeProgressFrame({ kind: 'arrival', activity })),
     });
-    res.write(`${JSON.stringify({ kind: 'result', ...result })}\n`);
+    writeFrame(`${JSON.stringify({ kind: 'result', ...result })}\n`);
   } catch (err) {
-    res.write(`${JSON.stringify({ kind: 'error', error: (err as Error).message })}\n`);
+    writeFrame(`${JSON.stringify({ kind: 'error', error: (err as Error).message })}\n`);
   }
   res.end();
 }

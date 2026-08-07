@@ -1,10 +1,11 @@
 // Accumulating status trail: settled stages as dots, one live (or halted) full mark.
 //
 // Paper: steps 3 through 12. Settled marks shrink back to 4px dots so the row stays compact.
-// Hover widens that slot to the right and crossfades the glyph in, so neighbors part instead of
-// stacking. The trail sits on its own row with horizontal room; vertical footprint stays fixed
-// so the transcript does not reflow. Nothing after a stop is shown: a halt has not decided the
-// later stages, so pending dots past it would be a lie.
+// The latest finished mark stays a full glyph (and while a stage is active or stopped, that
+// mark is the glyph). Hover widens earlier dots to the right and crossfades their glyphs, so
+// neighbors part instead of stacking. Vertical footprint stays fixed so the transcript does
+// not reflow. Nothing after a stop is shown: a halt has not decided the later stages, so
+// pending dots past it would be a lie.
 
 import { StageMark } from './StageMark';
 import {
@@ -21,8 +22,11 @@ export function StatusTrail(props: {
 }) {
   const { marks, reducedMotion = false } = props;
 
-  const settled: Array<{ index: number; stage: TrailStage; state: 'done' | 'skipped' }> = [];
-  let current: { stage: TrailStage; state: 'active' | 'stopped' } | null = null;
+  const settled: Array<{ stage: TrailStage; state: 'done' | 'skipped' }> = [];
+  let current: {
+    stage: TrailStage;
+    state: 'active' | 'stopped' | 'done' | 'skipped';
+  } | null = null;
   const pending: TrailStage[] = [];
   let halted = false;
   let pastCurrent = false;
@@ -31,7 +35,7 @@ export function StatusTrail(props: {
     const stage = TRAIL_STAGES[i]!;
     const state = (marks[i] ?? 'pending') as MarkState;
     if (state === 'done' || state === 'skipped') {
-      settled.push({ index: i, stage, state });
+      settled.push({ stage, state });
       continue;
     }
     if (state === 'active' || state === 'stopped') {
@@ -43,6 +47,12 @@ export function StatusTrail(props: {
     // pending
     if (halted) continue;
     if (pastCurrent || !current) pending.push(stage);
+  }
+
+  // A completed trail is all `done`, with no active mark. Keep the last finished stage as the
+  // full glyph so the row is not six identical dots.
+  if (!current && settled.length > 0) {
+    current = settled.pop()!;
   }
 
   // Before the first stage event, every mark is pending: show the full pending row.
@@ -70,6 +80,7 @@ export function StatusTrail(props: {
           className={`status-trail-slot status-trail-current${
             reducedMotion ? '' : ' status-trail-mark-in'
           }`}
+          title={markTitle(current.stage, current.state)}
         >
           <StageMark stage={current.stage} state={current.state} reducedMotion={reducedMotion} />
         </div>

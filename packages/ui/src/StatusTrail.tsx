@@ -1,10 +1,11 @@
 // Accumulating status trail: settled stages as dots, one live (or halted) full mark.
 //
-// Paper: steps 3 through 12. Settled marks shrink back to 4px dots so the row does not grow into
-// six icons. Hover restores the glyph. Nothing after a stop is shown: a halt has not decided the
+// Paper: steps 3 through 12. Settled marks shrink back to 4px dots so the row stays compact.
+// Hover widens that slot to the right and crossfades the glyph in, so neighbors part instead of
+// stacking. The trail sits on its own row with horizontal room; vertical footprint stays fixed
+// so the transcript does not reflow. Nothing after a stop is shown: a halt has not decided the
 // later stages, so pending dots past it would be a lie.
 
-import { useState } from 'react';
 import { StageMark } from './StageMark';
 import {
   TRAIL_STAGES,
@@ -19,7 +20,6 @@ export function StatusTrail(props: {
   reducedMotion?: boolean;
 }) {
   const { marks, reducedMotion = false } = props;
-  const [hover, setHover] = useState<number>(-1);
 
   const settled: Array<{ index: number; stage: TrailStage; state: 'done' | 'skipped' }> = [];
   let current: { stage: TrailStage; state: 'active' | 'stopped' } | null = null;
@@ -53,26 +53,14 @@ export function StatusTrail(props: {
     <div className="status-trail" aria-hidden="true">
       {settled.map((m) => {
         const title = markTitle(m.stage, m.state);
-        // Layout stays at the 4px dot footprint. The revealed mark is absolutely positioned so
-        // hover cannot widen the trail, grow the transcript, or kick a scrollbar that shifts
-        // the centered chat column.
         return (
-          <div
-            key={m.stage}
-            className="status-trail-settled"
-            onMouseEnter={() => setHover(m.index)}
-            onMouseLeave={() => setHover(-1)}
-            title={title}
-          >
-            {hover === m.index ? (
-              <StageMark stage={m.stage} state={m.state} reducedMotion={reducedMotion} />
-            ) : (
-              <span
-                className={`status-trail-dot status-trail-dot-${m.state}${
-                  reducedMotion ? '' : ' status-trail-dot-in'
-                }`}
-              />
-            )}
+          <div key={m.stage} className="status-trail-settled" title={title}>
+            <span
+              className={`status-trail-dot status-trail-dot-${m.state}${
+                reducedMotion ? '' : ' status-trail-dot-in'
+              }`}
+            />
+            <StageMark stage={m.stage} state={m.state} reducedMotion={reducedMotion} />
           </div>
         );
       })}

@@ -29,6 +29,7 @@
     "mocks": "npm run build --workspace @airp/demo && node packages/demo/dist/mock-servers.js",
     "mocks:public": "npm run build --workspace @airp/demo && node packages/demo/dist/public-mock-servers.js",
     "doctor": "npm run build --workspace @airp/core && npm run build --workspace @airp/store-sqlite && npm run build --workspace @airp/daemon && node packages/daemon/dist/doctor.js",
+    "key-set-digest": "npm run build --workspace @airp/core && node tools/key-set-digest.mjs",
     "deploy:airp-sites": "bash deploy/setup-airp-sites.sh"
   },
   "devDependencies": {

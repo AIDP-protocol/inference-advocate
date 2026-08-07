@@ -44,6 +44,16 @@ if (evaluatorEnv) {
   line('  that path exists', existsSync(evaluatorEnv) ? 'yes' : 'NO, the advocate will fall back to the rule evaluator');
 }
 line('AIRP_JURISDICTION', process.env['AIRP_JURISDICTION'] ?? 'not set, the daemon defaults to us-ny');
+const registerDocEnv = process.env['AIRP_REGISTER_DOCUMENT'];
+line(
+  'AIRP_REGISTER_DOCUMENT',
+  registerDocEnv
+    ? registerDocEnv
+    : 'not set, data/register/serving-register.json',
+);
+if (registerDocEnv) {
+  line('  that path exists', existsSync(registerDocEnv) ? 'yes' : 'NO');
+}
 for (const name of Object.keys(process.env).filter((k) => k.startsWith('AIRP_') && k.endsWith('_API_KEY'))) {
   line(name, process.env[name] ? 'set' : 'empty');
 }

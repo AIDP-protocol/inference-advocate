@@ -1,0 +1,120 @@
+{
+  "airpRegisterVersion": "1",
+  "issuedAt": "2026-08-06T14:31:33.001Z",
+  "registrar": {
+    "id": "demo-registrar",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAo5LqGJ4KMaIsrcIFk6tpQDVAX7WLfbAtZrsURQZ+OPo=\n-----END PUBLIC KEY-----\n"
+  },
+  "entries": [
+    {
+      "id": "demo.aligned",
+      "providerIdentity": "Aligned Reference Models (demo)",
+      "status": "active",
+      "authorizedEndpoints": [
+        "http://127.0.0.1:8811/v1"
+      ],
+      "models": [
+        "aligned-1"
+      ],
+      "keys": [
+        {
+          "selector": "s1",
+          "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAI1T3iYV22FOiohf8uYVJUhG3fULOAEoH26D42qICF+Q=\n-----END PUBLIC KEY-----\n",
+          "status": "current"
+        }
+      ],
+      "sealPolicy": "all"
+    },
+    {
+      "id": "demo.companion",
+      "providerIdentity": "Companion Labs (demo)",
+      "status": "active",
+      "authorizedEndpoints": [
+        "http://127.0.0.1:8812/v1"
+      ],
+      "models": [
+        "companion-1"
+      ],
+      "keys": [
+        {
+          "selector": "s1",
+          "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAGWgUp2rmKBKbS1KicHPKP7hgVCIWbfXbyEGz4i71yVk=\n-----END PUBLIC KEY-----\n",
+          "status": "current"
+        }
+      ],
+      "sealPolicy": "all"
+    },
+    {
+      "id": "demo.legacy",
+      "providerIdentity": "Legacy Serving Co (demo, seals nothing)",
+      "status": "active",
+      "authorizedEndpoints": [
+        "http://127.0.0.1:8813/v1"
+      ],
+      "models": [
+        "legacy-1"
+      ],
+      "keys": [],
+      "sealPolicy": "none"
+    },
+    {
+      "id": "demo.excluded",
+      "providerIdentity": "Excluded Serving Co (demo)",
+      "status": "active",
+      "authorizedEndpoints": [
+        "http://127.0.0.1:8814/v1"
+      ],
+      "models": [
+        "excluded-1"
+      ],
+      "keys": [],
+      "sealPolicy": "none"
+    },
+    {
+      "id": "honestmodel.win.entry",
+      "providerIdentity": "honestmodel.win",
+      "status": "active",
+      "authorizedEndpoints": [
+        "https://api.honestmodel.win/v1"
+      ],
+      "models": [
+        "honestmodel-1"
+      ],
+      "keys": [
+        {
+          "selector": "s1",
+          "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAVljT0VNEgsu2iPO2eWMooz50yjEHJGWrif2SgG0ybyw=\n-----END PUBLIC KEY-----\n",
+          "status": "current"
+        }
+      ],
+      "sealPolicy": "all",
+      "contentBinding": "sse-chat-delta-v1",
+      "identityDomain": "honestmodel.win"
+    },
+    {
+      "id": "cheapai.win.entry",
+      "providerIdentity": "cheapai.win",
+      "status": "active",
+      "authorizedEndpoints": [
+        "https://api.cheapai.win/v1"
+      ],
+      "models": [
+        "cheapai-1"
+      ],
+      "keys": [
+        {
+          "selector": "s1",
+          "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAz7mh83gHPycCRfhGSvAbGyFT2nPfNyMaGJxu7GA1BlY=\n-----END PUBLIC KEY-----\n",
+          "status": "current"
+        }
+      ],
+      "sealPolicy": "all",
+      "contentBinding": "sse-chat-delta-v1",
+      "identityDomain": "cheapai.win"
+    }
+  ],
+  "_airpFixture": {
+    "purpose": "key-set-digest-mismatch",
+    "note": "Valid registrar signature, substituted keys on honestmodel.win.entry. Client must refuse on key_set_digest_mismatch, not signature failure."
+  }
+}

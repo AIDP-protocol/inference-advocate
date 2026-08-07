@@ -484,7 +484,9 @@ button.session-item:not(.active):hover {
 .transcript-scroller {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
   padding: 22px 20px;
   display: flex;
   justify-content: center;
@@ -837,6 +839,8 @@ button.session-item:not(.active):hover {
   display: flex;
   align-items: center;
   gap: 10px;
+  /* Match the live mark so a row of settled dots does not grow when one is inspected. */
+  min-height: 16px;
 }
 
 .exchange-trail-meta {
@@ -896,12 +900,30 @@ button.session-item:not(.active):hover {
   place-items: center;
   width: 16px;
   height: 16px;
+  flex: none;
 }
 
-.status-trail-dot-hit {
+/* Settled dots keep a 4px layout box. Hover reveals the glyph without reflow. */
+.status-trail-settled {
+  position: relative;
+  display: grid;
+  place-items: center;
   width: 4px;
   height: 4px;
+  flex: none;
+  padding: 6px;
+  margin: -6px;
+  box-sizing: content-box;
   cursor: default;
+}
+
+.status-trail-settled .stage-mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .status-trail-dot {

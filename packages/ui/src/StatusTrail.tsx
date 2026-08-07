@@ -53,30 +53,26 @@ export function StatusTrail(props: {
     <div className="status-trail" aria-hidden="true">
       {settled.map((m) => {
         const title = markTitle(m.stage, m.state);
-        if (hover === m.index) {
-          return (
-            <div
-              key={m.stage}
-              className="status-trail-slot status-trail-hover"
-              onMouseLeave={() => setHover(-1)}
-              title={title}
-            >
-              <StageMark stage={m.stage} state={m.state} reducedMotion={reducedMotion} />
-            </div>
-          );
-        }
+        // Layout stays at the 4px dot footprint. The revealed mark is absolutely positioned so
+        // hover cannot widen the trail, grow the transcript, or kick a scrollbar that shifts
+        // the centered chat column.
         return (
           <div
             key={m.stage}
-            className="status-trail-slot status-trail-dot-hit"
+            className="status-trail-settled"
             onMouseEnter={() => setHover(m.index)}
+            onMouseLeave={() => setHover(-1)}
             title={title}
           >
-            <span
-              className={`status-trail-dot status-trail-dot-${m.state}${
-                reducedMotion ? '' : ' status-trail-dot-in'
-              }`}
-            />
+            {hover === m.index ? (
+              <StageMark stage={m.stage} state={m.state} reducedMotion={reducedMotion} />
+            ) : (
+              <span
+                className={`status-trail-dot status-trail-dot-${m.state}${
+                  reducedMotion ? '' : ' status-trail-dot-in'
+                }`}
+              />
+            )}
           </div>
         );
       })}

@@ -35,6 +35,14 @@ export interface SetupOptions {
   store: StoreBackend;
   /** Path to the providers file. Keys are read from named environment variables. */
   providersPath?: string;
+  /**
+   * Override the serving register document path. Defaults to
+   * `<dataDir>/register/serving-register.json`. Used to select the substituted-keys
+   * fixture for a live key set digest mismatch demo. Spec §4.8.
+   */
+  registerDocumentPath?: string;
+  /** Detached signature for registerDocumentPath. Defaults beside the document as `.sig`. */
+  registerSignaturePath?: string;
   jurisdictionId?: string;
   attestations?: AttestationPackage;
   /** An evaluator instance, if you are constructing one yourself. Wins over evaluatorPath. */
@@ -74,13 +82,27 @@ export function openAdvocate(opts: SetupOptions): OpenedAdvocate {
   const taxonomy = Taxonomy.loadFromFile(join(d, 'taxonomy', 'flags.v0.json'));
   const policy = DeliveryPolicy.loadFromFile(join(d, 'policy', 'delivery-policy.json'));
 
+  const registerDocumentPath =
+    opts.registerDocumentPath ??
+    process.env['AIRP_REGISTER_DOCUMENT'] ??
+    join(d, 'register', 'serving-register.json');
+  const registerSignaturePath =
+    opts.registerSignaturePath ??
+    process.env['AIRP_REGISTER_SIGNATURE'] ??
+    registerDocumentPath.replace(/\.json$/, '.sig');
   const register = ServingRegister.loadFromFiles(
-    join(d, 'register', 'serving-register.json'),
-    join(d, 'register', 'serving-register.sig'),
+    registerDocumentPath,
+    registerSignaturePath,
     join(d, 'register', 'registrar-public.pem'),
   );
   if (!register.signatureValid) {
     warnings.push('the serving register document did not verify against the pinned registrar key');
+  }
+  if (basename(registerDocumentPath) !== 'serving-register.json') {
+    warnings.push(
+      `loading alternate register document ${basename(registerDocumentPath)} ` +
+        '(not the live serving-register.json). Spec §4.8 mismatch demos use this path.',
+    );
   }
 
   let standing = StandingRegistry.empty();

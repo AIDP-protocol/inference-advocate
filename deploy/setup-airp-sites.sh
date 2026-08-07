@@ -275,6 +275,9 @@ print_verification_curls() {
   echo
   log 'CAA reminder (Cloudflare, not applied by this script):'
   echo '  Add CAA records 0 issue "letsencrypt.org" on airegister.uk, honestmodel.win, and cheapai.win.'
+  echo
+  log 'key set digests (paste into Cloudflare; this script does not edit DNS)'
+  (cd "$ROOT" && "$NPM_BIN" run build --workspace @airp/core >/dev/null && "$NODE_BIN" "$ROOT/tools/key-set-digest.mjs")
 }
 
 main() {

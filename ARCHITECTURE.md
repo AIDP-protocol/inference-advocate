@@ -23,7 +23,8 @@ packages/ui            React chat surface. Product chrome is ordinary chat; the 
 packages/desktop       Tauri shell (HostSession in the Node launcher over loopback RPC, no HTTP for the core API)
 packages/demo          mock providers and the scripted end-to-end scenario
 data/                  taxonomy, policy, jurisdictions, register, standing: documents, not code
-tools/                 demo key minting and additive public-entry re-sign
+tools/                 demo key minting, additive public-entry re-sign, key set digests,
+                       substituted-keys register fixture
 deploy/                idempotent Apache/TLS/PM2 setup for the public AIRP domains
 ```
 
@@ -286,10 +287,15 @@ records beneath the provider identity domain, with a key set digest (`k`) confir
 selected entry. The reference client parses those records, refuses unsafe `r` auto-fetch
 targets, and computes the key set digest. Public demo DNS and Apache publish
 `honestmodel.win` / `cheapai.win` bindings and serve the register at the `r=` URL
-(`deploy/`), including a detached `.sig` alongside the document. The client still loads a
-local signed register file rather than fetching `r` over HTTPS with `maxAge` caching, and
-DNS `k` is not published yet. Entries without `identityDomain` (the `demo.*` fixtures behind
-`tryairp.com`) stay unconfirmed by DNS.
+(`deploy/`), including a detached `.sig` alongside the document. `npm run key-set-digest`
+prints the ready-to-paste TXT lines (including `k`) from the deployed register. The client
+still loads a local signed register file rather than fetching `r` over HTTPS with `maxAge`
+caching. Entries without `identityDomain` (the `demo.*` fixtures behind `tryairp.com`) stay
+unconfirmed by DNS. A negative fixture at
+`data/register/serving-register.substituted-keys.json` (also served under
+`/airp/register.substituted-keys.json`) carries a valid registrar signature with substituted
+keys on `honestmodel.win.entry`; load it via `AIRP_REGISTER_DOCUMENT` to demo refusal on
+`key_set_digest_mismatch` rather than signature failure.
 
 **Real thresholds.** Every number in `data/policy/delivery-policy.json` is demonstration scale
 and labeled as such in three places. Calibration is an open question in the paper and it stays

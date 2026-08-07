@@ -37,6 +37,8 @@ that daemon.
 ```
 /airp/register.json      ->  data/register/serving-register.json
 /airp/register.json.sig  ->  data/register/serving-register.sig
+/airp/register.substituted-keys.json      ->  data/register/serving-register.substituted-keys.json
+/airp/register.substituted-keys.json.sig  ->  data/register/serving-register.substituted-keys.sig
 ```
 
 The document is served out of the repository so a re-minted register cannot drift
@@ -44,10 +46,27 @@ from what Apache publishes. The `.sig` suffix is the detached-signature location
 intended for draft `-01`; the current draft does not yet define where a detached
 signature lives when a document is fetched from an `r=` URL.
 
+The substituted-keys document verifies against the same pinned registrar key but
+replaces the sealing key on `honestmodel.win.entry`. Point the daemon at it with
+`AIRP_REGISTER_DOCUMENT` / `AIRP_REGISTER_SIGNATURE` (or the matching
+`registerDocumentPath` setup options) to show a live `key_set_digest_mismatch`
+refusal. Regenerate with `node tools/build-substituted-keys-register.mjs`.
+
 **The reference client still loads the register from local storage.** Publishing
 these URLs makes the DNS `r=` tag resolve to a real document. Nothing in this
 repository fetches that URL yet. HTTPS fetch with `maxAge` caching is separate
 work.
+
+## Key set digest (`k` tag)
+
+```bash
+npm run key-set-digest
+```
+
+Prints the §4.8 digests for every entry with `identityDomain` and the full
+`_airp` TXT lines ready to paste into Cloudflare. TTL 300. This script does not
+edit DNS. Re-run after any key change so the published value stays regenerable
+from the register rather than a number someone once wrote down.
 
 ## Mock providers
 

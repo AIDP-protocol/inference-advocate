@@ -94,8 +94,9 @@ export function endpointMatches(registeredBase: string, contactedUrl: string): b
  * Status is outside the digest. Use the PEM body bytes, do not re-encode from a parsed key.
  */
 export function computeKeySetDigest(entry: RegisterEntry): string {
+  // Ascending byte order of the selector, not locale collation and not insertion order.
   const sorted = [...entry.keys].sort((a, b) =>
-    a.selector < b.selector ? -1 : a.selector > b.selector ? 1 : 0,
+    Buffer.compare(Buffer.from(a.selector, 'utf8'), Buffer.from(b.selector, 'utf8')),
   );
   let material = '';
   for (const key of sorted) {

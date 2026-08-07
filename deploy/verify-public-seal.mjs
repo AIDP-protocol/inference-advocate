@@ -2,7 +2,9 @@
 // Non-streamed acceptance test: seal verifies through Apache to api.honestmodel.win,
 // endpoint authorization passes against the public URL, and identityDomain engages DNS.
 //
-// Streaming proof is a separate follow-up once the mock gains an SSE path.
+// Explicitly requests non_streamed transport. send() defaults to streamed, and this entry
+// names a content binding; without the flag the call refuses before it reaches the wire.
+// Streaming proof is deploy/verify-public-stream.mjs.
 
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -53,6 +55,7 @@ console.log(`DNS binding OK: e=${dns.binding.entryId}`);
 
 const response = await send(provider, {
   messages: [{ role: 'user', content: 'ping' }],
+  transport: 'non_streamed',
   timeoutMs: 30_000,
 });
 

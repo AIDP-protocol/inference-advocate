@@ -1,0 +1,21 @@
+{
+  "id": "fixture.keyset",
+  "providerIdentity": "Key Set Digest Fixture",
+  "status": "active",
+  "authorizedEndpoints": [],
+  "models": [],
+  "sealPolicy": "all",
+  "keys": [
+    {
+      "selector": "k2",
+      "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAEJ9zX9sgQ/6hIV8nua7h0LOtjrrN2qQ32hc9e6xndRE=\n-----END PUBLIC KEY-----\n",
+      "status": "current"
+    },
+    {
+      "selector": "k1",
+      "publicKeyPem": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAWZ5jQ12AhnoJvz5cpGpMHkt/hqK/4gvpXerLDYdxrng=\n-----END PUBLIC KEY-----\n",
+      "status": "current"
+    }
+  ],
+  "expectedDigest": "UVIoiaQv3sD80OPFaP39BG7mm0pe0GC350UE2K4DSBA"
+}
